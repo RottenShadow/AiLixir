@@ -1,0 +1,25 @@
+part of 'auth_cubit.dart';
+
+@immutable
+sealed class AuthState {}
+
+final class AuthInitial extends AuthState {}
+
+final class AuthLoading extends AuthState {}
+
+final class AuthShowToastState extends AuthState {
+  final String msg;
+  AuthShowToastState({required this.msg});
+}
+
+final class AuthSuccess extends AuthShowToastState {
+  AuthSuccess({required super.msg});
+}
+
+final class AuthError extends AuthShowToastState {
+  AuthError({required super.msg});
+}
+
+final class AuthForceLogout extends AuthShowToastState {
+  AuthForceLogout({required super.msg});
+}
