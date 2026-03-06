@@ -1,3 +1,4 @@
+import 'package:ailixir/features/home/presentation/views/scientist_credits_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/custom_photo_view.dart';
@@ -16,6 +17,11 @@ abstract class AppRouter {
       GoRoute(
         path: HomeView.routeName,
         builder: (context, state) => const HomeView(),
+      ),
+      // Scientist Credits
+      GoRoute(
+        path: ScientistCreditView.routeName,
+        builder: (context, state) => const ScientistCreditView(),
       ),
 
       // Splash & Onboarding

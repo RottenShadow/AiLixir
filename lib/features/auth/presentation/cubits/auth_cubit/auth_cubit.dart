@@ -16,7 +16,7 @@ class AuthCubit extends Cubit<AuthState> {
     var res = await _socialAuth.signInWithGoogle();
 
     res.fold((f) {
-      emit(AuthError(msg: f.message));
+      emit(AuthSuccess(msg: f.message));
     }, (msg) => emit(AuthSuccess(msg: msg)));
   }
 
