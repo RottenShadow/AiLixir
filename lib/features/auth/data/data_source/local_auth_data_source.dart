@@ -19,10 +19,11 @@ class LocalAuthDataSource {
       profilePicture: authLoginSuccessModel.user.avatar,
       bio: authLoginSuccessModel.user.bio,
     );
-    await saveUserTokens(
-      token: authLoginSuccessModel.token,
-      refreshToken: authLoginSuccessModel.refreshToken,
-    );
+    await updateUserAccessToken(token: authLoginSuccessModel.token);
+    // await saveUserTokens(
+    //   token: authLoginSuccessModel.token,
+    //   // refreshToken: authLoginSuccessModel.refreshToken,
+    // );
   }
 
   Future<void> saveUserData({
@@ -53,25 +54,25 @@ class LocalAuthDataSource {
     return await secureStorage.readValue(key: AppConstants.accessTokenKey);
   }
 
-  Future<String?> getUserRefreshToken() async {
-    return await secureStorage.readValue(
-      key: AppConstants.refreshAccessTokenKey,
-    );
-  }
+  // Future<String?> getUserRefreshToken() async {
+  //   return await secureStorage.readValue(
+  //     key: AppConstants.refreshAccessTokenKey,
+  //   );
+  // }
 
-  Future<void> saveUserTokens({
-    required String token,
-    required String refreshToken,
-  }) async {
-    await secureStorage.writeValue(
-      key: AppConstants.accessTokenKey,
-      value: token,
-    );
-    await secureStorage.writeValue(
-      key: AppConstants.refreshAccessTokenKey,
-      value: refreshToken,
-    );
-  }
+  // Future<void> saveUserTokens({
+  //   required String token,
+  //   required String refreshToken,
+  // }) async {
+  //   await secureStorage.writeValue(
+  //     key: AppConstants.accessTokenKey,
+  //     value: token,
+  //   );
+  //   await secureStorage.writeValue(
+  //     key: AppConstants.refreshAccessTokenKey,
+  //     value: refreshToken,
+  //   );
+  // }
 
   Future<void> updateUserAccessToken({required String token}) async {
     await secureStorage.writeValue(
