@@ -1,3 +1,4 @@
+import 'package:ailixir/features/home/presentation/views/awards_view.dart';
 import 'package:ailixir/features/home/presentation/views/scientist_credits_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
@@ -23,7 +24,13 @@ abstract class AppRouter {
         path: ScientistCreditView.routeName,
         builder: (context, state) => const ScientistCreditView(),
       ),
-
+      // Awards
+      GoRoute(
+        path: AwardsView.routeName,
+        builder: (context, state) {
+          return AwardsView(query: state.extra as String);
+        },
+      ),
       // Splash & Onboarding
       GoRoute(
         path: SplashView.routeName,

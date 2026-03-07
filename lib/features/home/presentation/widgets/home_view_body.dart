@@ -1,4 +1,5 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
+import 'package:ailixir/features/home/presentation/views/awards_view.dart';
 import 'package:ailixir/features/home/presentation/views/scientist_credits_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -96,11 +97,17 @@ class HomeSidebar extends StatelessWidget {
           _navItem(Icons.folder_open_outlined, 'My Projects'),
           _navItem(Icons.hub_outlined, 'Neural Models'),
           const Spacer(),
+          // _navItem(
+          //   Icons.diversity_3,
+          //   "Top Scientists",
+          //   context: context,
+          //   navRoute: ScientistCreditView.routeName,
+          // ),
           _navItem(
-            Icons.diversity_3,
-            "Esteemed Scientists",
+            Icons.grade_sharp,
+            "Awards",
             context: context,
-            navRoute: ScientistCreditView.routeName,
+            navRoute: AwardsView.routeName,
           ),
           _navItem(Icons.settings_outlined, 'Settings'),
           _navItem(Icons.logout, 'Sign Out', color: AppColors.red400),
@@ -144,7 +151,7 @@ class HomeSidebar extends StatelessWidget {
         ),
         onTap: () {
           if (context != null && navRoute != null) {
-            context.navigateTo(navRoute);
+            context.navigateTo(navRoute, arguments: "");
           }
         },
         shape: RoundedRectangleBorder(
