@@ -1,38 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import '../cubits/molecular_lab_cubit.dart';
 import '../widgets/molstar_web_viewer.dart';
 
-class MolecularLabView extends StatefulWidget {
+class MolecularLabView extends StatelessWidget {
   const MolecularLabView({super.key});
 
   @override
-  State<MolecularLabView> createState() => _MolecularLabViewState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => MolecularLabCubit(),
+      child: const MolecularLabViewBody(),
+    );
+  }
 }
 
-class _MolecularLabViewState extends State<MolecularLabView> {
+class MolecularLabViewBody extends StatefulWidget {
+  const MolecularLabViewBody({super.key});
+
+  @override
+  State<MolecularLabViewBody> createState() => _MolecularLabViewBodyState();
+}
+
+class _MolecularLabViewBodyState extends State<MolecularLabViewBody> {
   final TextEditingController _pdbCtrl = TextEditingController();
-  String? _activePdbId;
 
   // Quick-access sample structures
   static const _samples = [
-    _Sample('7BV2', 'SARS-CoV-2 Spike', Icons.coronavirus),
-    _Sample('1CRN', 'Crambin', Icons.grain),
+    _Sample('4WKQ', 'EGFR kinase + Gefitinib (Lung cancer)', Icons.coronavirus),
     _Sample('4HHB', 'Haemoglobin', Icons.water_drop),
+    _Sample('1CRN', 'Crambin', Icons.grain),
+    _Sample('7BV2', 'SARS-CoV-2 Spike', Icons.coronavirus),
     _Sample('6VXX', 'COVID-19 S protein', Icons.biotech),
   ];
-
-  void _load(String pdb) {
-    final id = pdb.trim().toUpperCase();
-    if (id.isEmpty) return;
-    setState(() => _activePdbId = id);
-  }
 
   @override
   void dispose() {
     _pdbCtrl.dispose();
     super.dispose();
+  }
+
+  void _load(String pdb) {
+    context.read<MolecularLabCubit>().loadPdb(pdb);
   }
 
   @override
@@ -42,21 +54,42 @@ class _MolecularLabViewState extends State<MolecularLabView> {
       child: Column(
         children: [
           // ── Top toolbar ──────────────────────────────────────────────────
-          _Toolbar(
-            pdbCtrl: _pdbCtrl,
-            samples: _samples,
-            activePdbId: _activePdbId,
-            onLoad: _load,
+          BlocBuilder<MolecularLabCubit, MolecularLabState>(
+            builder: (context, state) {
+              String? activePdb;
+              if (state is MolecularLabLoaded) activePdb = state.pdbId;
+
+              return _Toolbar(
+                pdbCtrl: _pdbCtrl,
+                samples: _samples,
+                activePdbId: activePdb,
+                onLoad: _load,
+              );
+            },
           ),
 
           // ── Viewer area ──────────────────────────────────────────────────
           Expanded(
-            child: _activePdbId == null
-                ? _EmptyState(samples: _samples, onTap: _load)
-                : MolstarWebViewer(
-                    key: ValueKey(_activePdbId),
-                    pdbId: _activePdbId,
-                  ),
+            child: BlocBuilder<MolecularLabCubit, MolecularLabState>(
+              buildWhen: (previous, current) =>
+                  (previous is MolecularLabInitial &&
+                      current is MolecularLabLoaded) ||
+                  (previous is MolecularLabLoaded &&
+                      current is MolecularLabInitial),
+              builder: (context, state) {
+                return Stack(
+                  children: [
+                    // The WebView viewer - initialized ONLY ONCE.
+                    // We don't use ValueKey here so it preserves state.
+                    const MolstarWebViewer(),
+
+                    // Empty state overlay (shown if no structure is loaded)
+                    if (state is MolecularLabInitial)
+                      _EmptyState(samples: _samples, onTap: _load),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -92,13 +125,11 @@ class _Toolbar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Icon + title
           Icon(Icons.science_outlined, color: AppColors.brandBlue, size: 20.sp),
           SizedBox(width: 10.w),
           Text('Molecular Lab', style: AppTextStyles.h4),
           SizedBox(width: 32.w),
 
-          // Quick-access sample chips
           ...samples.map(
             (s) => Padding(
               padding: EdgeInsets.only(right: 6.w),
@@ -112,7 +143,6 @@ class _Toolbar extends StatelessWidget {
 
           const Spacer(),
 
-          // PDB ID search field
           SizedBox(
             width: 180.w,
             height: 36.h,
@@ -120,7 +150,7 @@ class _Toolbar extends StatelessWidget {
               controller: pdbCtrl,
               style: AppTextStyles.bodysmall.copyWith(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'PDB ID (e.g. 7BV2)',
+                hintText: 'PDB ID (e.g. 4WKQ)',
                 hintStyle: AppTextStyles.bodysmall.copyWith(
                   color: AppColors.authTextSecondary,
                 ),
@@ -233,39 +263,43 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.biotech_outlined,
-            size: 72.sp,
-            color: AppColors.brandBlue.withValues(alpha: 0.2),
-          ),
-          SizedBox(height: 24.h),
-          Text('Molecular Viewer', style: AppTextStyles.h2),
-          SizedBox(height: 8.h),
-          Text(
-            'Enter a PDB ID in the toolbar or pick a sample structure below.',
-            style: AppTextStyles.bodysmall.copyWith(
-              color: AppColors.authTextSecondary,
+    return Container(
+      color: AppColors.slate1000, // Solid background to cover the viewer
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.biotech_outlined,
+              size: 72.sp,
+              color: AppColors.brandBlue.withValues(alpha: 0.2),
             ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 32.h),
-          // Sample structure grid
-          Wrap(
-            spacing: 12.w,
-            runSpacing: 10.h,
-            alignment: WrapAlignment.center,
-            children: samples
-                .map(
-                  (s) =>
-                      _EmptySampleCard(sample: s, onTap: () => onTap(s.pdbId)),
-                )
-                .toList(),
-          ),
-        ],
+            SizedBox(height: 24.h),
+            Text('Molecular Viewer', style: AppTextStyles.h2),
+            SizedBox(height: 8.h),
+            Text(
+              'Enter a PDB ID in the toolbar or pick a sample structure below.',
+              style: AppTextStyles.bodysmall.copyWith(
+                color: AppColors.authTextSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 32.h),
+            Wrap(
+              spacing: 12.w,
+              runSpacing: 10.h,
+              alignment: WrapAlignment.center,
+              children: samples
+                  .map(
+                    (s) => _EmptySampleCard(
+                      sample: s,
+                      onTap: () => onTap(s.pdbId),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -332,10 +366,6 @@ class _EmptySampleCardState extends State<_EmptySampleCard> {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Data helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _Sample {
   final String pdbId;
