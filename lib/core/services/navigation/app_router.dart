@@ -1,5 +1,5 @@
-import 'package:ailixir/features/home/presentation/views/awards_view.dart';
-import 'package:ailixir/features/home/presentation/views/scientist_credits_view.dart';
+import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
+import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/custom_photo_view.dart';

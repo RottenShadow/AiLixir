@@ -1,6 +1,5 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
-import 'package:ailixir/features/home/presentation/views/awards_view.dart';
-import 'package:ailixir/features/home/presentation/views/scientist_credits_view.dart';
+import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';

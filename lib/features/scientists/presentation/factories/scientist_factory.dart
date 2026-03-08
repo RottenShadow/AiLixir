@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:ailixir/features/home/presentation/models/scientist_model.dart';
+import 'package:ailixir/features/scientists/presentation/models/scientist_model.dart';
 
 abstract class ScientistFactory {
   static List<ScientistModel> getAwardsFromJson(String json) {

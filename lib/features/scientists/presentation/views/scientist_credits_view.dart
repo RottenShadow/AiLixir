@@ -1,4 +1,4 @@
-import 'package:ailixir/features/home/presentation/widgets/scientist_credits_view_body.dart';
+import 'package:ailixir/features/scientists/presentation/widgets/scientist_credits_view_body.dart';
 import 'package:flutter/material.dart';
 
 class ScientistCreditView extends StatelessWidget {

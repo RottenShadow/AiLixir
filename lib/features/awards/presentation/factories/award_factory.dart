@@ -1,4 +1,4 @@
-import 'package:ailixir/features/home/presentation/models/award_model.dart';
+import 'package:ailixir/features/awards/data/models/award_model.dart';
 
 abstract class AwardFactory {
   static List<AwardModel> getAwardsFromJson(Map<String, dynamic> data) {

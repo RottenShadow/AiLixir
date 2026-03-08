@@ -1,5 +1,6 @@
 import 'package:ailixir/features/auth/data/repos/social_auth_repo_impl.dart';
-import 'package:ailixir/features/home/presentation/cubits/award_cubits/award_cubit.dart';
+import 'package:ailixir/features/awards/data/repos/award_repo.dart';
+import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
@@ -51,7 +52,9 @@ void getItRegisterSingleton() {
       dioService: GetIt.I.get(),
     ),
   );
-
+  GetIt.I.registerLazySingleton<AwardRepo>(
+    () => AwardRepo(dioService: GetIt.I.get()),
+  );
   // My Cubits
 
   GetIt.I.registerLazySingleton<AuthCubit>(() => AuthCubit());

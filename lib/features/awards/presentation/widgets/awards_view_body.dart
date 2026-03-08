@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/home/presentation/cubits/award_cubits/award_cubit.dart';
-import 'package:ailixir/features/home/presentation/models/award_model.dart';
+import 'package:ailixir/features/awards/data/models/award_model.dart';
+import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
@@ -11,11 +11,11 @@ import 'package:get_it/get_it.dart';
 class AwardsViewBody extends StatelessWidget {
   final String query;
   final List<AwardModel> awards;
-  AwardsViewBody({super.key, required this.query, this.awards = const [
-          ],
-  }) {
-    GetIt.I.get<AwardsCubit>().getAwards(query);
-  }
+  const AwardsViewBody({
+    super.key,
+    required this.query,
+    this.awards = const [],
+  });
   static final List<Color> _colors = [
     Color(0xFF60a5fa), //blue
     Color(0xFFd4af37), //yellow

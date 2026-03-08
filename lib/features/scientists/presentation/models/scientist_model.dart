@@ -1,5 +1,3 @@
-import 'package:ailixir/features/home/presentation/models/award_model.dart';
-
 class ScientistModel {
   final String name;
   final int id;
