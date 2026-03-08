@@ -11,11 +11,11 @@ class AuthBackground extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       decoration: const BoxDecoration(
-        color: AppColors.authBackground,
+        color: AppColors.slate1000,
         gradient: RadialGradient(
           center: Alignment.topLeft,
           radius: 1.5,
-          colors: [Color(0xFF131A2B), AppColors.authBackground],
+          colors: [AppColors.slate900, AppColors.slate1000],
         ),
       ),
       child: Stack(

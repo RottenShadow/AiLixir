@@ -54,7 +54,7 @@ class CustomAlertDialog extends StatelessWidget {
           },
       shape: BoxShape.rectangle,
       borderRadius: BorderRadius.circular(16.r),
-      gradient: action.gradient ?? AppGradients.whiteLinearGradient,
+      gradient: action.gradient ?? AppGradients.brandBlueGradient,
       backgroundColor: action.backgroundColor,
       child: Text(
         action.text,

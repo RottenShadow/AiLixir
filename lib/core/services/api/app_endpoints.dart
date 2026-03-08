@@ -1,7 +1,7 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      'https://america-hyperlipemic-grazyna.ngrok-free.dev/api/';
+      'https://cristine-uninstanced-unforeseeably.ngrok-free.dev/api/';
 
   static const String authBaseUrl = 'auth';
 
@@ -12,7 +12,7 @@ abstract class AppEndpoints {
   static const String authResendVerificationOtp =
       '$authBaseUrl/resend-verification-otp';
   static const String authCompleteLoginOtp = '$authBaseUrl/complete-login-otp';
-  static const String authGoogle = 'user/$authBaseUrl/google/url';
+  static const String authGoogle = 'user/$authBaseUrl/google';
   static const String authFacebook = '$authBaseUrl/facebook';
   static const String authForgotPassword = '$authBaseUrl/forgotPassword';
   static const String authVerifyPasswordOtp = '$authBaseUrl/verify-otp';

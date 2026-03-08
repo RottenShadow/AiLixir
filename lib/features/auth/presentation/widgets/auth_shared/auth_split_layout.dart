@@ -21,7 +21,6 @@ class AuthSplitLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.authBackground,
       body: Row(
         children: [
           // Left Side - Visual/Marketing
