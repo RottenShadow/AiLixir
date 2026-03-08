@@ -44,6 +44,8 @@ class MyMaterialApp extends StatelessWidget {
         AppTextStyles.init(Locale(lang));
         log('Did Rebuild Full App $lang');
         return MaterialApp.router(
+          restorationScopeId:
+              "Test", // <-- Add this line to fix windows release
           routerConfig: AppRouter.router,
           debugShowCheckedModeBanner: false,
           localizationsDelegates: const [
