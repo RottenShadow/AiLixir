@@ -12,11 +12,13 @@ abstract class AppColors {
   static const Color blackShadow30 = Color(0x4E000000);
   static const Color slateZeroOpacity700 = Color(0x00334155);
   static const Color customButtonGrey = Color(0xFF565A65);
-  static const Color authBackground = Color(0xFF0B0E14);
   static const Color authCardBackground = Color(0xFF12161F);
   static const Color brandBlue = Color(0xFF1E69FF);
   static const Color brandBorder = Color(0xFF1E2430);
   static const Color authTextSecondary = Color(0xFF94A3B8);
+  static const Color logoGradientStart = Color(0xFF2775AE);
+  static const Color logoGradientMid = Color(0xFF52C1CC);
+  static const Color logoGradientEnd = Color(0xFF5BBBE2);
 
   // Generated
   static const Color white = Color(0xffffffff);
