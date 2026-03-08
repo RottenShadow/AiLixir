@@ -28,6 +28,7 @@ class JoinViewBody extends StatelessWidget {
           OutlinedButton(
             onPressed: () => context.navigateTo(SignupView.routeName),
             style: OutlinedButton.styleFrom(
+              backgroundColor: AppColors.authButtonBackground,
               minimumSize: Size(double.infinity, 56.h),
               side: const BorderSide(color: AppColors.brandBorder),
               shape: RoundedRectangleBorder(
@@ -51,7 +52,7 @@ class JoinViewBody extends StatelessWidget {
                 child: Text(
                   'OR CONTINUE WITH',
                   style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.authTextSecondary.withValues(alpha: 0.5),
+                    color: AppColors.authTextSecondary.withValues(alpha: 0.8),
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -87,6 +88,7 @@ class JoinViewBody extends StatelessWidget {
       ),
       style: OutlinedButton.styleFrom(
         padding: EdgeInsets.symmetric(vertical: 16.h),
+        backgroundColor: AppColors.authButtonBackground,
         side: const BorderSide(color: AppColors.brandBorder),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.r),

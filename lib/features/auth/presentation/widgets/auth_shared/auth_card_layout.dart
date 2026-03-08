@@ -85,7 +85,7 @@ class AuthCardLayout extends StatelessWidget {
                   width: 580.w,
                   padding: EdgeInsets.all(40.w),
                   decoration: BoxDecoration(
-                    color: AppColors.authCardBackground.withValues(alpha: 0.4),
+                    color: AppColors.cardBackground,
                     borderRadius: BorderRadius.circular(24.r),
                     border: Border.all(color: AppColors.brandBorder),
                   ),
@@ -108,32 +108,15 @@ class AuthCardLayout extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '© 2024 AILIXIR PLATFORMS INC.',
+              '© 2026 AILIXIR PLATFORM.',
               style: AppTextStyles.labelsmall.copyWith(
                 color: AppColors.authTextSecondary.withValues(alpha: 0.5),
                 letterSpacing: 1,
               ),
             ),
-            SizedBox(width: 40.w),
-            _footerLink('STATUS'),
-            SizedBox(width: 24.w),
-            _footerLink('ETHICS'),
-            SizedBox(width: 24.w),
-            _footerLink('LEGAL'),
           ],
         ),
       ],
-    );
-  }
-
-  Widget _footerLink(String text) {
-    return Text(
-      text,
-      style: AppTextStyles.labelsmall.copyWith(
-        color: AppColors.authTextSecondary,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 1,
-      ),
     );
   }
 }

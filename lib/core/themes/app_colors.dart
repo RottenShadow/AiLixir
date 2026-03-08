@@ -12,7 +12,8 @@ abstract class AppColors {
   static const Color blackShadow30 = Color(0x4E000000);
   static const Color slateZeroOpacity700 = Color(0x00334155);
   static const Color customButtonGrey = Color(0xFF565A65);
-  static const Color authCardBackground = Color(0xFF12161F);
+  static const Color cardBackground = Color(0xff1e293b);
+  static const Color authButtonBackground = Color(0xff0e1424);
   static const Color brandBlue = Color(0xFF1E69FF);
   static const Color brandBorder = Color(0xFF1E2430);
   static const Color authTextSecondary = Color(0xFF94A3B8);
