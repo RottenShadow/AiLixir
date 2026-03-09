@@ -19,6 +19,14 @@ abstract class SharedPreferencesService {
     return _instance.getBool(key) ?? defaultValue;
   }
 
+  static Future<void> setInt({required String key, required int value}) async {
+    await _instance.setInt(key, value);
+  }
+
+  static int getInt({required String key, int defaultValue = 0}) {
+    return _instance.getInt(key) ?? defaultValue;
+  }
+
   static Future<void> setString({
     required String key,
     required String value,
@@ -43,9 +51,9 @@ abstract class SharedPreferencesService {
 
   static Future<void> deleteAllUserData() async {
     await _instance.remove(AppConstants.userIdKey);
-    await _instance.remove(AppConstants.userDisplayNameKey);
-    await _instance.remove(AppConstants.userUserNameKey);
-    await _instance.remove(AppConstants.userBioKey);
+    await _instance.remove(AppConstants.userNameKey);
+    await _instance.remove(AppConstants.userEmailKey);
+    await _instance.remove(AppConstants.userRoleKey);
     await _instance.remove(AppConstants.userImageKey);
   }
 }
