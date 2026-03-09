@@ -5,17 +5,12 @@ import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get_it/get_it.dart';
 
 class AwardsViewBody extends StatelessWidget {
-  final String query;
-  final List<AwardModel> awards;
-  const AwardsViewBody({
-    super.key,
-    required this.query,
-    this.awards = const [],
-  });
+  const AwardsViewBody({super.key});
+
   static final List<Color> _colors = [
     Color(0xFF60a5fa), //blue
     Color(0xFFd4af37), //yellow
@@ -36,22 +31,49 @@ class AwardsViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 3,
-      crossAxisSpacing: 0.02.sw,
-      mainAxisSpacing: 0.06.sh,
-      childAspectRatio: 1.777,
-      padding: EdgeInsetsGeometry.symmetric(
-        horizontal: 0.05.sw,
-        vertical: 0.05.sh,
-      ),
-      children: List.generate(awards.length, (index) {
-        return _awardCard(index);
-      }),
+    return BlocBuilder<AwardsCubit, AwardState>(
+      builder: (context, state) {
+        if (state is AwardLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is AwardSuccess) {
+          return GridView.count(
+            crossAxisCount: 3,
+            crossAxisSpacing: 0.02.sw,
+            mainAxisSpacing: 0.06.sh,
+            childAspectRatio: 1.777,
+            padding: EdgeInsetsGeometry.symmetric(
+              horizontal: 0.05.sw,
+              vertical: 0.05.sh,
+            ),
+            children: List.generate(state.awards.length, (index) {
+              return _awardCard(state.awards[index]);
+            }),
+          );
+        } else {
+          final cubit = context.read<AwardsCubit>();
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "ERROR: FAILED TO FETCH AWARDS",
+                  style: TextStyle(color: AppColors.red800),
+                ),
+                IconButton(
+                  onPressed: () {
+                    cubit.getTestAwards();
+                  },
+                  icon: Icon(Icons.refresh),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
-  Widget _awardCard(int index) {
+  Widget _awardCard(AwardModel award) {
     Color categoryColor = _colors[Random().nextInt(_colors.length)];
     IconData categoryIcon = _icons[Random().nextInt(_icons.length)];
     return InkWell(
@@ -74,7 +96,7 @@ class AwardsViewBody extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _categoryIcon(categoryIcon, categoryColor),
-                  _categoryText(awards[index].category, categoryColor),
+                  _categoryText(award.category, categoryColor),
                 ],
               ),
             ),
@@ -83,12 +105,12 @@ class AwardsViewBody extends StatelessWidget {
                 left: _paddingValue,
                 top: _paddingValue,
               ),
-              child: Text(awards[index].name, style: AppTextStyles.h2),
+              child: Text(award.name, style: AppTextStyles.h2),
             ),
             Padding(
               padding: EdgeInsetsGeometry.all(_paddingValue),
               child: Text(
-                awards[index].shortDesc,
+                award.shortDesc,
                 style: TextStyle(color: AppColors.authTextSecondary),
               ),
             ),
