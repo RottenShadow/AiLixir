@@ -1,7 +1,7 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      'https://cristine-uninstanced-unforeseeably.ngrok-free.dev/api/';
+      'https://ailixirbackend-production-8e10.up.railway.app/api/';
 
   static const String authBaseUrl = 'auth';
 
