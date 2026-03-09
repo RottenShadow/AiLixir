@@ -11,11 +11,10 @@ abstract class AppConstants {
   static const String localizeKey = 'localizeKey';
   // Shared Preferences [Cached User Data]
   static const String userIdKey = 'userIdKey';
-  static const String userDisplayNameKey = 'userDisplayNameKey';
-  static const String userUserNameKey = 'userUserNameKey';
-  static const String userBioKey = 'userBioKey';
+  static const String userNameKey = 'userNameKey';
+  static const String userEmailKey = 'userEmailKey';
+  static const String userRoleKey = 'userRoleKey';
   static const String userImageKey = 'userImageKey';
-  static const String userRecentSearchKey = 'userRecentSearchKey';
   static const String pushNotificationsEnabledKey =
       'pushNotificationsEnabledKey';
 

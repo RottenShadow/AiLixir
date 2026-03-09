@@ -1,8 +1,7 @@
 abstract class AppStrings {
-  static const userDefaultId = 'NO-ID';
-  static const userDefaultDisplayName = 'Guest';
-  static const userDefaultUsername = 'username';
-  static const userDefaultBio = '';
-  static const userDefaultCountry = '';
-  static const userDefaultDateOfBirth = 'mm/dd/yyyy';
+  static const userDefaultId = 0;
+  static const userDefaultName = 'Guest';
+  static const userDefaultEmail = 'test@ailixir.com';
+  static const userDefaultRole = 'normal';
+  static const userDefaultAvatar = '';
 }
