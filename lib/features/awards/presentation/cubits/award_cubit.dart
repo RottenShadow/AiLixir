@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
 import 'package:ailixir/features/awards/presentation/factories/award_factory.dart';
@@ -28,7 +26,7 @@ class AwardsCubit extends Cubit<AwardState> {
     );
   }
 
-  Future<void> getTestAwards(String query) async {
+  Future<void> getTestAwards([String? query]) async {
     emit(AwardLoading());
     await Future.delayed(Duration(milliseconds: 22));
     var res = _repo.getTestAwards();
