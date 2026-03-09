@@ -1,3 +1,5 @@
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
+import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
@@ -15,11 +17,24 @@ class RightSidebar extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
           children: [
-            const _SideCard(
+            _SideCard(
               title: 'Global Awards',
-              trailing: Text(
-                'View All',
-                style: TextStyle(color: AppColors.brandBlue, fontSize: 11),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  context.navigateTo(AwardsView.routeName, arguments: "");
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  overlayColor: Colors.transparent,
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'View All',
+                  style: TextStyle(color: AppColors.brandBlue, fontSize: 11),
+                ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
