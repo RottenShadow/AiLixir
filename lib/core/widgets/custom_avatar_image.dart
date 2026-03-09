@@ -15,7 +15,7 @@ class CustomAvatarImage extends StatelessWidget {
     required this.image,
     this.errorImagePlaceholder,
     this.showBorder = false,
-    this.color = AppColors.fuchsia600,
+    this.color = AppColors.brandBlue,
     this.radius,
   });
 
