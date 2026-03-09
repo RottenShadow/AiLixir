@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +24,6 @@ class AilixirApp extends StatelessWidget {
       builder: (context, child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => GetIt.I<AuthCubit>()),
-          BlocProvider(create: (context) => GetIt.I<AwardsCubit>()),
           BlocProvider(create: (context) => AppSettingsCubit()),
         ],
         child: const MyMaterialApp(),
