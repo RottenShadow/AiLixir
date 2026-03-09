@@ -42,9 +42,7 @@ class SocialAuthRepoImpl {
         );
         _isGoogleSigninInit = true;
       }
-      var auth =
-          await googleSignIn.silentSignIn() ??
-          await googleSignIn.signInOnline();
+      var auth = await googleSignIn.signIn();
       log('auth: ${auth?.accessToken}');
       token = auth!.accessToken;
       log('google access token: $token');
@@ -56,9 +54,9 @@ class SocialAuthRepoImpl {
       );
     }
 
-    final res = await dioService.get(
+    final res = await dioService.post(
       endpoint: AppEndpoints.authGoogle,
-      data: {'auth_url': token},
+      data: {'access_token': token},
     );
 
     return await _saveUserDataFromResponse(res);

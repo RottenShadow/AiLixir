@@ -1,7 +1,7 @@
+import 'package:ailixir/core/constants/app_images.dart';
+import 'package:ailixir/core/widgets/gradient_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:ailixir/core/themes/app_colors.dart';
-import 'package:ailixir/core/themes/app_text_styles.dart';
 
 class AuthBrandLogo extends StatelessWidget {
   final double? size;
@@ -13,37 +13,17 @@ class AuthBrandLogo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: size ?? 48.w,
-          height: size ?? 48.w,
-          decoration: BoxDecoration(
-            color: AppColors.brandBlue,
-            borderRadius: BorderRadius.circular(12.r),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.brandBlue.withValues(alpha: 0.3),
-                blurRadius: 15,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: Icon(
-            Icons.science_outlined,
-            color: Colors.white,
-            size: (size ?? 48.w) * 0.6,
+        Image.asset(AppImages.logo, width: 32.w),
+        SizedBox(width: 10.w),
+        GradientText(
+          text: 'Ailixir',
+          style: TextStyle(
+            fontFamily: 'UniNeueTrial',
+            fontSize: 24.sp,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.1,
           ),
         ),
-        if (showText) ...[
-          SizedBox(width: 12.w),
-          Text(
-            'Ailixir',
-            style: AppTextStyles.h1.copyWith(
-              fontSize: 24.sp,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1,
-            ),
-          ),
-        ],
       ],
     );
   }

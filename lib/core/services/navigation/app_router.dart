@@ -1,4 +1,5 @@
 import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
+import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
@@ -7,7 +8,6 @@ import 'package:ailixir/features/auth/presentation/views/join_view.dart';
 import 'package:ailixir/features/auth/presentation/views/login_view.dart';
 import 'package:ailixir/features/auth/presentation/views/signup_view.dart';
 import 'package:ailixir/features/splash/presentation/views/splash_view.dart';
-import 'package:ailixir/features/home/presentation/views/home_view.dart';
 
 abstract class AppRouter {
   static final router = GoRouter(
@@ -16,8 +16,8 @@ abstract class AppRouter {
     routes: [
       // Home
       GoRoute(
-        path: HomeView.routeName,
-        builder: (context, state) => const HomeView(),
+        path: MainView.routeName,
+        builder: (context, state) => const MainView(),
       ),
       // Scientist Credits
       GoRoute(

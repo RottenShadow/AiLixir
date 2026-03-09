@@ -5,8 +5,8 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/constants/app_constants.dart';
-import 'package:ailixir/core/services/api/app_endpoints.dart';
-import 'package:ailixir/core/services/api/dio_service.dart';
+// import 'package:ailixir/core/services/api/app_endpoints.dart';
+// import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.dart';
 import 'package:ailixir/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
 
@@ -20,8 +20,8 @@ class DioInterceptors extends Interceptor {
 
   /// ===== GLOBAL LOCKS =====
   static bool _isLoggingOut = false;
-  static bool _isRefreshing = false;
-  static Completer<void>? _refreshCompleter;
+  // static final bool _isRefreshing = false;
+  // static Completer<void>? _refreshCompleter;
 
   /// =======================
 
@@ -69,28 +69,28 @@ class DioInterceptors extends Interceptor {
       return handler.next(err);
     }
 
-    // Access token expired → try refresh
-    if (statusCode == 401 && !isRefreshRequest) {
-      final refreshToken = await localAuthDataSource.getUserRefreshToken();
+    // // Access token expired → try refresh
+    // if (statusCode == 401 && !isRefreshRequest) {
+    //   final refreshToken = await localAuthDataSource.getUserRefreshToken();
 
-      if (refreshToken == null) {
-        // await _forceLogoutOnce();
-        return handler.next(err);
-      }
+    //   if (refreshToken == null) {
+    //     // await _forceLogoutOnce();
+    //     return handler.next(err);
+    //   }
 
-      final refreshed = await _refreshTokenOnce(refreshToken);
+    //   final refreshed = await _refreshTokenOnce(refreshToken);
 
-      if (refreshed) {
-        try {
-          final response = await _retry(err.requestOptions);
-          return handler.resolve(response);
-        } catch (e) {
-          return handler.next(err);
-        }
-      }
+    //   if (refreshed) {
+    //     try {
+    //       final response = await _retry(err.requestOptions);
+    //       return handler.resolve(response);
+    //     } catch (e) {
+    //       return handler.next(err);
+    //     }
+    //   }
 
-      await _forceLogoutOnce();
-    }
+    //   await _forceLogoutOnce();
+    // }
 
     handler.next(err);
   }
@@ -98,48 +98,48 @@ class DioInterceptors extends Interceptor {
   /// =======================
   /// REFRESH TOKEN (ONCE)
   /// =======================
-  Future<bool> _refreshTokenOnce(String refreshToken) async {
-    if (_isRefreshing) {
-      await _refreshCompleter?.future;
-      return await localAuthDataSource.getUserToken() != null;
-    }
+  // Future<bool> _refreshTokenOnce(String refreshToken) async {
+  //   if (_isRefreshing) {
+  //     await _refreshCompleter?.future;
+  //     return await localAuthDataSource.getUserToken() != null;
+  //   }
 
-    _isRefreshing = true;
-    _refreshCompleter = Completer<void>();
+  //   _isRefreshing = true;
+  //   _refreshCompleter = Completer<void>();
 
-    try {
-      final res = await client.post(
-        AppEndpoints.authRefreshToken,
-        options: Options(
-          headers: {
-            HttpHeaders.authorizationHeader:
-                '${AppConstants.bearer}$refreshToken',
-          },
-          extra: {'refresh': true},
-        ),
-      );
+  //   try {
+  //     final res = await client.post(
+  //       AppEndpoints.authRefreshToken,
+  //       options: Options(
+  //         headers: {
+  //           HttpHeaders.authorizationHeader:
+  //               '${AppConstants.bearer}$refreshToken',
+  //         },
+  //         extra: {'refresh': true},
+  //       ),
+  //     );
 
-      if (res.statusCode == 200) {
-        final data = res.data['data'];
+  //     if (res.statusCode == 200) {
+  //       final data = res.data['data'];
 
-        await localAuthDataSource.saveUserTokens(
-          token: data['token'],
-          refreshToken: data['refreshToken'],
-        );
+  //       await localAuthDataSource.saveUserTokens(
+  //         token: data['token'],
+  //         refreshToken: data['refreshToken'],
+  //       );
 
-        return true;
-      }
+  //       return true;
+  //     }
 
-      return false;
-    } catch (e, st) {
-      log('Refresh failed: $e\n$st');
-      return false;
-    } finally {
-      _isRefreshing = false;
-      _refreshCompleter?.complete();
-      _refreshCompleter = null;
-    }
-  }
+  //     return false;
+  //   } catch (e, st) {
+  //     log('Refresh failed: $e\n$st');
+  //     return false;
+  //   } finally {
+  //     _isRefreshing = false;
+  //     _refreshCompleter?.complete();
+  //     _refreshCompleter = null;
+  //   }
+  // }
 
   /// =======================
   /// LOGOUT (ONCE)
@@ -156,28 +156,28 @@ class DioInterceptors extends Interceptor {
     _isLoggingOut = false;
   }
 
-  /// =======================
-  /// RETRY REQUEST
-  /// =======================
-  Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
-    final token = await localAuthDataSource.getUserToken();
+  // /// =======================
+  // /// RETRY REQUEST
+  // /// =======================
+  // Future<Response<dynamic>> _retry(RequestOptions requestOptions) async {
+  //   final token = await localAuthDataSource.getUserToken();
 
-    final options = Options(
-      method: requestOptions.method,
-      headers: {
-        ...requestOptions.headers,
-        if (token != null)
-          HttpHeaders.authorizationHeader: '${AppConstants.bearer}$token',
-      },
-    );
+  //   final options = Options(
+  //     method: requestOptions.method,
+  //     headers: {
+  //       ...requestOptions.headers,
+  //       if (token != null)
+  //         HttpHeaders.authorizationHeader: '${AppConstants.bearer}$token',
+  //     },
+  //   );
 
-    final data = await DioService.rebuildFormDataIfNeeded(requestOptions.data);
+  //   final data = await DioService.rebuildFormDataIfNeeded(requestOptions.data);
 
-    return client.request(
-      requestOptions.path,
-      data: data,
-      queryParameters: requestOptions.queryParameters,
-      options: options,
-    );
-  }
+  //   return client.request(
+  //     requestOptions.path,
+  //     data: data,
+  //     queryParameters: requestOptions.queryParameters,
+  //     options: options,
+  //   );
+  // }
 }
