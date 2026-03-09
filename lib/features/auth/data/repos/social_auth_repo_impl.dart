@@ -42,7 +42,7 @@ class SocialAuthRepoImpl {
         );
         _isGoogleSigninInit = true;
       }
-      var auth = await googleSignIn.signIn();
+      var auth = await googleSignIn.signInOnline();
       log('auth: ${auth?.accessToken}');
       token = auth!.accessToken;
       log('google access token: $token');
@@ -76,7 +76,7 @@ class SocialAuthRepoImpl {
   ) async {
     final res = remoteAuthDataSource.getUserSuccessDataFromApi(req: response);
     await localAuthDataSource.saveAllUserData(authLoginSuccessModel: res.data!);
-    log('User Data Saved: ${res.data?.user.displayName}');
+    log('User Data Saved: ${res.data?.user.name}');
     return res.message;
   }
 }
