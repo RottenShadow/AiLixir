@@ -13,34 +13,24 @@ class AuthLoginSuccessModel {
 }
 
 class AuthUser {
-  String id;
-  String username;
-  String displayName;
+  int id;
   String email;
+  String name;
+  String role;
   String? avatar;
-  String? bio;
-  String? dateOfBirth;
-  String? country;
-
   AuthUser({
     required this.id,
-    required this.username,
-    required this.displayName,
     required this.email,
+    required this.name,
+    required this.role,
     this.avatar,
-    this.country,
-    this.dateOfBirth,
-    this.bio,
   });
 
   factory AuthUser.fromJson(Map<String, dynamic> json) => AuthUser(
     id: json['id'],
-    username: json['username'],
     email: json['email'],
-    displayName: json['displayName'] ?? json['username'],
+    name: json['name'],
+    role: json['role'],
     avatar: json['avatar'],
-    country: json['country'],
-    dateOfBirth: json['dateOfBirth'],
-    bio: json['bio'],
   );
 }
