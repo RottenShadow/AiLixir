@@ -1,4 +1,6 @@
+import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
+import 'package:ailixir/features/awards/presentation/views/single_award_view.dart';
 import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:go_router/go_router.dart';
@@ -29,6 +31,12 @@ abstract class AppRouter {
         path: AwardsView.routeName,
         builder: (context, state) {
           return AwardsView(query: state.extra as String);
+        },
+      ),
+      GoRoute(
+        path: SingleAwardView.routeName,
+        builder: (context, state) {
+          return SingleAwardView(award: state.extra as AwardModel);
         },
       ),
       // Splash & Onboarding

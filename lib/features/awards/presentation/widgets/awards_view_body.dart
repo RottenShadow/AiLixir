@@ -1,9 +1,11 @@
 import 'dart:math';
 
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
+import 'package:ailixir/features/awards/presentation/views/single_award_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -46,7 +48,7 @@ class AwardsViewBody extends StatelessWidget {
               vertical: 0.05.sh,
             ),
             children: List.generate(state.awards.length, (index) {
-              return _awardCard(state.awards[index]);
+              return _awardCard(state.awards[index], context);
             }),
           );
         } else {
@@ -73,13 +75,15 @@ class AwardsViewBody extends StatelessWidget {
     );
   }
 
-  Widget _awardCard(AwardModel award) {
+  Widget _awardCard(AwardModel award, BuildContext context) {
     Color categoryColor = _colors[Random().nextInt(_colors.length)];
     IconData categoryIcon = _icons[Random().nextInt(_icons.length)];
     return InkWell(
       splashColor: categoryColor,
       borderRadius: BorderRadius.circular(15.r),
-      onTap: () {},
+      onTap: () {
+        context.navigateTo(SingleAwardView.routeName, arguments: award);
+      },
       child: Card(
         color: AppColors.brandBlue.withAlpha((0.2 * 255).toInt()),
         child: Column(
