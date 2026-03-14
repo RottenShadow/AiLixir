@@ -14,6 +14,55 @@ class AwardRepo {
     });
   }
 
+  Future<Either<Failure, Map<String, dynamic>>> getScientists(int awardId) {
+    return safeApiCall(() async {
+      return await dioService.get(
+        endpoint: "${AppEndpoints.baseUrl}awards/$awardId/scientists",
+      );
+    });
+  }
+
+  Future<Either<Failure, Map<String, dynamic>>> getTestScientists(
+    int awardId,
+  ) async {
+    await Future.delayed(Duration(milliseconds: 30));
+    Map<String, dynamic> res = {
+      "success": true,
+      "data": {
+        "results": [
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+        ],
+      },
+    };
+    return Right(res);
+  }
+
   Either<Failure, Map<String, dynamic>> getTestAwards() {
     Map<String, dynamic> res = {
       "success": true,

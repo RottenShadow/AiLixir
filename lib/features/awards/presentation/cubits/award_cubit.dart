@@ -1,6 +1,8 @@
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
 import 'package:ailixir/features/awards/presentation/factories/award_factory.dart';
+import 'package:ailixir/features/scientists/presentation/factories/scientist_factory.dart';
+import 'package:ailixir/features/scientists/presentation/models/scientist_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:bloc/bloc.dart';
@@ -26,6 +28,18 @@ class AwardsCubit extends Cubit<AwardState> {
     );
   }
 
+  Future<List<ScientistModel>> getScientists(int awardId) async {
+    var res = await _repo.getScientists(awardId);
+    return res.fold(
+      (_) {
+        return [];
+      },
+      (jsonData) {
+        return ScientistFactory.getScientistsFromAwardJson(jsonData);
+      },
+    );
+  }
+
   Future<void> getTestAwards([String? query]) async {
     emit(AwardLoading());
     await Future.delayed(Duration(milliseconds: 22));
@@ -36,6 +50,18 @@ class AwardsCubit extends Cubit<AwardState> {
       },
       (jsonData) {
         emit(AwardSuccess(awards: AwardFactory.getAwardsFromJson(jsonData)));
+      },
+    );
+  }
+
+  Future<List<ScientistModel>> getTestScientists(int awardId) async {
+    var res = await _repo.getTestScientists(awardId);
+    return res.fold(
+      (_) {
+        return [];
+      },
+      (jsonData) {
+        return ScientistFactory.getScientistsFromAwardJson(jsonData);
       },
     );
   }

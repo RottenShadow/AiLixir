@@ -4,6 +4,7 @@ import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
+import 'package:ailixir/features/awards/data/models/award_package.dart';
 import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:ailixir/features/awards/presentation/views/single_award_view.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +83,13 @@ class AwardsViewBody extends StatelessWidget {
       splashColor: categoryColor,
       borderRadius: BorderRadius.circular(15.r),
       onTap: () {
-        context.navigateTo(SingleAwardView.routeName, arguments: award);
+        context.navigateTo(
+          SingleAwardView.routeName,
+          arguments: AwardPackage(
+            award: award,
+            cubit: context.read<AwardsCubit>(),
+          ),
+        );
       },
       child: Card(
         color: AppColors.brandBlue.withAlpha((0.2 * 255).toInt()),
