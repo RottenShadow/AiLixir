@@ -20,6 +20,7 @@ class SingleAwardView extends StatefulWidget {
 
 class _SingleAwardViewState extends State<SingleAwardView> {
   List<ScientistModel> scientists = [];
+  bool err = false;
   @override
   void initState() {
     super.initState();
@@ -27,11 +28,18 @@ class _SingleAwardViewState extends State<SingleAwardView> {
   }
 
   void getScientists() {
-    widget.cubit.getTestScientists(widget.award.id).then((v) {
-      setState(() {
-        scientists = v;
-      });
-    });
+    widget.cubit
+        .getTestScientists(widget.award.id)
+        .then((v) {
+          setState(() {
+            scientists = v;
+          });
+        })
+        .onError((_, _) {
+          setState(() {
+            err = true;
+          });
+        });
   }
 
   @override
@@ -41,7 +49,7 @@ class _SingleAwardViewState extends State<SingleAwardView> {
         title: Text(widget.award.name),
         backgroundColor: AppColors.slate1000,
       ),
-      body: scientists.isEmpty
+      body: err
           ? Center(
               child: Column(
                 children: [
@@ -58,7 +66,12 @@ class _SingleAwardViewState extends State<SingleAwardView> {
                 ],
               ),
             )
-          : SingleAwardViewBody(award: widget.award, scientists: scientists),
+          : (scientists.isEmpty
+                ? Center(child: CircularProgressIndicator())
+                : SingleAwardViewBody(
+                    award: widget.award,
+                    scientists: scientists,
+                  )),
     );
   }
 }

@@ -14,11 +14,11 @@ class ScientistModel {
     this.yearWon,
   });
   const ScientistModel.defaultScientist({
-    this.name = "",
+    this.name = "DEFAULT_NAME",
     this.id = -1,
     this.imageUrl = "",
-    this.shortBio = "",
-    this.field = "",
-    this.yearWon,
+    this.shortBio = "SHORT_BIO",
+    this.field = "FIELD",
+    this.yearWon = "2026",
   });
 }

@@ -1,13 +1,17 @@
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
+import 'package:ailixir/features/scientists/data/models/scientist_package.dart';
+import 'package:ailixir/features/scientists/presentation/cubits/scientist_credit_cubit.dart';
+import 'package:ailixir/features/scientists/presentation/views/single_scientist_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:math';
 
 class ScientistCreditsViewBody extends StatefulWidget {
-  final List<ScientistModel> scientists;
-  const ScientistCreditsViewBody({super.key, required this.scientists});
+  const ScientistCreditsViewBody({super.key});
   @override
   State<StatefulWidget> createState() => _ScientistCreditState();
 }
@@ -31,6 +35,20 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<ScientistCreditCubit, ScientistCreditState>(
+      builder: (context, state) {
+        if (state is ScientistCreditError) {
+          return Center(child: Text("Error: Failed to Fetch"));
+        } else if (state is ScientistCreditSuccess) {
+          return _body(state.res);
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+
+  Widget _body(List<ScientistModel> scientists) {
     return Stack(
       children: [
         ListView.separated(
@@ -38,12 +56,26 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
           padding: EdgeInsetsGeometry.all(0.05.sw),
           physics: const NeverScrollableScrollPhysics(),
           controller: _scrollController,
-          itemCount: 3,
+          itemCount: scientists.length,
           separatorBuilder: (context, index) {
             return SizedBox(width: 0.05.sw);
           },
           itemBuilder: (context, idx) {
-            return _scientistCard();
+            return _scientistCard(
+              onTap: () {
+                context.navigateTo(
+                  SingleScientistView.routeName,
+                  arguments: ScientistPackage(
+                    scientist: scientists[idx],
+                    cubit: context.read<ScientistCreditCubit>(),
+                  ),
+                );
+              },
+              scientistName: scientists[idx].name,
+              scientistImage: scientists[idx].imageUrl,
+              scientistField: scientists[idx].field,
+              scientistWork: scientists[idx].shortBio,
+            );
           },
         ),
         Row(
@@ -70,21 +102,6 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
           ],
         ),
       ],
-    );
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        padding: EdgeInsetsGeometry.symmetric(
-          horizontal: 0.05.sw,
-          vertical: 0.05.sh,
-        ),
-        alignment: Alignment.center,
-        child: Row(
-          spacing: 0.05.sw,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [_scientistCard(), _scientistCard()],
-        ),
-      ),
     );
   }
 
@@ -118,14 +135,31 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
     );
   }
 
+  Widget _fieldPill(String field) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+      decoration: BoxDecoration(
+        color: AppColors.brandBlue.withAlpha(53),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: AppColors.brandBlue),
+      ),
+      child: Text(
+        field,
+        style: TextStyle(color: AppColors.brandBlue, fontSize: 10),
+      ),
+    );
+  }
+
   Widget _scientistCard({
+    required void Function() onTap,
     String scientistName = "DEFAULT_SCIENTIST_NAME",
+    String scientistField = "DEFAULT_FIELD",
     String scientistWork = _defaultAchievement,
     String scientistImage =
         "https://media.gettyimages.com/id/57520719/photo/doctor-holding-note-pad-posing-in-studio-portrait.jpg?s=612x612&w=0&k=20&c=cxnjilkTFucKBOneZYY6xZY7sEWTLvKLXzyWRgjJCqE=",
   }) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       borderRadius: BorderRadius.circular(12.r),
       child: SizedBox(
         width: 0.8.sw,
@@ -151,6 +185,10 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
                   children: [
                     Align(
                       alignment: Alignment.center,
+                      child: _fieldPill(scientistField),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
                       child: Text(scientistName, style: AppTextStyles.h1),
                     ),
                     Row(
@@ -163,7 +201,7 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 16.w),
                           child: Text(
-                            'Their Achievements',
+                            'Short Biography',
                             style: AppTextStyles.labelsmall.copyWith(
                               color: AppColors.authTextSecondary.withValues(
                                 alpha: 0.6,
