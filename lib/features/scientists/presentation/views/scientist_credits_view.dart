@@ -1,3 +1,4 @@
+import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/features/scientists/presentation/widgets/scientist_credits_view_body.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +8,12 @@ class ScientistCreditView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: ScientistCreditsViewBody());
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Esteemed Scientists"),
+        backgroundColor: AppColors.slate1000,
+      ),
+      body: ScientistCreditsViewBody(scientists: []),
+    );
   }
 }

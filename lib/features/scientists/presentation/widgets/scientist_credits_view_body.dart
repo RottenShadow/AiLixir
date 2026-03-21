@@ -1,27 +1,105 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:math';
 
-class ScientistCreditsViewBody extends StatelessWidget {
-  const ScientistCreditsViewBody({super.key});
+class ScientistCreditsViewBody extends StatefulWidget {
+  final List<ScientistModel> scientists;
+  const ScientistCreditsViewBody({super.key, required this.scientists});
+  @override
+  State<StatefulWidget> createState() => _ScientistCreditState();
+}
+
+class _ScientistCreditState extends State<ScientistCreditsViewBody> {
+  late ScrollController _scrollController;
+  late int _currentScientist;
+
+  @override
+  void initState() {
+    _scrollController = ScrollController();
+    _currentScientist = 0;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsetsGeometry.all(0.05.sw),
+          physics: const NeverScrollableScrollPhysics(),
+          controller: _scrollController,
+          itemCount: 3,
+          separatorBuilder: (context, index) {
+            return SizedBox(width: 0.05.sw);
+          },
+          itemBuilder: (context, idx) {
+            return _scientistCard();
+          },
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _scrollButton(Icons.arrow_left, () {
+              _currentScientist = max(0, (_currentScientist - 1));
+              _scrollController.animateTo(
+                0.8.sw * _currentScientist,
+                duration: Duration(milliseconds: 600),
+                curve: Curves.easeInOut,
+              );
+            }),
+            _scrollButton(Icons.arrow_right, () {
+              _currentScientist = min(_currentScientist + 1, 2);
+              _scrollController.animateTo(
+                0.8.sw * _currentScientist,
+                duration: Duration(milliseconds: 600),
+                curve: Curves.easeInOut,
+              );
+            }),
+          ],
+        ),
+      ],
+    );
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Container(
         padding: EdgeInsetsGeometry.symmetric(
-          horizontal: 0.1.sw,
-          vertical: 0.1.sh,
+          horizontal: 0.05.sw,
+          vertical: 0.05.sh,
         ),
         alignment: Alignment.center,
         child: Row(
-          spacing: 0.1.sw,
+          spacing: 0.05.sw,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [_scientistCard(), _scientistCard()],
         ),
       ),
+    );
+  }
+
+  Widget _scrollButton(IconData icon, void Function() onTap) {
+    return IconButton(
+      onPressed: onTap,
+      color: AppColors.red500,
+      splashColor: AppColors.white,
+      style: ElevatedButton.styleFrom(
+        shape: CircleBorder(),
+        padding: EdgeInsets.all(10),
+        backgroundColor: AppColors.brandBlue.withAlpha(53),
+        foregroundColor: Colors.white,
+      ),
+      icon: Icon(icon),
     );
   }
 
@@ -46,59 +124,67 @@ class ScientistCreditsViewBody extends StatelessWidget {
     String scientistImage =
         "https://media.gettyimages.com/id/57520719/photo/doctor-holding-note-pad-posing-in-studio-portrait.jpg?s=612x612&w=0&k=20&c=cxnjilkTFucKBOneZYY6xZY7sEWTLvKLXzyWRgjJCqE=",
   }) {
-    return SizedBox(
-      width: 0.8.sw,
-      child: Card(
-        color: AppColors.brandBlue.withOpacity(0.1),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(12.r),
-          side: BorderSide(color: AppColors.brandBorder, width: 2),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          spacing: 0,
-          children: [
-            _scientistImage(scientistImage),
-            SizedBox(
-              width: 0.35.sw,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(scientistName, style: AppTextStyles.h1),
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(color: AppColors.brandBorder),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Text(
-                          'Their Achievements',
-                          style: AppTextStyles.labelsmall.copyWith(
-                            color: AppColors.authTextSecondary.withValues(
-                              alpha: 0.5,
-                            ),
-                            letterSpacing: 1.5,
+    return InkWell(
+      onTap: () {},
+      borderRadius: BorderRadius.circular(12.r),
+      child: SizedBox(
+        width: 0.8.sw,
+        child: Card(
+          color: AppColors.brandBlue.withAlpha(26),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(12.r),
+            side: BorderSide(color: AppColors.brandBorder, width: 2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            spacing: 0,
+            children: [
+              _scientistImage(scientistImage),
+              SizedBox(
+                width: 0.35.sw,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(scientistName, style: AppTextStyles.h1),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: AppColors.authTextSecondary.withAlpha(153),
                           ),
                         ),
-                      ),
-                      const Expanded(
-                        child: Divider(color: AppColors.brandBorder),
-                      ),
-                    ],
-                  ),
-                  Text(scientistWork, style: AppTextStyles.bodymedium),
-                ],
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: Text(
+                            'Their Achievements',
+                            style: AppTextStyles.labelsmall.copyWith(
+                              color: AppColors.authTextSecondary.withValues(
+                                alpha: 0.6,
+                              ),
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: AppColors.authTextSecondary.withAlpha(153),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(scientistWork, style: AppTextStyles.bodymedium),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

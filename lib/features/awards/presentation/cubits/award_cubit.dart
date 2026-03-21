@@ -1,8 +1,8 @@
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
 import 'package:ailixir/features/awards/presentation/factories/award_factory.dart';
-import 'package:ailixir/features/scientists/presentation/factories/scientist_factory.dart';
-import 'package:ailixir/features/scientists/presentation/models/scientist_model.dart';
+import 'package:ailixir/features/scientists/data/factories/scientist_factory.dart';
+import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:bloc/bloc.dart';

@@ -1,9 +1,8 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
-import 'package:ailixir/features/scientists/presentation/models/scientist_model.dart';
+import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SingleAwardViewBody extends StatelessWidget {

@@ -1,5 +1,6 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
+import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
@@ -53,7 +54,10 @@ class RightSidebar extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20.h),
-            _SideCard(
+            _TapableSideCard(
+              onTap: () {
+                context.navigateTo(ScientistCreditView.routeName);
+              },
               title: 'Top Scientists',
               trailing: Row(
                 children: [
@@ -135,6 +139,50 @@ class _SideCard extends StatelessWidget {
   }
 }
 
+class _TapableSideCard extends StatelessWidget {
+  final String title;
+  final Widget trailing;
+  final Widget child;
+  final void Function() onTap;
+
+  const _TapableSideCard({
+    required this.title,
+    required this.trailing,
+    required this.child,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      splashColor: AppColors.brandBlue.withAlpha(51),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(20.w),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: AppColors.brandBorder),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(child: Text(title, style: AppTextStyles.h4)),
+                trailing,
+              ],
+            ),
+            SizedBox(height: 16.h),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _AwardTile extends StatelessWidget {

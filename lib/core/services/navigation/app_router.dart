@@ -1,11 +1,9 @@
-import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/data/models/award_package.dart';
-import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
 import 'package:ailixir/features/awards/presentation/views/single_award_view.dart';
 import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ailixir/features/scientists/presentation/views/single_scientist_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/custom_photo_view.dart';
@@ -28,6 +26,10 @@ abstract class AppRouter {
       GoRoute(
         path: ScientistCreditView.routeName,
         builder: (context, state) => const ScientistCreditView(),
+      ),
+      GoRoute(
+        path: SingleScientistView.routeName,
+        builder: (context, state) => const SingleScientistView(),
       ),
       // Awards
       GoRoute(

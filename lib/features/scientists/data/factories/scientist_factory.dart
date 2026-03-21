@@ -1,6 +1,4 @@
-import 'dart:convert';
-
-import 'package:ailixir/features/scientists/presentation/models/scientist_model.dart';
+import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
 
 abstract class ScientistFactory {
   static List<ScientistModel> getScientistsFromJson(Map<String, dynamic> json) {
