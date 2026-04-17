@@ -1,4 +1,6 @@
 import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
+import 'package:ailixir/core/entities/ligand_entity.dart';
+import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
 import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:go_router/go_router.dart';
@@ -57,6 +59,15 @@ abstract class AppRouter {
         builder: (context, state) {
           final imageUrl = state.extra as String;
           return CustomPhotoView(imageUrl: imageUrl);
+        },
+      ),
+
+      // Ligand Details
+      GoRoute(
+        path: LigandDetailsView.routeName,
+        builder: (context, state) {
+          final ligand = state.extra as LigandEntity;
+          return LigandDetailsView(ligand: ligand);
         },
       ),
     ],
