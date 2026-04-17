@@ -7,7 +7,7 @@ import 'package:ailixir/core/themes/app_text_styles.dart';
 import '../cubits/molecular_lab_cubit.dart';
 
 /// A WebView widget that loads the bundled Mol* (MolStar) molecular viewer
-/// from the local Flutter asset `assets/web/viewer/index.html`.
+/// from the local Flutter asset `assets/web/index.html`.
 ///
 /// It initializes the WebView ONLY ONCE and listens to [MolecularLabCubit]
 /// to load new structures without disposing/recreating the view.
