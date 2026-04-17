@@ -1,3 +1,4 @@
+import 'package:ailixir/features/auth/data/repos/auth_repo_impl.dart';
 import 'package:ailixir/features/auth/data/repos/social_auth_repo_impl.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
 import 'package:dio/dio.dart';
@@ -44,6 +45,14 @@ void getItRegisterSingleton() {
 
   // My Repos
 
+  GetIt.I.registerLazySingleton<AuthRepoImpl>(
+    () => AuthRepoImpl(
+      localAuthDataSource: GetIt.I.get(),
+      remoteAuthDataSource: GetIt.I.get(),
+      dioService: GetIt.I.get(),
+    ),
+  );
+
   GetIt.I.registerLazySingleton<SocialAuthRepoImpl>(
     () => SocialAuthRepoImpl(
       localAuthDataSource: GetIt.I.get(),
@@ -51,6 +60,7 @@ void getItRegisterSingleton() {
       dioService: GetIt.I.get(),
     ),
   );
+
   GetIt.I.registerLazySingleton<AwardRepo>(
     () => AwardRepo(dioService: GetIt.I.get()),
   );
