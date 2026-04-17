@@ -3,11 +3,7 @@ class BaseResponseModel<T> {
   final String message;
   final T? data;
 
-  BaseResponseModel({
-    required this.success,
-    required this.message,
-    this.data,
-  });
+  BaseResponseModel({required this.success, required this.message, this.data});
 
   factory BaseResponseModel.fromJson(
     Map<String, dynamic> json,

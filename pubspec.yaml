@@ -32,6 +32,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   dio: ^5.9.1
+  event_bus: ^2.0.1
+  fade_indexed_stack: ^0.2.2
+  file_picker: ^8.1.7
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
@@ -75,8 +78,7 @@ flutter:
     - .env
     - assets/icons/
     - assets/images/
-    - assets/web/viewer/
-    - assets/web/viewer/theme/
+    - assets/web/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
   # For details regarding adding assets from package dependencies, see

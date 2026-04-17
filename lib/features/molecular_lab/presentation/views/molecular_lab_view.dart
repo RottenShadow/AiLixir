@@ -30,7 +30,7 @@ class _MolecularLabViewBodyState extends State<MolecularLabViewBody> {
 
   // Quick-access sample structures
   static const _samples = [
-    _Sample('4WKQ', 'EGFR kinase + Gefitinib (Lung cancer)', Icons.coronavirus),
+    _Sample('4WKQ', 'EGFR kinase + Gefitinib', Icons.coronavirus),
     _Sample('4HHB', 'Haemoglobin', Icons.water_drop),
     _Sample('1CRN', 'Crambin', Icons.grain),
     _Sample('7BV2', 'SARS-CoV-2 Spike', Icons.coronavirus),

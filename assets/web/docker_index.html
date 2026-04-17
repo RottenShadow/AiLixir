@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ailixir Docking Viewer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #0f172a; }
+    #app { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+    #box-canvas {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .msp-btn-link-toggle-off {
+      display: none !important;
+      pointer-events: none !important;
+    }
+
+     /* .msp-layout-region.msp-layout-left {
+      display: none !important;
+      pointer-events: none !important;
+    } */
+
+    #status-bar {
+      position: absolute; bottom: 12px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15,23,42,0.85);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 5px 16px;
+      color: #94a3b8;
+      font-family: monospace;
+      font-size: 11px;
+      z-index: 20;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+  </style>
+  <link rel="stylesheet" href="./molstar.css"/>
+</head>
+<body>
+  <div id="app"></div>
+  <canvas id="box-canvas"></canvas>
+  <div id="status-bar">Initializing viewer...</div>
+
+  <script src="./molstar.js"></script>
+  <script>
+    'use strict';
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    var _viewer        = null;
+    var _proteinLoaded = false;
+    var _showStatus    = false; 
+    var _boxParams     = { cx: 0, cy: 0, cz: 0, sx: 20, sy: 20, sz: 20 };
+    // Bounding box of the protein (from PDB parsing) — used to clamp the box
+    var _proteinBounds = null; // { minX,minY,minZ, maxX,maxY,maxZ }
+
+    // Root-level refs owned by each slot — Set of ref strings
+    var _proteinRefs   = new Set();
+    var _ligandRefs    = new Set();
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    molstar.Viewer.create('app', {
+      layoutShowControls:        false,
+      viewportShowExpand:        false,
+      viewportShowSelectionMode: false,
+      viewportShowAnimation:     false,
+      collapseLeftPanel:         true,
+      powerPreference:           'high-performance',
+    }).then(function(viewer) {
+      _viewer = viewer;
+      window._viewerReady = true;
+      setStatus('Ready — load a structure to begin.');
+      _scheduleBoxLoop();
+    }).catch(function(e) {
+      setStatus('Viewer init error: ' + e);
+    });
+
+    // ── State-tree helpers ────────────────────────────────────────────────────
+
+    /** Return the Set of all current root-child refs in the state tree. */
+    function _rootChildRefs() {
+      var refs = new Set();
+      try {
+        var state = _viewer.plugin.state.data;
+        var rootRef = state.tree.root.ref;          // the root node ref
+        // children of root are the top-level data nodes
+        var children = state.tree.children.get(rootRef);
+        if (children) {
+          children.forEach(function(ref) { refs.add(ref); });
+        }
+      } catch(e) { /* ignore */ }
+      return refs;
+    }
+
+    /**
+     * Delete every ref in the given Set from the state tree.
+     * Uses plugin.state.data.build().delete(ref).commit() for each ref.
+     */
+    async function _deleteRefs(refSet) {
+      if (!refSet || refSet.size === 0 || !_viewer) return;
+      var state = _viewer.plugin.state.data;
+      for (var ref of refSet) {
+        try {
+          if (state.cells.has(ref)) {
+            await state.build().delete(ref).commit();
+          }
+        } catch(e) {
+          console.warn('[Viewer] Could not delete ref', ref, e);
+        }
+      }
+    }
+
+    // ── PDB parsing ───────────────────────────────────────────────────────────
+
+    /**
+     * Parse ATOM/HETATM lines from raw PDB text.
+     * Returns { centroid:[x,y,z], bounds:{minX,minY,minZ,maxX,maxY,maxZ} }
+     * or null if no atoms found.
+     */
+    function _parsePdb(pdbText) {
+      var xs = [], ys = [], zs = [];
+      var lines = pdbText.split('\n');
+      for (var i = 0; i < lines.length; i++) {
+        var line = lines[i];
+        var rec  = line.substring(0, 6).trim();
+        if (rec !== 'ATOM' && rec !== 'HETATM') continue;
+        var x = parseFloat(line.substring(30, 38));
+        var y = parseFloat(line.substring(38, 46));
+        var z = parseFloat(line.substring(46, 54));
+        if (!isNaN(x) && !isNaN(y) && !isNaN(z)) {
+          xs.push(x); ys.push(y); zs.push(z);
+        }
+      }
+      if (xs.length === 0) return null;
+
+      var minX = xs[0], maxX = xs[0];
+      var minY = ys[0], maxY = ys[0];
+      var minZ = zs[0], maxZ = zs[0];
+      for (var j = 1; j < xs.length; j++) {
+        if (xs[j] < minX) minX = xs[j]; if (xs[j] > maxX) maxX = xs[j];
+        if (ys[j] < minY) minY = ys[j]; if (ys[j] > maxY) maxY = ys[j];
+        if (zs[j] < minZ) minZ = zs[j]; if (zs[j] > maxZ) maxZ = zs[j];
+      }
+
+      return {
+        centroid: [
+          (minX + maxX) / 2,
+          (minY + maxY) / 2,
+          (minZ + maxZ) / 2,
+        ],
+        bounds: { minX: minX, minY: minY, minZ: minZ,
+                  maxX: maxX, maxY: maxY, maxZ: maxZ },
+      };
+    }
+
+    // ── Box clamping ──────────────────────────────────────────────────────────
+
+    /**
+     * Clamp the box center so the box stays within the protein bounding box.
+     * The box center must be at least half the box size away from each face.
+     */
+    function _clampBoxToProtein(cx, cy, cz, sx, sy, sz) {
+      if (!_proteinBounds) return { cx: cx, cy: cy, cz: cz };
+      var b  = _proteinBounds;
+      var hx = sx / 2, hy = sy / 2, hz = sz / 2;
+
+      // Clamp center so box fits inside bounds
+      var ncx = Math.max(b.minX + hx, Math.min(b.maxX - hx, cx));
+      var ncy = Math.max(b.minY + hy, Math.min(b.maxY - hy, cy));
+      var ncz = Math.max(b.minZ + hz, Math.min(b.maxZ - hz, cz));
+
+      return { cx: ncx, cy: ncy, cz: ncz };
+    }
+
+    // ── Flutter bridge ────────────────────────────────────────────────────────
+
+    function _notifyFlutter(cx, cy, cz) {
+      _notifyFlutterFull(cx, cy, cz,
+        _boxParams.sx, _boxParams.sy, _boxParams.sz);
+    }
+
+    function _notifyFlutterFull(cx, cy, cz, sx, sy, sz) {
+      try {
+        if (window.flutter_inappwebview) {
+          window.flutter_inappwebview.callHandler(
+            'onBoxCenterChanged',
+            { cx: cx, cy: cy, cz: cz, sx: sx, sy: sy, sz: sz }
+          );
+        }
+      } catch(e) { /* bridge not ready */ }
+    }
+
+    // ── Public API ────────────────────────────────────────────────────────────
+
+    /**
+     * Load protein.
+     * 1. Snapshot root children before load.
+     * 2. Delete previous protein refs.
+     * 3. Load new protein.
+     * 4. Diff root children to find new refs → store as _proteinRefs.
+     * 5. Parse PDB for centroid + bounds, center box, notify Flutter.
+     */
+    async function loadStructureBase64(b64, format) {
+      if (!_viewer) { setStatus('Viewer not ready'); return; }
+      setStatus('Loading protein...');
+
+      var text = decodeURIComponent(escape(atob(b64)));
+      var fmt  = (format === 'pdbqt') ? 'pdb' : (format || 'pdb');
+
+      try {
+        // 1. Delete previous protein
+        await _deleteRefs(_proteinRefs);
+        _proteinRefs = new Set();
+
+        // 2. Snapshot existing refs
+        var before = _rootChildRefs();
+
+        // 3. Load
+        var blob = new Blob([text], { type: 'text/plain' });
+        var url  = URL.createObjectURL(blob);
+        await _viewer.loadStructureFromUrl(url, fmt, false);
+        URL.revokeObjectURL(url);
+
+        // 4. Diff — new refs are the protein
+        var after = _rootChildRefs();
+        after.forEach(function(ref) {
+          if (!before.has(ref)) _proteinRefs.add(ref);
+        });
+
+        // 5. Parse PDB for centroid + bounds
+        var parsed = _parsePdb(text);
+        if (parsed) {
+          _proteinBounds = parsed.bounds;
+          var c = parsed.centroid;
+          // Initial box: centered on protein, size = 20 Å (or current size)
+          var clamped = _clampBoxToProtein(
+            c[0], c[1], c[2],
+            _boxParams.sx, _boxParams.sy, _boxParams.sz
+          );
+          _boxParams.cx = clamped.cx;
+          _boxParams.cy = clamped.cy;
+          _boxParams.cz = clamped.cz;
+          _notifyFlutter(clamped.cx, clamped.cy, clamped.cz);
+          setStatus('Protein loaded — edit grid box fields to adjust search space.');
+        } else {
+          setStatus('Protein loaded.');
+        }
+
+        _proteinLoaded = true;
+      } catch(e) {
+        console.error('Protein load error:', e);
+        setStatus('Protein load error: ' + (e.message || e));
+      }
+    }
+
+    /**
+     * Load ligand — same diff pattern, independent of protein.
+     */
+    async function loadLigandBase64(b64, format) {
+      if (!_viewer) { setStatus('Viewer not ready'); return; }
+      setStatus('Loading ligand...');
+
+      var text = decodeURIComponent(escape(atob(b64)));
+      var fmt  = (format === 'pdbqt' || format === 'pdb') ? 'pdb' : 'sdf';
+
+      try {
+        // 1. Delete previous ligand
+        await _deleteRefs(_ligandRefs);
+        _ligandRefs = new Set();
+
+        // 2. Snapshot
+        var before = _rootChildRefs();
+
+        // 3. Load
+        var blob = new Blob([text], { type: 'text/plain' });
+        var url  = URL.createObjectURL(blob);
+        await _viewer.loadStructureFromUrl(url, fmt, false);
+        URL.revokeObjectURL(url);
+
+        // 4. Diff
+        var after = _rootChildRefs();
+        after.forEach(function(ref) {
+          if (!before.has(ref)) _ligandRefs.add(ref);
+        });
+
+        setStatus('Ligand loaded.');
+      } catch(e) {
+        console.error('Ligand load error:', e);
+        setStatus('Ligand load error: ' + (e.message || e));
+      }
+    }
+
+
+    /**
+     * Called from Flutter when the user edits the grid-box fields.
+     * Clamps center to protein bounds and size to [5, 100].
+     * Always notifies Flutter back with the final clamped values so
+     * the text fields correct themselves if the user typed out-of-bounds.
+     */
+    function updateBox(cx, cy, cz, sx, sy, sz) {
+      var ncx = parseFloat(cx) || 0;
+      var ncy = parseFloat(cy) || 0;
+      var ncz = parseFloat(cz) || 0;
+      var nsx = Math.min(100, Math.max(5, parseFloat(sx) || 20));
+      var nsy = Math.min(100, Math.max(5, parseFloat(sy) || 20));
+      var nsz = Math.min(100, Math.max(5, parseFloat(sz) || 20));
+
+      // Clamp center to protein bounds if protein is loaded
+      if (_proteinLoaded && _proteinBounds) {
+        var clamped = _clampBoxToProtein(ncx, ncy, ncz, nsx, nsy, nsz);
+        ncx = clamped.cx; ncy = clamped.cy; ncz = clamped.cz;
+      }
+
+      _boxParams = { cx: ncx, cy: ncy, cz: ncz, sx: nsx, sy: nsy, sz: nsz };
+
+      // Always notify Flutter so out-of-bounds inputs get corrected in the UI
+      _notifyFlutterFull(ncx, ncy, ncz, nsx, nsy, nsz);
+    }
+
+    async function clearAll() {
+      if (!_viewer) return;
+      await _viewer.plugin.clear();
+      _proteinRefs   = new Set();
+      _ligandRefs    = new Set();
+      _proteinLoaded = false;
+      _proteinBounds = null;
+      setStatus('Cleared.');
+    }
+
+    /** Remove only the protein from the viewer. */
+    async function clearProtein() {
+      await _deleteRefs(_proteinRefs);
+      _proteinRefs   = new Set();
+      _proteinLoaded = false;
+      _proteinBounds = null;
+      setStatus('Protein removed.');
+    }
+
+    /** Remove only the ligand from the viewer. */
+    async function clearLigand() {
+      await _deleteRefs(_ligandRefs);
+      _ligandRefs = new Set();
+      setStatus('Ligand removed.');
+    }
+
+    // ── Canvas box overlay ────────────────────────────────────────────────────
+
+    function _scheduleBoxLoop() {
+      requestAnimationFrame(function() {
+        _drawBox();
+        _scheduleBoxLoop();
+      });
+    }
+
+    function _mat4LookAt(eye, center, up) {
+      var fx = center[0]-eye[0], fy = center[1]-eye[1], fz = center[2]-eye[2];
+      var fl = Math.sqrt(fx*fx+fy*fy+fz*fz);
+      if (fl < 1e-10) return null;
+      fx/=fl; fy/=fl; fz/=fl;
+      var sx = fy*up[2]-fz*up[1], sy = fz*up[0]-fx*up[2], sz = fx*up[1]-fy*up[0];
+      var sl = Math.sqrt(sx*sx+sy*sy+sz*sz);
+      if (sl < 1e-10) return null;
+      sx/=sl; sy/=sl; sz/=sl;
+      var ux = sy*fz-sz*fy, uy = sz*fx-sx*fz, uz = sx*fy-sy*fx;
+      var m = new Float32Array(16);
+      m[0]=sx;  m[1]=ux;  m[2]=-fx; m[3]=0;
+      m[4]=sy;  m[5]=uy;  m[6]=-fy; m[7]=0;
+      m[8]=sz;  m[9]=uz;  m[10]=-fz;m[11]=0;
+      m[12]=-(sx*eye[0]+sy*eye[1]+sz*eye[2]);
+      m[13]=-(ux*eye[0]+uy*eye[1]+uz*eye[2]);
+      m[14]= (fx*eye[0]+fy*eye[1]+fz*eye[2]);
+      m[15]=1;
+      return m;
+    }
+
+    function _mat4Perspective(fovY, aspect, near, far) {
+      var f  = 1.0 / Math.tan(fovY * 0.5);
+      var nf = 1.0 / (near - far);
+      var m  = new Float32Array(16);
+      m[0]=f/aspect; m[5]=f;
+      m[10]=(far+near)*nf; m[11]=-1;
+      m[14]=2*far*near*nf; m[15]=0;
+      return m;
+    }
+
+    function _mat4Mul(a, b) {
+      var r = new Float32Array(16);
+      for (var col = 0; col < 4; col++)
+        for (var row = 0; row < 4; row++) {
+          var sum = 0;
+          for (var k = 0; k < 4; k++) sum += a[k*4+row] * b[col*4+k];
+          r[col*4+row] = sum;
+        }
+      return r;
+    }
+
+    function _drawBox() {
+      var canvas = document.getElementById('box-canvas');
+      if (!canvas) return;
+
+      var W = canvas.clientWidth, H = canvas.clientHeight;
+      if (W === 0 || H === 0) return;
+      if (canvas.width  !== W) canvas.width  = W;
+      if (canvas.height !== H) canvas.height = H;
+
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, W, H);
+
+      if (!_proteinLoaded) return;
+      if (!_viewer || !_viewer.plugin || !_viewer.plugin.canvas3d) return;
+
+      var vp = null;
+      try {
+        var cam = _viewer.plugin.canvas3d.camera;
+        if (cam.viewProjection && cam.viewProjection.length >= 16) {
+          vp = cam.viewProjection;
+        } else {
+          var cs = cam.state;
+          if (cs) {
+            var pos    = cs.position || cs.eye;
+            var target = cs.target   || cs.center;
+            var up     = cs.up;
+            var fov    = cs.fov || cs.fieldOfView || (Math.PI / 4);
+            var near   = cs.near || 0.1;
+            var far    = cs.far  || 10000;
+            if (pos && target && up) {
+              var toArr = function(v) {
+                return v.x !== undefined ? [v.x, v.y, v.z] : [v[0], v[1], v[2]];
+              };
+              var viewMat = _mat4LookAt(toArr(pos), toArr(target), toArr(up));
+              var projMat = _mat4Perspective(fov, W / H, near, far);
+              if (viewMat && projMat) vp = _mat4Mul(projMat, viewMat);
+            }
+          }
+        }
+      } catch(e) { /* ignore */ }
+
+      if (!vp) return;
+
+      var p  = _boxParams;
+      var hx = p.sx/2, hy = p.sy/2, hz = p.sz/2;
+
+      var corners = [
+        [p.cx-hx, p.cy-hy, p.cz-hz], [p.cx+hx, p.cy-hy, p.cz-hz],
+        [p.cx+hx, p.cy+hy, p.cz-hz], [p.cx-hx, p.cy+hy, p.cz-hz],
+        [p.cx-hx, p.cy-hy, p.cz+hz], [p.cx+hx, p.cy-hy, p.cz+hz],
+        [p.cx+hx, p.cy+hy, p.cz+hz], [p.cx-hx, p.cy+hy, p.cz+hz],
+      ];
+
+      function project(pt) {
+        var x = pt[0], y = pt[1], z = pt[2];
+        var w = vp[3]*x + vp[7]*y + vp[11]*z + vp[15];
+        if (Math.abs(w) < 1e-7) return null;
+        var nx = (vp[0]*x + vp[4]*y + vp[8]*z  + vp[12]) / w;
+        var ny = (vp[1]*x + vp[5]*y + vp[9]*z  + vp[13]) / w;
+        return { x: (nx+1)*0.5*W, y: (-ny+1)*0.5*H };
+      }
+
+      var pts   = corners.map(project);
+      var edges = [
+        [0,1],[1,2],[2,3],[3,0],
+        [4,5],[5,6],[6,7],[7,4],
+        [0,4],[1,5],[2,6],[3,7],
+      ];
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(34,211,238,0.9)';
+      ctx.lineWidth   = 1.5;
+      ctx.setLineDash([6, 3]);
+
+      for (var i = 0; i < edges.length; i++) {
+        var a = pts[edges[i][0]], b = pts[edges[i][1]];
+        if (!a || !b) continue;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+
+      var ctr = project([p.cx, p.cy, p.cz]);
+      if (ctr) {
+        ctx.setLineDash([]);
+        ctx.strokeStyle = 'rgba(251,191,36,0.95)';
+        ctx.lineWidth   = 1.5;
+        var r = 6;
+        ctx.beginPath();
+        ctx.moveTo(ctr.x-r, ctr.y); ctx.lineTo(ctr.x+r, ctr.y);
+        ctx.moveTo(ctr.x, ctr.y-r); ctx.lineTo(ctr.x, ctr.y+r);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function setStatus(msg) {
+      var el = document.getElementById('status-bar');
+      if (!el) return;
+      if (!_showStatus) {
+        el.style.display = 'none';
+        return;
+      }
+      el.style.display = 'block';
+      el.textContent = msg;
+    }
+  </script>
+</body>
+</html>

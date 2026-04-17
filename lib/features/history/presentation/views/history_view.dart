@@ -1,36 +1,17 @@
+import 'package:ailixir/features/history/presentation/cubits/history_cubit/history_cubit.dart';
+import 'package:ailixir/features/history/presentation/widgets/history_view_body.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/core/themes/app_colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HistoryView extends StatelessWidget {
+  static const routeName = '/history';
   const HistoryView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.slate1000,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.history,
-              size: 80.sp,
-              color: AppColors.brandBlue.withOpacity(0.4),
-            ),
-            SizedBox(height: 24.h),
-            Text('Research History', style: AppTextStyles.h2),
-            SizedBox(height: 8.h),
-            Text(
-              'Timeline of past discoveries and clinical logs',
-              style: AppTextStyles.bodymedium.copyWith(
-                color: AppColors.authTextSecondary,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return BlocProvider(
+      create: (_) => HistoryCubit()..loadHistory(),
+      child: const Scaffold(body: HistoryViewBody()),
     );
   }
 }

@@ -14,10 +14,10 @@ class LocalAuthDataSource {
   }) async {
     await saveUserData(
       id: authLoginSuccessModel.user.id,
-      displayName: authLoginSuccessModel.user.displayName,
-      userName: authLoginSuccessModel.user.username,
-      profilePicture: authLoginSuccessModel.user.avatar,
-      bio: authLoginSuccessModel.user.bio,
+      name: authLoginSuccessModel.user.name,
+      email: authLoginSuccessModel.user.email,
+      role: authLoginSuccessModel.user.role,
+      avatar: authLoginSuccessModel.user.avatar,
     );
     await updateUserAccessToken(token: authLoginSuccessModel.token);
     // await saveUserTokens(
@@ -27,26 +27,33 @@ class LocalAuthDataSource {
   }
 
   Future<void> saveUserData({
-    String? id,
-    String? displayName,
-    String? userName,
-    String? profilePicture,
-    String? bio,
+    int? id,
+    String? name,
+    String? email,
+    String? role,
+    String? avatar,
   }) async {
     final current = CachedUserDataModel.fromCache();
     final updated = CachedUserDataModel(
       id: id ?? current.id,
-      displayName: displayName ?? current.displayName,
-      userName: userName ?? current.userName,
-      bio: bio ?? current.bio,
-      profilePicture: profilePicture ?? current.profilePicture,
+      name: name ?? current.name,
+      email: email ?? current.email,
+      role: role ?? current.role,
+      avatar: avatar ?? current.avatar,
     );
 
     for (final entry in updated.toMap().entries) {
-      await SharedPreferencesService.setString(
-        key: entry.key,
-        value: entry.value,
-      );
+      if (entry.value is String) {
+        await SharedPreferencesService.setString(
+          key: entry.key,
+          value: entry.value,
+        );
+      } else if (entry.value is int) {
+        await SharedPreferencesService.setInt(
+          key: entry.key,
+          value: entry.value,
+        );
+      }
     }
   }
 

@@ -3,50 +3,44 @@ import 'package:ailixir/core/constants/app_strings.dart';
 import 'package:ailixir/core/services/local_storage/shared_preferences_service.dart';
 
 class CachedUserDataModel {
-  final String id;
-  final String displayName;
-  final String userName;
-  final String profilePicture;
-  final String bio;
+  final int id;
+  final String name;
+  final String email;
+  final String role;
+  final String avatar;
 
   CachedUserDataModel({
     required this.id,
-    required this.displayName,
-    required this.userName,
-    required this.profilePicture,
-    required this.bio,
+    required this.name,
+    required this.email,
+    required this.role,
+    required this.avatar,
   });
 
   /// Factory constructor to build from SharedPreferences
   factory CachedUserDataModel.fromCache() {
     return CachedUserDataModel(
-      id:
-          SharedPreferencesService.getString(key: AppConstants.userIdKey) ??
-          AppStrings.userDefaultId,
-      displayName:
-          SharedPreferencesService.getString(
-            key: AppConstants.userDisplayNameKey,
-          ) ??
-          AppStrings.userDefaultDisplayName,
-      userName:
-          SharedPreferencesService.getString(
-            key: AppConstants.userUserNameKey,
-          ) ??
-          AppStrings.userDefaultUsername,
-      bio:
-          SharedPreferencesService.getString(key: AppConstants.userBioKey) ??
-          AppStrings.userDefaultBio,
-      profilePicture:
+      id: SharedPreferencesService.getInt(key: AppConstants.userIdKey),
+      name:
+          SharedPreferencesService.getString(key: AppConstants.userNameKey) ??
+          AppStrings.userDefaultName,
+      email:
+          SharedPreferencesService.getString(key: AppConstants.userEmailKey) ??
+          AppStrings.userDefaultEmail,
+      role:
+          SharedPreferencesService.getString(key: AppConstants.userRoleKey) ??
+          AppStrings.userDefaultRole,
+      avatar:
           SharedPreferencesService.getString(key: AppConstants.userImageKey) ??
           '',
     );
   }
 
-  Map<String, String> toMap() => {
+  Map<String, dynamic> toMap() => {
     AppConstants.userIdKey: id,
-    AppConstants.userDisplayNameKey: displayName,
-    AppConstants.userUserNameKey: userName,
-    AppConstants.userBioKey: bio,
-    AppConstants.userImageKey: profilePicture,
+    AppConstants.userNameKey: name,
+    AppConstants.userEmailKey: email,
+    AppConstants.userRoleKey: role,
+    AppConstants.userImageKey: avatar,
   };
 }

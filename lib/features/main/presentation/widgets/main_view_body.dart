@@ -1,3 +1,4 @@
+import 'package:fade_indexed_stack/fade_indexed_stack.dart';
 import 'package:flutter/material.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/features/home/presentation/widgets/home_view_body.dart';
@@ -20,23 +21,15 @@ class MainViewBody extends StatefulWidget {
 class _MainViewBodyState extends State<MainViewBody> {
   int _selectedIndex = 0;
 
-  Widget _buildBody() {
-    // Widgets are only created when this function runs for a specific index
-    switch (_selectedIndex) {
-      case 1:
-        return const MolecularLabView();
-      case 2:
-        return const GenerationView();
-      case 3:
-        return const DockingView();
-      case 4:
-        return const MDView();
-      case 5:
-        return const HistoryView();
-      default:
-        return const HomeViewBody();
-    }
-  }
+  // All screens are kept alive in the IndexedStack — built once, never rebuilt.
+  static const _screens = [
+    HomeViewBody(), // 0
+    MolecularLabView(), // 1
+    GenerationView(), // 2
+    DockingView(), // 3
+    MDView(), // 4
+    HistoryView(), // 5
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -49,22 +42,7 @@ class _MainViewBodyState extends State<MainViewBody> {
             onNavTap: (i) => setState(() => _selectedIndex = i),
           ),
           Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 260),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (child, anim) => FadeTransition(
-                opacity: anim,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.02),
-                    end: Offset.zero,
-                  ).animate(anim),
-                  child: child,
-                ),
-              ),
-              child: _buildBody(),
-            ),
+            child: FadeIndexedStack(index: _selectedIndex, children: _screens),
           ),
         ],
       ),
