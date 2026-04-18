@@ -1,4 +1,4 @@
-import 'package:fade_indexed_stack/fade_indexed_stack.dart';
+import 'package:ailixir/core/widgets/indexed_stack/fade_lazy_load_indexed_stack.dart';
 import 'package:flutter/material.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/features/home/presentation/widgets/home_view_body.dart';
@@ -42,7 +42,11 @@ class _MainViewBodyState extends State<MainViewBody> {
             onNavTap: (i) => setState(() => _selectedIndex = i),
           ),
           Expanded(
-            child: FadeIndexedStack(index: _selectedIndex, children: _screens),
+            child: FadeLazyLoadIndexedStack(
+              index: _selectedIndex,
+              autoDisposeIndexes: [1], // auto dispose index 1 = Molecular Lab
+              children: _screens,
+            ),
           ),
         ],
       ),
