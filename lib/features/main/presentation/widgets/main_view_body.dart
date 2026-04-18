@@ -44,7 +44,7 @@ class _MainViewBodyState extends State<MainViewBody> {
           Expanded(
             child: FadeLazyLoadIndexedStack(
               index: _selectedIndex,
-              autoDisposeIndexes: [1], // auto dispose index 1 = Molecular Lab
+              // autoDisposeIndexes: [1], // auto dispose index 1 = Molecular Lab
               children: _screens,
             ),
           ),
