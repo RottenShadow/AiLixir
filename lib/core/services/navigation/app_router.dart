@@ -6,6 +6,7 @@ import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
 import 'package:ailixir/features/scientists/data/models/scientist_package.dart';
 import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:ailixir/features/scientists/presentation/views/single_scientist_view.dart';
+import 'package:ailixir/features/similarity/presentation/views/similarity_result_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/custom_photo_view.dart';
@@ -48,6 +49,13 @@ abstract class AppRouter {
           return SingleAwardView(award: pkg.award, cubit: pkg.cubit);
         },
       ),
+      GoRoute(
+        path: SimilarityResultView.routeName,
+        builder: (context, state) {
+          return SimilarityResultView(smileQuery: state.extra as String);
+        },
+      ),
+
       // Splash & Onboarding
       GoRoute(
         path: SplashView.routeName,

@@ -1,3 +1,4 @@
+import 'package:ailixir/features/similarity/presentation/views/similarity_view.dart';
 import 'package:flutter/material.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/features/home/presentation/widgets/home_view_body.dart';
@@ -33,6 +34,8 @@ class _MainViewBodyState extends State<MainViewBody> {
         return const MDView();
       case 5:
         return const HistoryView();
+      case 6:
+        return SimilarityView();
       default:
         return const HomeViewBody();
     }
