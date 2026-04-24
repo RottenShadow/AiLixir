@@ -1,3 +1,4 @@
+import 'package:ailixir/features/admet/presentation/admet_view.dart';
 import 'package:ailixir/features/similarity/presentation/views/similarity_view.dart';
 import 'package:flutter/material.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
@@ -36,6 +37,8 @@ class _MainViewBodyState extends State<MainViewBody> {
         return const HistoryView();
       case 6:
         return SimilarityView();
+      case 7:
+        return AdmetView();
       default:
         return const HomeViewBody();
     }

@@ -93,7 +93,7 @@ class _OperationsDropdown extends StatelessWidget {
     (index: 3, icon: Icons.handshake_outlined, label: 'Docking'),
     (index: 4, icon: Icons.waves, label: 'MD'),
     (index: 6, icon: Icons.science, label: 'Similarity'),
-    (index: 7, icon: Icons.science, label: 'ADMET'),
+    (index: 7, icon: Icons.autofps_select, label: 'ADMET'),
   ];
 
   @override
