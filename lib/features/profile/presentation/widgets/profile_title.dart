@@ -1,6 +1,5 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:ailixir/features/profile/presentation/widgets/extra.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,7 +30,7 @@ class ProfileTitle extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 0.015.sh,
           children: [
-            Text("Dr. Tamer", style: AppTextStyles.small),
+            Text("Dr. Jane Doe", style: AppTextStyles.small),
             iconLabel(
               "Stanford University • Senior Biologist",
               Icons.school_outlined,
