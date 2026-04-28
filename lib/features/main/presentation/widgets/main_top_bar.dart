@@ -1,4 +1,6 @@
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/gradient_text.dart';
+import 'package:ailixir/features/profile/presentation/views/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
@@ -231,39 +233,44 @@ class _NavItemContent extends StatelessWidget {
 class _ProfileChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-      decoration: BoxDecoration(
-        color: AppColors.slate1000,
-        borderRadius: BorderRadius.circular(30.r),
-        border: Border.all(color: AppColors.brandBorder),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 12.r,
-            backgroundColor: AppColors.brandBlue,
-            child: const Text(
-              'JD',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10,
-                fontWeight: FontWeight.bold,
+    return InkWell(
+        onTap: (){
+         context.navigateTo(ProfileView.routeName);
+        },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+        decoration: BoxDecoration(
+          color: AppColors.slate1000,
+          borderRadius: BorderRadius.circular(30.r),
+          border: Border.all(color: AppColors.brandBorder),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 12.r,
+              backgroundColor: AppColors.brandBlue,
+              child: const Text(
+                'JD',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          SizedBox(width: 8.w),
-          Text(
-            'Dr. Jane Doe',
-            style: AppTextStyles.labelsmall.copyWith(color: AppColors.white),
-          ),
-          SizedBox(width: 4.w),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            color: AppColors.authTextSecondary,
-            size: 16,
-          ),
-        ],
+            SizedBox(width: 8.w),
+            Text(
+              'Dr. Jane Doe',
+              style: AppTextStyles.labelsmall.copyWith(color: AppColors.white),
+            ),
+            SizedBox(width: 4.w),
+            const Icon(
+              Icons.keyboard_arrow_down,
+              color: AppColors.authTextSecondary,
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }
