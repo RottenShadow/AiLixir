@@ -111,11 +111,6 @@ class _DockingCard extends StatelessWidget {
                 label: 'Vina Score',
                 value: docking.vinaScore.toString(),
               ),
-              SizedBox(width: 20.w),
-              _StatItem(
-                label: 'Hydrogen Bonds',
-                value: docking.hydrogenBonds.toString(),
-              ),
               const Spacer(),
               Container(
                 width: 36.w,

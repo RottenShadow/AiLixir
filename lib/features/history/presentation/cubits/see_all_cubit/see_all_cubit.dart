@@ -97,7 +97,6 @@ class DockingSeeAllCubit extends Cubit<SeeAllState<DockingEntity>> {
       jobId: 'JOB-${1000 + i}-${44000 + i * 7}',
       createdAt: DateTime.now().subtract(Duration(days: i + 1)),
       vinaScore: t.$3 - (i % 3) * 0.3,
-      hydrogenBonds: 2 + (i % 3),
     );
   });
 

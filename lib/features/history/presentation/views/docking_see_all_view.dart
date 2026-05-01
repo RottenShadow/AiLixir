@@ -209,9 +209,6 @@ class _DockingRow extends StatelessWidget {
           // Vina Score
           _ScoreChip(label: 'Vina', value: docking.vinaScore.toString()),
           SizedBox(width: 12.w),
-          // H-Bonds
-          _ScoreChip(label: 'H-Bonds', value: docking.hydrogenBonds.toString()),
-          SizedBox(width: 12.w),
           // Download
           Container(
             width: 34.w,
