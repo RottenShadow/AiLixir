@@ -20,4 +20,13 @@ abstract class AppEndpoints {
   static const String authRefreshToken = '$authBaseUrl/refresh-token';
   static const String authUpdatePassword = '$authBaseUrl/password';
   static const String authLogout = '$authBaseUrl/logout';
+
+  // Drug Repurposing Endpoints
+  static const String drugRepurposingBaseUrl =
+      'https://rottenshadow-test-drug-purposing.hf.space/api/v1/screen';
+  static const String drugRepurposingScreen = '/screen';
+  static String drugRepurposingTargets(String diseaseName) {
+    final String encodedDisease = Uri.encodeComponent(diseaseName);
+    return '/targets/$encodedDisease';
+  }
 }
