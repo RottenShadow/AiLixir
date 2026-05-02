@@ -1,0 +1,48 @@
+name: Flutter Windows Release
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build_windows:
+    name: Build Windows Release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Enable Windows support
+        run: flutter config --enable-windows-desktop
+
+      - name: Create .env file
+        shell: bash
+        run: |
+          cat << EOF > .env
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          HF_TOKEN=${{ secrets.HF_TOKEN }}
+          EOF
+
+      - name: Build Windows Release
+        run: flutter build windows --release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ailixir-windows-release
+          path: build/windows/x64/runner/Release/
