@@ -1,0 +1,1 @@
+enum DrugRepurposingMode { quick, full }
