@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ailixir/core/services/api/dio_interceptor.dart';
@@ -8,8 +9,13 @@ import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.da
 class DioService {
   final Dio dio;
   final LocalAuthDataSource localAuthDataSource;
+  final String? forcedToken;
 
-  DioService({required this.dio, required this.localAuthDataSource});
+  DioService({
+    required this.dio,
+    required this.localAuthDataSource,
+    this.forcedToken,
+  });
 
   void init() async {
     // TODO: remove this when we get the real certificate
@@ -18,13 +24,22 @@ class DioService {
     //   client.badCertificateCallback = (cert, host, port) => true;
     //   return client;
     // };
+    (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+      final client = HttpClient();
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
     dio.interceptors.addAll([
-      DioInterceptors(client: dio, localAuthDataSource: localAuthDataSource),
+      DioInterceptors(
+        client: dio,
+        localAuthDataSource: localAuthDataSource,
+        forcedToken: forcedToken,
+      ),
       PrettyDioLogger(),
     ]);
   }
 
-  Future<Map<String, dynamic>> get({
+  Future<dynamic> get({
     required String endpoint,
     Map<String, dynamic>? data,
     Map<String, dynamic>? queryParameters,
@@ -33,12 +48,13 @@ class DioService {
     var res = await dio.get(
       endpoint,
       data: data,
+      queryParameters: queryParameters,
       options: Options(headers: headers),
     );
     return res.data;
   }
 
-  Future<Map<String, dynamic>> post({
+  Future<dynamic> post({
     required String endpoint,
     dynamic data,
     Map<String, dynamic>? queryParameters,
@@ -47,12 +63,13 @@ class DioService {
     var res = await dio.post(
       endpoint,
       data: data,
+      queryParameters: queryParameters,
       options: Options(headers: headers),
     );
     return res.data;
   }
 
-  Future<Map<String, dynamic>> patch({
+  Future<dynamic> patch({
     required String endpoint,
     Map<String, dynamic>? data,
     Map<String, dynamic>? queryParameters,
@@ -61,12 +78,13 @@ class DioService {
     var res = await dio.patch(
       endpoint,
       data: data,
+      queryParameters: queryParameters,
       options: Options(headers: headers),
     );
     return res.data;
   }
 
-  Future delete({
+  Future<dynamic> delete({
     required String endpoint,
     Map<String, dynamic>? data,
     Map<String, dynamic>? queryParameters,
@@ -75,6 +93,7 @@ class DioService {
     var res = await dio.delete(
       endpoint,
       data: data,
+      queryParameters: queryParameters,
       options: Options(headers: headers),
     );
     return res.data;

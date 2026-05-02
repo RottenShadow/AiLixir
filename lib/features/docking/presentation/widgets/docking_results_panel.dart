@@ -17,8 +17,10 @@ class DockingResultsPanel extends StatelessWidget {
           children: [
             Icon(Icons.hub_outlined, color: AppColors.cyan400, size: 16.sp),
             SizedBox(width: 6.w),
-            Text('Docking Results',
-                style: AppTextStyles.h5.copyWith(color: AppColors.white)),
+            Text(
+              'Docking Results',
+              style: AppTextStyles.h5.copyWith(color: AppColors.white),
+            ),
           ],
         ),
         SizedBox(height: 10.h),
@@ -55,21 +57,20 @@ class _DockingResultCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Icon(Icons.download_outlined,
-                  color: AppColors.slate400, size: 16.sp),
+              Icon(
+                Icons.download_outlined,
+                color: AppColors.slate400,
+                size: 16.sp,
+              ),
             ],
           ),
           SizedBox(height: 4.h),
-          Text('Job: ${result.jobId}',
-              style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500)),
-          SizedBox(height: 8.h),
-          Row(
-            children: [
-              _Stat('Vina Score', result.vinaScore.toString()),
-              SizedBox(width: 16.w),
-              _Stat('H-Bonds', result.hydrogenBonds.toString()),
-            ],
+          Text(
+            'Job: ${result.jobId}',
+            style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
           ),
+          SizedBox(height: 8.h),
+          _Stat('Vina Score', result.vinaScore.toString()),
         ],
       ),
     );
@@ -86,10 +87,11 @@ class _Stat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400)),
-        Text(value,
-            style: AppTextStyles.h5.copyWith(color: AppColors.cyan400)),
+        Text(
+          label,
+          style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+        ),
+        Text(value, style: AppTextStyles.h5.copyWith(color: AppColors.cyan400)),
       ],
     );
   }

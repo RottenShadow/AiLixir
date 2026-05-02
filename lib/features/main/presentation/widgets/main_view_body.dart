@@ -1,4 +1,4 @@
-import 'package:fade_indexed_stack/fade_indexed_stack.dart';
+import 'package:ailixir/core/widgets/indexed_stack/fade_lazy_load_indexed_stack.dart';
 import 'package:flutter/material.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/features/home/presentation/widgets/home_view_body.dart';
@@ -6,11 +6,12 @@ import 'package:ailixir/features/molecular_lab/presentation/views/molecular_lab_
 import 'package:ailixir/features/generation/presentation/views/generation_view.dart';
 import 'package:ailixir/features/docking/presentation/views/docking_view.dart';
 import 'package:ailixir/features/molecular_dynamics/presentation/views/md_view.dart';
+import 'package:ailixir/features/drug_repurposing/presentation/views/drug_repurposing_view.dart';
 import 'package:ailixir/features/history/presentation/views/history_view.dart';
 import 'main_top_bar.dart';
 
 // Page index constants — single source of truth
-// 0 News Feed (Home View) | 1 Molecular Lab | 2 Generation | 3 Docking | 4 MD | 5 History
+// 0 News Feed (Home View) | 1 Molecular Lab | 2 Generation | 3 Docking | 4 MD | 5 Drug Repurposing | 6 History
 class MainViewBody extends StatefulWidget {
   const MainViewBody({super.key});
 
@@ -23,12 +24,13 @@ class _MainViewBodyState extends State<MainViewBody> {
 
   // All screens are kept alive in the IndexedStack — built once, never rebuilt.
   static const _screens = [
-    HomeViewBody(), // 0
-    MolecularLabView(), // 1
-    GenerationView(), // 2
-    DockingView(), // 3
-    MDView(), // 4
-    HistoryView(), // 5
+    HomeViewBody(),          // 0
+    MolecularLabView(),      // 1
+    GenerationView(),        // 2
+    DockingView(),           // 3
+    MDView(),                // 4
+    DrugRepurposingView(),   // 5
+    HistoryView(),           // 6
   ];
 
   @override
@@ -42,7 +44,11 @@ class _MainViewBodyState extends State<MainViewBody> {
             onNavTap: (i) => setState(() => _selectedIndex = i),
           ),
           Expanded(
-            child: FadeIndexedStack(index: _selectedIndex, children: _screens),
+            child: FadeLazyLoadIndexedStack(
+              index: _selectedIndex,
+              // autoDisposeIndexes: [1], // auto dispose index 1 = Molecular Lab
+              children: _screens,
+            ),
           ),
         ],
       ),

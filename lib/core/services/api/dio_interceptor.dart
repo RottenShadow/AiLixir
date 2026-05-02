@@ -13,8 +13,13 @@ import 'package:ailixir/features/auth/presentation/cubits/auth_cubit/auth_cubit.
 class DioInterceptors extends Interceptor {
   final Dio client;
   final LocalAuthDataSource localAuthDataSource;
+  final String? forcedToken;
 
-  DioInterceptors({required this.client, required this.localAuthDataSource});
+  DioInterceptors({
+    required this.client,
+    required this.localAuthDataSource,
+    this.forcedToken,
+  });
 
   // TODO: Refactor this shit
 
@@ -38,7 +43,7 @@ class DioInterceptors extends Interceptor {
       return handler.next(options);
     }
 
-    final token = await localAuthDataSource.getUserToken();
+    final token = forcedToken ?? await localAuthDataSource.getUserToken();
 
     if (token != null) {
       options.headers[HttpHeaders.authorizationHeader] =
@@ -65,7 +70,9 @@ class DioInterceptors extends Interceptor {
 
     // Refresh request itself failed → force logout once
     if (statusCode == 401 && isRefreshRequest) {
-      await _forceLogoutOnce();
+      if (forcedToken == null) {
+        await _forceLogoutOnce();
+      }
       return handler.next(err);
     }
 

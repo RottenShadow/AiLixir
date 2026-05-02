@@ -18,8 +18,8 @@ class MainTopBar extends StatelessWidget {
     required this.onNavTap,
   });
 
-  // Operations is active whenever one of its 3 sub-pages is selected
-  bool get _opsActive => selectedIndex >= 2 && selectedIndex <= 4;
+  // Operations is active whenever one of its sub-pages is selected
+  bool get _opsActive => selectedIndex >= 2 && selectedIndex <= 5;
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +65,8 @@ class MainTopBar extends StatelessWidget {
           _NavItem(
             icon: Icons.history,
             label: 'History',
-            isActive: selectedIndex == 5,
-            onTap: () => onNavTap(5),
+            isActive: selectedIndex == 6,
+            onTap: () => onNavTap(6),
           ),
 
           const Spacer(),
@@ -92,6 +92,7 @@ class _OperationsDropdown extends StatelessWidget {
     (index: 2, icon: Icons.auto_awesome, label: 'New Generation'),
     (index: 3, icon: Icons.handshake_outlined, label: 'Docking'),
     (index: 4, icon: Icons.waves, label: 'MD'),
+    (index: 5, icon: Icons.biotech, label: 'Drug Repurposing'),
   ];
 
   @override
