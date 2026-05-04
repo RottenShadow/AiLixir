@@ -15,9 +15,7 @@ abstract class AppValidators {
     caseSensitive: false,
     multiLine: false,
   );
-  static final usernameRegex = RegExp(
-    r'^[a-zA-Z0-9_]+$',
-  );
+  static final usernameRegex = RegExp(r'^[a-zA-Z0-9_]+$');
 
   static String? validate(AppValidatorType type, String value) {
     switch (type) {

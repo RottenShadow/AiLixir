@@ -1,6 +1,9 @@
+import 'package:ailixir/features/auth/data/repos/auth_repo_impl.dart';
 import 'package:ailixir/features/auth/data/repos/social_auth_repo_impl.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
+import 'package:ailixir/features/drug_repurposing/data/repositories/drug_repurposing_repository.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
@@ -29,9 +32,9 @@ void getItRegisterSingleton() {
     () => Dio(
       BaseOptions(
         baseUrl: AppEndpoints.baseUrl,
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
-        sendTimeout: const Duration(seconds: 10),
+        connectTimeout: const Duration(seconds: 3),
+        receiveTimeout: const Duration(seconds: 3),
+        sendTimeout: const Duration(seconds: 3),
       ),
     ),
   );
@@ -44,6 +47,14 @@ void getItRegisterSingleton() {
 
   // My Repos
 
+  GetIt.I.registerLazySingleton<AuthRepoImpl>(
+    () => AuthRepoImpl(
+      localAuthDataSource: GetIt.I.get(),
+      remoteAuthDataSource: GetIt.I.get(),
+      dioService: GetIt.I.get(),
+    ),
+  );
+
   GetIt.I.registerLazySingleton<SocialAuthRepoImpl>(
     () => SocialAuthRepoImpl(
       localAuthDataSource: GetIt.I.get(),
@@ -51,9 +62,29 @@ void getItRegisterSingleton() {
       dioService: GetIt.I.get(),
     ),
   );
+
   GetIt.I.registerLazySingleton<AwardRepo>(
     () => AwardRepo(dioService: GetIt.I.get()),
   );
+
+  // Drug Repurposing uses its own Dio instance pointing at the HuggingFace API
+  GetIt.I.registerLazySingleton<DrugRepurposingRepository>(() {
+    final drugDio = Dio(
+      BaseOptions(
+        baseUrl: AppEndpoints.drugRepurposingBaseUrl,
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 120),
+        sendTimeout: const Duration(seconds: 60),
+      ),
+    );
+    final drugDioService = DioService(
+      dio: drugDio,
+      localAuthDataSource: GetIt.I.get(),
+      forcedToken: dotenv.env['HF_TOKEN'],
+    )..init();
+    return DrugRepurposingRepository(dio: drugDioService);
+  });
+
   // My Cubits
 
   GetIt.I.registerLazySingleton<AuthCubit>(() => AuthCubit());

@@ -60,7 +60,7 @@ class MyMaterialApp extends StatelessWidget {
           darkTheme: AppThemes.getTheme(context, isDarkTheme: true),
           theme: AppThemes.getTheme(context, isDarkTheme: false),
           builder: (context, widget) {
-            log('Did Rebuild App22 ${S.current.locale}');
+            log('Did Rebuild App22');
             return AnnotatedRegion<SystemUiOverlayStyle>(
               value: const SystemUiOverlayStyle(
                 statusBarColor: Colors.transparent,

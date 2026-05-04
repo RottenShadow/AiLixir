@@ -1,5 +1,4 @@
-import 'package:ailixir/features/admet/presentation/admet_view.dart';
-import 'package:ailixir/features/similarity/presentation/views/similarity_view.dart';
+import 'package:ailixir/core/widgets/indexed_stack/fade_lazy_load_indexed_stack.dart';
 import 'package:flutter/material.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/features/home/presentation/widgets/home_view_body.dart';
@@ -7,11 +6,11 @@ import 'package:ailixir/features/molecular_lab/presentation/views/molecular_lab_
 import 'package:ailixir/features/generation/presentation/views/generation_view.dart';
 import 'package:ailixir/features/docking/presentation/views/docking_view.dart';
 import 'package:ailixir/features/molecular_dynamics/presentation/views/md_view.dart';
+import 'package:ailixir/features/drug_repurposing/presentation/views/drug_repurposing_view.dart';
 import 'package:ailixir/features/history/presentation/views/history_view.dart';
 import 'main_top_bar.dart';
 
 // Page index constants — single source of truth
-// 0 News Feed (Home View) | 1 Molecular Lab | 2 Generation | 3 Docking | 4 MD | 5 History
 class MainViewBody extends StatefulWidget {
   const MainViewBody({super.key});
 
@@ -22,27 +21,16 @@ class MainViewBody extends StatefulWidget {
 class _MainViewBodyState extends State<MainViewBody> {
   int _selectedIndex = 0;
 
-  Widget _buildBody() {
-    // Widgets are only created when this function runs for a specific index
-    switch (_selectedIndex) {
-      case 1:
-        return const MolecularLabView();
-      case 2:
-        return const GenerationView();
-      case 3:
-        return const DockingView();
-      case 4:
-        return const MDView();
-      case 5:
-        return const HistoryView();
-      case 6:
-        return SimilarityView();
-      case 7:
-        return AdmetView();
-      default:
-        return const HomeViewBody();
-    }
-  }
+  // All screens are kept alive in the IndexedStack — built once, never rebuilt.
+  static const _screens = [
+    HomeViewBody(), // 0
+    MolecularLabView(), // 1
+    GenerationView(), // 2
+    DockingView(), // 3
+    MDView(), // 4
+    DrugRepurposingView(), // 5
+    HistoryView(), // 6
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -55,21 +43,10 @@ class _MainViewBodyState extends State<MainViewBody> {
             onNavTap: (i) => setState(() => _selectedIndex = i),
           ),
           Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 260),
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              transitionBuilder: (child, anim) => FadeTransition(
-                opacity: anim,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.02),
-                    end: Offset.zero,
-                  ).animate(anim),
-                  child: child,
-                ),
-              ),
-              child: _buildBody(),
+            child: FadeLazyLoadIndexedStack(
+              index: _selectedIndex,
+              // autoDisposeIndexes: [1], // auto dispose index 1 = Molecular Lab
+              children: _screens,
             ),
           ),
         ],

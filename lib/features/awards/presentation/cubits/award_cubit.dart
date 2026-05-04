@@ -15,7 +15,7 @@ class AwardsCubit extends Cubit<AwardState> {
   final _repo = GetIt.I.get<AwardRepo>();
   AwardsCubit() : super(AwardInitial());
 
-  Future<void> getAwards() async {
+  Future<void> getAwards(String query) async {
     emit(AwardLoading());
     var res = await _repo.getAwards();
     res.fold(

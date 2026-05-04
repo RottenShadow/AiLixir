@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:ailixir/core/services/molstar_server_service.dart';
 
 part 'molecular_lab_state.dart';
 
@@ -8,11 +8,9 @@ class MolecularLabCubit extends Cubit<MolecularLabState> {
   MolecularLabCubit() : super(MolecularLabInitial()) {
     _init();
   }
-  final InAppLocalhostServer _localhostServer = InAppLocalhostServer(
-    documentRoot: 'assets/web/viewer',
-  );
+
   void _init() async {
-    await _localhostServer.start();
+    await MolstarServerService().start();
   }
 
   void loadPdb(String id) {
@@ -31,7 +29,7 @@ class MolecularLabCubit extends Cubit<MolecularLabState> {
 
   @override
   Future<void> close() async {
-    await _localhostServer.close();
+    // We don't stop the server here because it might be needed by other views
     await super.close();
   }
 }

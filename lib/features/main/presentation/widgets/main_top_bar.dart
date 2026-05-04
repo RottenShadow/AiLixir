@@ -1,6 +1,7 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/gradient_text.dart';
 import 'package:ailixir/features/profile/presentation/views/profile_view.dart';
+import 'package:ailixir/core/widgets/gradient_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
@@ -21,7 +22,8 @@ class MainTopBar extends StatelessWidget {
   });
 
   // Operations is active whenever one of its 3 sub-pages is selected
-  bool get _opsActive => selectedIndex >= 2 && selectedIndex <= 4;
+  // Operations is active whenever one of its sub-pages is selected
+  bool get _opsActive => selectedIndex >= 2 && selectedIndex <= 5;
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +69,8 @@ class MainTopBar extends StatelessWidget {
           _NavItem(
             icon: Icons.history,
             label: 'History',
-            isActive: selectedIndex == 5,
-            onTap: () => onNavTap(5),
+            isActive: selectedIndex == 6,
+            onTap: () => onNavTap(6),
           ),
 
           const Spacer(),
@@ -94,8 +96,7 @@ class _OperationsDropdown extends StatelessWidget {
     (index: 2, icon: Icons.auto_awesome, label: 'New Generation'),
     (index: 3, icon: Icons.handshake_outlined, label: 'Docking'),
     (index: 4, icon: Icons.waves, label: 'MD'),
-    (index: 6, icon: Icons.science, label: 'Similarity'),
-    (index: 7, icon: Icons.autofps_select, label: 'ADMET'),
+    (index: 5, icon: Icons.biotech, label: 'Drug Repurposing'),
   ];
 
   @override
@@ -234,9 +235,9 @@ class _ProfileChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: (){
-         context.navigateTo(ProfileView.routeName);
-        },
+      onTap: () {
+        context.navigateTo(ProfileView.routeName);
+      },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
         decoration: BoxDecoration(
