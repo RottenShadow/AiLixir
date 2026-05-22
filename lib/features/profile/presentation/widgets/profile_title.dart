@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileTitle extends StatelessWidget {
-  const ProfileTitle({super.key});
+  final String username;
+  const ProfileTitle({super.key, this.username = "Jane Doe"});
   @override
   Widget build(BuildContext context) {
+    String secondChar = username.split(" ").last[0];
     return Row(
       spacing: 0.01.sw,
       mainAxisSize: MainAxisSize.max,
@@ -17,12 +19,12 @@ class ProfileTitle extends StatelessWidget {
         ClipRRect(
           clipBehavior: Clip.antiAlias,
           borderRadius: BorderRadiusGeometry.circular(12.r),
-          child: Image.network(
-            "http://st3.depositphotos.com/1000975/12502/i/450/depositphotos_125020636-Woman-chemist-working-in-the-lab.jpg",
-            fit: BoxFit.cover,
+          child: Container(
+            color: AppColors.brandBlue,
             width: 0.06.sw,
             height: 0.06.sw,
-            alignment: Alignment.topLeft,
+            alignment: Alignment.center,
+            child: Text("${username[0]}$secondChar", style: AppTextStyles.xl),
           ),
         ),
         Column(
@@ -30,7 +32,7 @@ class ProfileTitle extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 0.015.sh,
           children: [
-            Text("Dr. Jane Doe", style: AppTextStyles.small),
+            Text(username, style: AppTextStyles.small),
             iconLabel(
               "Stanford University • Senior Biologist",
               Icons.school_outlined,

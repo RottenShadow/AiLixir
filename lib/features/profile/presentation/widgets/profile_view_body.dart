@@ -1,5 +1,7 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/features/profile/data/models/profile_model.dart';
+import 'package:ailixir/features/profile/data/repos/profile_repo.dart';
 import 'package:ailixir/features/profile/presentation/widgets/credits_island.dart';
 import 'package:ailixir/features/profile/presentation/widgets/extra.dart';
 import 'package:ailixir/features/profile/presentation/widgets/history_card.dart';
@@ -9,8 +11,27 @@ import 'package:ailixir/features/profile/presentation/widgets/status_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ProfileViewBody extends StatelessWidget {
+class ProfileViewBody extends StatefulWidget {
   const ProfileViewBody({super.key});
+  @override
+  State<StatefulWidget> createState() => _ProfileViewBodyState();
+}
+
+class _ProfileViewBodyState extends State<ProfileViewBody> {
+  late ProfileModel _profile;
+  final ProfileRepo _repo = ProfileRepo();
+  @override
+  void initState() {
+    super.initState();
+    _repo.getTestProfile("").then((v) {
+      v.fold((f) {}, (profile) {
+        setState(() {
+          _profile = profile;
+        });
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -30,7 +51,7 @@ class ProfileViewBody extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 10,
                 children: [
-                  ProfileTitle(),
+                  ProfileTitle(username: _profile.name),
                   iconLabel(
                     "Usage Statistis",
                     Icons.query_stats,
