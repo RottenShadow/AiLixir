@@ -11,15 +11,15 @@ class ScientistRepo {
   Future<Either<Failure, Map<String, dynamic>>> getAwards(int scientistId) {
     return safeApiCall(() async {
       return await dioService.get(
-        endpoint: "${AppEndpoints.baseUrl}scientists/$scientistId/awards",
+        endpoint: "${AppEndpoints.baseUrl}/api/scientists/$scientistId/awards",
       );
     });
   }
 
-  Future<Either<Failure, Map<String, dynamic>>> getScientists() {
+  Future<Either<Failure, Map<String, dynamic>>> getScientists({int page = 1}) {
     return safeApiCall(() async {
       return await dioService.get(
-        endpoint: "${AppEndpoints.baseUrl}scientists",
+        endpoint: "${AppEndpoints.baseUrl}/api/scientists?page=$page",
       );
     });
   }
@@ -60,10 +60,17 @@ class ScientistRepo {
     return Right(res);
   }
 
-  Future<Either<Failure, Map<String, dynamic>>> getTestScientists() async {
+  Future<Either<Failure, Map<String, dynamic>>> getTestScientists({
+    int page = 1,
+  }) async {
     await Future.delayed(Duration(milliseconds: 30));
     Map<String, dynamic> res = {
       "success": true,
+      "pagination": {
+        "currentPage": page,
+        "totalPages": 3,
+        "hasNextPage": page < 3,
+      },
       "data": {
         "results": [
           {

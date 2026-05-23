@@ -11,7 +11,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:math';
 
 class ScientistCreditsViewBody extends StatefulWidget {
-  const ScientistCreditsViewBody({super.key});
+  final Future<List<ScientistModel>> Function() getPage;
+  const ScientistCreditsViewBody({super.key, required this.getPage});
   @override
   State<StatefulWidget> createState() => _ScientistCreditState();
 }
@@ -19,6 +20,7 @@ class ScientistCreditsViewBody extends StatefulWidget {
 class _ScientistCreditState extends State<ScientistCreditsViewBody> {
   late ScrollController _scrollController;
   late int _currentScientist;
+  List<ScientistModel> scientists = [];
 
   @override
   void initState() {
@@ -40,7 +42,8 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
         if (state is ScientistCreditError) {
           return Center(child: Text("Error: Failed to Fetch"));
         } else if (state is ScientistCreditSuccess) {
-          return _body(state.res);
+          scientists = state.res;
+          return _body();
         } else {
           return Center(child: CircularProgressIndicator());
         }
@@ -48,7 +51,7 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
     );
   }
 
-  Widget _body(List<ScientistModel> scientists) {
+  Widget _body() {
     return Stack(
       children: [
         ListView.separated(
@@ -86,15 +89,26 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
             _scrollButton(Icons.arrow_left, () {
               _currentScientist = max(0, (_currentScientist - 1));
               _scrollController.animateTo(
-                0.8.sw * _currentScientist,
+                0.85.sw * _currentScientist,
                 duration: Duration(milliseconds: 600),
                 curve: Curves.easeInOut,
               );
             }),
             _scrollButton(Icons.arrow_right, () {
-              _currentScientist = min(_currentScientist + 1, 2);
+              _currentScientist = min(
+                _currentScientist + 1,
+                scientists.length - 1,
+              );
+              if (_currentScientist == scientists.length - 2) {
+                widget.getPage().then((v) {
+                  if (v.isNotEmpty) {
+                    scientists.addAll(v);
+                    setState(() {});
+                  }
+                });
+              }
               _scrollController.animateTo(
-                0.8.sw * _currentScientist,
+                0.85.sw * _currentScientist,
                 duration: Duration(milliseconds: 600),
                 curve: Curves.easeInOut,
               );

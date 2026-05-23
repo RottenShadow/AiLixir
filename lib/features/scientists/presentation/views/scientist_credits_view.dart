@@ -10,14 +10,19 @@ class ScientistCreditView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var cubit = ScientistCreditCubit();
     return Scaffold(
       appBar: AppBar(
         title: Text("Esteemed Scientists"),
         backgroundColor: AppColors.slate1000,
       ),
       body: BlocProvider(
-        create: (context) => ScientistCreditCubit()..getTestScientists(),
-        child: ScientistCreditsViewBody(),
+        create: (context) => cubit..getTestScientists(),
+        child: ScientistCreditsViewBody(
+          getPage: () {
+            return cubit.getPagedTestScientists();
+          },
+        ),
       ),
     );
   }

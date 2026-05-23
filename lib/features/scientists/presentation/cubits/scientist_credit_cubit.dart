@@ -18,6 +18,8 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
   final ScientistRepo _repo = ScientistRepo(
     dioService: GetIt.I.get<DioService>(),
   );
+  late final int maxPage;
+  int currentPage = 1;
   Future<void> getScientists() async {
     emit(ScientistCreditLoading());
     var res = await _repo.getScientists();
@@ -26,6 +28,7 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
         emit(ScientistCreditError());
       },
       (jsonData) {
+        maxPage = jsonData["pagination"]["totalPages"];
         emit(
           ScientistCreditSuccess(
             res: ScientistFactory.getScientistsFromJson(jsonData),
@@ -43,6 +46,7 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
         emit(ScientistCreditError());
       },
       (jsonData) {
+        maxPage = jsonData["pagination"]["totalPages"];
         emit(
           ScientistCreditSuccess(
             res: ScientistFactory.getScientistsFromJson(jsonData),
@@ -50,6 +54,34 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
         );
       },
     );
+  }
+
+  Future<List<ScientistModel>> getPagedScientists() async {
+    if (maxPage <= currentPage) {
+      await Future.delayed(Duration(milliseconds: 33));
+      return [];
+    }
+    currentPage += 1;
+    var res = await _repo.getScientists(page: currentPage);
+    List<ScientistModel> sci = [];
+    res.fold((_) {}, (jsonData) {
+      sci = ScientistFactory.getScientistsFromJson(jsonData);
+    });
+    return sci;
+  }
+
+  Future<List<ScientistModel>> getPagedTestScientists() async {
+    if (maxPage <= currentPage) {
+      await Future.delayed(Duration(milliseconds: 33));
+      return [];
+    }
+    currentPage += 1;
+    var res = await _repo.getTestScientists(page: currentPage);
+    List<ScientistModel> sci = [];
+    res.fold((_) {}, (jsonData) {
+      sci = ScientistFactory.getScientistsFromJson(jsonData);
+    });
+    return sci;
   }
 
   Future<List<AwardModel>> getAwards(int sciId) async {

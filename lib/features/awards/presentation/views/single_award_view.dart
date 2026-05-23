@@ -42,11 +42,33 @@ class _SingleAwardViewState extends State<SingleAwardView> {
         });
   }
 
+  Widget _title(String name) {
+    return ShaderMask(
+      shaderCallback: (Rect bounds) {
+        return LinearGradient(
+          colors: [
+            AppColors.awardNameGradientTop,
+            AppColors.awardNameGradientBottom,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ).createShader(bounds);
+      },
+      child: Row(
+        spacing: 10,
+        children: [
+          Icon(Icons.emoji_events, size: AppTextStyles.large.fontSize),
+          Text("$name Winners"),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.award.name),
+        title: _title(widget.award.name),
         backgroundColor: AppColors.slate1000,
       ),
       body: err

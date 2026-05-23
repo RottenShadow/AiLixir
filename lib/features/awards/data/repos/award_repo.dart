@@ -8,16 +8,18 @@ class AwardRepo {
   final DioService dioService;
   AwardRepo({required this.dioService});
 
-  Future<Either<Failure, Map<String, dynamic>>> getAwards() {
+  Future<Either<Failure, Map<String, dynamic>>> getAwards({int page = 1}) {
     return safeApiCall(() async {
-      return await dioService.get(endpoint: "${AppEndpoints.baseUrl}awards/");
+      return await dioService.get(
+        endpoint: "${AppEndpoints.baseUrl}api/awards?page=$page",
+      );
     });
   }
 
   Future<Either<Failure, Map<String, dynamic>>> getScientists(int awardId) {
     return safeApiCall(() async {
       return await dioService.get(
-        endpoint: "${AppEndpoints.baseUrl}awards/$awardId/scientists",
+        endpoint: "${AppEndpoints.baseUrl}api/awards/$awardId/scientists",
       );
     });
   }
@@ -57,17 +59,118 @@ class AwardRepo {
             "year_won": "2026",
             "contribution": "DEFAULT_CONTRIBUTION",
           },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_SCIENTIST",
+            "field": "DEFAULT_FIELD",
+            "image":
+                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "year_won": "2026",
+            "contribution": "DEFAULT_CONTRIBUTION",
+          },
         ],
       },
     };
     return Right(res);
   }
 
-  Either<Failure, Map<String, dynamic>> getTestAwards() {
+  Either<Failure, Map<String, dynamic>> getTestAwards({int page = 1}) {
     Map<String, dynamic> res = {
       "success": true,
+      "pagination": {
+        "currentPage": page,
+        "totalPages": 2,
+        "hasNextPage": page >= 2,
+      },
       "data": {
         "results": [
+          {
+            "id": -1,
+            "name": "DEFAULT_NAME",
+            "category": "DEFAULT_CATEGORY",
+            "images": [""],
+            "short_description": "SHORT_DESCRIPTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_NAME",
+            "category": "DEFAULT_CATEGORY",
+            "images": [""],
+            "short_description": "SHORT_DESCRIPTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_NAME",
+            "category": "DEFAULT_CATEGORY",
+            "images": [""],
+            "short_description": "SHORT_DESCRIPTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_NAME",
+            "category": "DEFAULT_CATEGORY",
+            "images": [""],
+            "short_description": "SHORT_DESCRIPTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_NAME",
+            "category": "DEFAULT_CATEGORY",
+            "images": [""],
+            "short_description": "SHORT_DESCRIPTION",
+          },
+          {
+            "id": -1,
+            "name": "DEFAULT_NAME",
+            "category": "DEFAULT_CATEGORY",
+            "images": [""],
+            "short_description": "SHORT_DESCRIPTION",
+          },
           {
             "id": -1,
             "name": "DEFAULT_NAME",

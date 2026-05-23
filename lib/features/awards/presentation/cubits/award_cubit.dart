@@ -13,16 +13,19 @@ part 'award_state.dart';
 
 class AwardsCubit extends Cubit<AwardState> {
   final _repo = GetIt.I.get<AwardRepo>();
+  late final int maxPage;
+  int currentPage = 1;
   AwardsCubit() : super(AwardInitial());
 
-  Future<void> getAwards(String query) async {
+  Future<void> getAwards(int page) async {
     emit(AwardLoading());
-    var res = await _repo.getAwards();
+    var res = await _repo.getAwards(page: page);
     res.fold(
       (_) {
         emit(AwardError());
       },
       (jsonData) {
+        maxPage = jsonData["pagination"]["totalPages"];
         emit(AwardSuccess(awards: AwardFactory.getAwardsFromJson(jsonData)));
       },
     );
@@ -49,9 +52,38 @@ class AwardsCubit extends Cubit<AwardState> {
         emit(AwardError());
       },
       (jsonData) {
+        maxPage = jsonData["pagination"]["totalPages"];
         emit(AwardSuccess(awards: AwardFactory.getAwardsFromJson(jsonData)));
       },
     );
+  }
+
+  Future<List<AwardModel>> getPageAwards() async {
+    if (currentPage == maxPage) {
+      return [];
+    }
+    currentPage += 1;
+    var res = await _repo.getAwards(page: currentPage);
+    List<AwardModel> out = [];
+    res.fold((_) {}, (jsonData) {
+      out = AwardFactory.getAwardsFromJson(jsonData);
+    });
+    return out;
+  }
+
+  Future<List<AwardModel>> getPageTestAwards() async {
+    await Future.delayed(Duration(milliseconds: 22));
+    if (currentPage == maxPage) {
+      return [];
+    }
+    print("hello");
+    currentPage += 1;
+    var res = _repo.getTestAwards(page: currentPage);
+    List<AwardModel> out = [];
+    res.fold((_) {}, (jsonData) {
+      out = AwardFactory.getAwardsFromJson(jsonData);
+    });
+    return out;
   }
 
   Future<List<ScientistModel>> getTestScientists(int awardId) async {

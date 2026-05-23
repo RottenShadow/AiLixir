@@ -15,14 +15,12 @@ class SingleAwardViewBody extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsetsGeometry.symmetric(horizontal: 25.w),
-        child: Column(
-          spacing: 0.03.sh,
-          children: [_infoCard(), _winnersHeader(), _winners()],
-        ),
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(
+        horizontal: 0.05.sw,
+        vertical: 0.03.sh,
       ),
+      child: Column(spacing: 0.03.sh, children: [_winners()]),
     );
   }
 
@@ -42,7 +40,6 @@ class SingleAwardViewBody extends StatelessWidget {
           spacing: 50.h,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _title(award.name),
             Text(award.shortDesc),
             Row(children: [Text(award.category)]),
           ],
@@ -62,11 +59,17 @@ class SingleAwardViewBody extends StatelessWidget {
   }
 
   Widget _winners() {
-    return Column(
-      spacing: 0.02.sh,
-      children: List.generate(scientists.length, (idx) {
-        return _winnerCard(idx);
-      }),
+    return Expanded(
+      child: GridView.count(
+        crossAxisCount: 3,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        childAspectRatio: 2.6 / 1.777,
+        shrinkWrap: true,
+        children: List.generate(scientists.length, (idx) {
+          return _winnerCard(idx);
+        }),
+      ),
     );
   }
 
@@ -77,87 +80,61 @@ class SingleAwardViewBody extends StatelessWidget {
       onTap: () {},
       child: Card(
         color: AppColors.brandBlue.withAlpha((0.2 * 255).toInt()),
-        child: Row(
+        child: Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Padding(
-              padding: EdgeInsetsGeometry.all(0.03.sw),
-              child: ClipRRect(
-                clipBehavior: Clip.antiAlias,
-                borderRadius: BorderRadiusGeometry.circular(12.r),
-                child: Image.network(
-                  scientists[idx].imageUrl,
-                  scale: 1,
-                  width: 0.1.sw,
-                  fit: BoxFit.fill,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                spacing: 0.07.sh,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: EdgeInsetsGeometry.only(right: 0.03.sw),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(scientists[idx].name, style: AppTextStyles.h1),
-                        Text(
-                          scientists[idx].yearWon ?? "",
-                          style: AppTextStyles.h5.copyWith(
-                            color: AppColors.awardNameGradientTop,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+            Row(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsetsGeometry.fromLTRB(
+                      0.03.sw,
+                      0.03.sw,
+                      0.01.sw,
+                      0.03.sw,
+                    ),
+                    child: ClipRRect(
+                      clipBehavior: Clip.antiAlias,
+                      borderRadius: BorderRadiusGeometry.circular(12.r),
+                      child: Image.network(
+                        scientists[idx].imageUrl,
+                        scale: 1,
+                        width: 0.08.sw,
+                        fit: BoxFit.fill,
+                      ),
                     ),
                   ),
-                  Row(
-                    spacing: 10.w,
-                    children: [
-                      Icon(
-                        Icons.science,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(scientists[idx].name, style: AppTextStyles.bodyxl),
+                    Text(
+                      scientists[idx].yearWon ?? "",
+                      style: AppTextStyles.h5.copyWith(
                         color: AppColors.awardNameGradientTop,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Text(
-                        scientists[idx].shortBio,
-                        style: AppTextStyles.h2.copyWith(
-                          color: AppColors.awardNameGradientTop,
-                        ),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                SizedBox(width: 0.01.sw),
+                Icon(Icons.science, color: AppColors.awardNameGradientTop),
+                Text(
+                  scientists[idx].shortBio,
+                  style: AppTextStyles.h3.copyWith(
+                    color: AppColors.awardNameGradientTop,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _title(String name) {
-    return ShaderMask(
-      shaderCallback: (Rect bounds) {
-        return LinearGradient(
-          colors: [
-            AppColors.awardNameGradientTop,
-            AppColors.awardNameGradientBottom,
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ).createShader(bounds);
-      },
-      child: Row(
-        spacing: 10,
-        children: [
-          Icon(Icons.emoji_events, size: AppTextStyles.xl.fontSize),
-          Text(name, style: AppTextStyles.xl.copyWith(color: AppColors.white)),
-        ],
       ),
     );
   }

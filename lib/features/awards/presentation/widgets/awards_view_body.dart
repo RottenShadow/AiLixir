@@ -2,40 +2,35 @@ import 'dart:math';
 
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
-import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/award_card.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/data/models/award_package.dart';
 import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:ailixir/features/awards/presentation/views/single_award_view.dart';
-import 'package:ailixir/core/themes/app_colors.dart';
-import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/awards/data/models/award_model.dart';
-import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+final List<Color> _colors = [
+  Color(0xFF60a5fa), //blue
+  Color(0xFFd4af37), //yellow
+  Color(0xFF34d399), //green
+  Color(0xFFc084fc), //purple
+  Color(0xFFee6c80), //red
+  Color(0xFFe8970d), //orange
+];
+final List<IconData> _icons = [
+  Icons.badge,
+  Icons.science,
+  Icons.check_rounded,
+  Icons.auto_awesome_rounded,
+  Icons.public_rounded,
+  Icons.medical_information,
+];
+final double _paddingValue = 20;
+
 class AwardsViewBody extends StatelessWidget {
   const AwardsViewBody({super.key});
-
-  static final List<Color> _colors = [
-    Color(0xFF60a5fa), //blue
-    Color(0xFFd4af37), //yellow
-    Color(0xFF34d399), //green
-    Color(0xFFc084fc), //purple
-    Color(0xFFee6c80), //red
-    Color(0xFFe8970d), //orange
-  ];
-  static final List<IconData> _icons = [
-    Icons.badge,
-    Icons.science,
-    Icons.check_rounded,
-    Icons.auto_awesome_rounded,
-    Icons.public_rounded,
-    Icons.medical_information,
-  ];
-  static final double _paddingValue = 20;
 
   @override
   Widget build(BuildContext context) {
@@ -44,36 +39,9 @@ class AwardsViewBody extends StatelessWidget {
         if (state is AwardLoading) {
           return Center(child: CircularProgressIndicator());
         } else if (state is AwardSuccess) {
-          return GridView.count(
-            crossAxisCount: 3,
-            crossAxisSpacing: 0.02.sw,
-            mainAxisSpacing: 0.06.sh,
-            childAspectRatio: 1.777,
-            padding: EdgeInsetsGeometry.symmetric(
-              horizontal: 0.05.sw,
-              vertical: 0.05.sh,
-            ),
-            children: List.generate(state.awards.length, (index) {
-              Color categoryColor = _colors[Random().nextInt(_colors.length)];
-              IconData categoryIcon = _icons[Random().nextInt(_icons.length)];
-              return awardCard(
-                state.awards[index],
-                context,
-                categoryColor,
-                categoryIcon,
-                20,
-                () {
-                  context.navigateTo(
-                    SingleAwardView.routeName,
-                    arguments: AwardPackage(
-                      award: state.awards[index],
-                      cubit: context.read<AwardsCubit>(),
-                    ),
-                  );
-                },
-              );
-              //              return _awardCard(state.awards[index]);
-            }),
+          return _AwardsBlocBody(
+            state: state,
+            cubit: context.read<AwardsCubit>(),
           );
         } else {
           final cubit = context.read<AwardsCubit>();
@@ -173,4 +141,69 @@ class AwardsViewBody extends StatelessWidget {
   //      ),
   //    );
   //  }
+}
+
+class _AwardsBlocBody extends StatefulWidget {
+  final AwardSuccess state;
+  final AwardsCubit cubit;
+  const _AwardsBlocBody({required this.state, required this.cubit});
+  @override
+  State<StatefulWidget> createState() => _AwardsBlocBodyState();
+}
+
+class _AwardsBlocBodyState extends State<_AwardsBlocBody> {
+  late List<AwardModel> _awards;
+  late ScrollController _controller;
+  @override
+  void initState() {
+    _awards = widget.state.awards;
+    _controller = ScrollController();
+    _controller.addListener(() {
+      if (_controller.position.pixels >= _controller.position.maxScrollExtent) {
+        widget.cubit.getPageTestAwards().then((v) {
+          if (v.isNotEmpty) {
+            _awards.addAll(v);
+            setState(() {});
+          }
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      controller: _controller,
+      crossAxisCount: 3,
+      crossAxisSpacing: 0.02.sw,
+      mainAxisSpacing: 0.06.sh,
+      childAspectRatio: 1.777,
+      padding: EdgeInsetsGeometry.symmetric(
+        horizontal: 0.05.sw,
+        vertical: 0.05.sh,
+      ),
+      children: List.generate(_awards.length, (index) {
+        Color categoryColor = _colors[Random().nextInt(_colors.length)];
+        IconData categoryIcon = _icons[Random().nextInt(_icons.length)];
+        return awardCard(
+          _awards[index],
+          context,
+          categoryColor,
+          categoryIcon,
+          20,
+          () {
+            context.navigateTo(
+              SingleAwardView.routeName,
+              arguments: AwardPackage(
+                award: _awards[index],
+                cubit: context.read<AwardsCubit>(),
+              ),
+            );
+          },
+        );
+        //              return _awardCard(state.awards[index]);
+      }),
+    );
+  }
 }

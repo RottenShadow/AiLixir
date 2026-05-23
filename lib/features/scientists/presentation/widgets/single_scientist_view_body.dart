@@ -1,7 +1,10 @@
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/widgets/award_card.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
-import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
+import 'package:ailixir/features/awards/data/models/award_package.dart';
+import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
+import 'package:ailixir/features/awards/presentation/views/single_award_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -30,7 +33,15 @@ class SingleScientistViewBody extends StatelessWidget {
           AppColors.awardNameGradientTop,
           Icons.emoji_events,
           20,
-          () {},
+          () {
+            context.navigateTo(
+              SingleAwardView.routeName,
+              arguments: AwardPackage(
+                award: awards[index],
+                cubit: AwardsCubit(),
+              ),
+            );
+          },
         );
       }),
     );
