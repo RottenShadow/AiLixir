@@ -1,3 +1,4 @@
+import 'package:ailixir/features/home/data/repos/news_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
@@ -24,12 +25,16 @@ class HomeViewBody extends StatefulWidget {
 
 class _HomeViewBodyState extends State<HomeViewBody> {
   String _selectedFilterId = NewsFilter.all.first.id; // 'all'
+  List<NewsEntity> _bookmarks = [];
+  final NewsRepo _repo = NewsRepo();
 
   List<NewsEntity> get _filtered => _selectedFilterId == 'all'
       ? _allNews
-      : _allNews
-            .where((n) => n.categories.contains(_selectedFilterId))
-            .toList();
+      : (_selectedFilterId == "saved"
+            ? _bookmarks
+            : _allNews
+                  .where((n) => n.categories.contains(_selectedFilterId))
+                  .toList());
 
   @override
   Widget build(BuildContext context) {
@@ -60,8 +65,18 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                 NewsFilterTabs(
                   filters: NewsFilter.all,
                   selectedId: _selectedFilterId,
-                  onFilterSelected: (id) =>
-                      setState(() => _selectedFilterId = id),
+                  onFilterSelected: (id) => setState(() {
+                    _selectedFilterId = id;
+                    if (id == "saved") {
+                      _repo.getBookmarks("3sgdrrte").then((v) {
+                        v.fold((f) {}, (v) {
+                          setState(() {
+                            _bookmarks = v;
+                          });
+                        });
+                      });
+                    }
+                  }),
                 ),
                 SizedBox(height: 24.h),
 
@@ -69,7 +84,17 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                 ..._filtered.map(
                   (news) => Padding(
                     padding: EdgeInsets.only(bottom: 20.h),
-                    child: NewsCard(news: news),
+                    child: NewsCard(
+                      news: news,
+                      onBookmark: (id) async {
+                        var res = await _repo.saveBookmark("", id);
+                        bool success = false;
+                        res.fold((_) {}, (v) {
+                          success = v;
+                        });
+                        return success;
+                      },
+                    ),
                   ),
                 ),
 

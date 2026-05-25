@@ -13,10 +13,7 @@ class ProfileRepo {
       return ProfileModel.fromJson(
         await dioService.get(
           endpoint: "${AppEndpoints.baseUrl}api/user/profile",
-          headers: {
-            "Authorization": "Bearer $token",
-            'Content-Type': 'application/json',
-          },
+          headers: {"Authorization": "Bearer $token"},
         ),
       );
     });

@@ -6,8 +6,9 @@ import 'package:ailixir/features/home/domain/entities/news_entity.dart';
 
 class NewsCard extends StatefulWidget {
   final NewsEntity news;
+  final Future<bool> Function(String) onBookmark;
 
-  const NewsCard({super.key, required this.news});
+  const NewsCard({super.key, required this.news, required this.onBookmark});
 
   @override
   State<NewsCard> createState() => _NewsCardState();
@@ -15,7 +16,6 @@ class NewsCard extends StatefulWidget {
 
 class _NewsCardState extends State<NewsCard>
     with SingleTickerProviderStateMixin {
-  bool _bookmarked = false;
   late final AnimationController _bookmarkCtrl;
   late final Animation<double> _bookmarkScale;
 
@@ -51,7 +51,11 @@ class _NewsCardState extends State<NewsCard>
   }
 
   void _toggleBookmark() {
-    setState(() => _bookmarked = !_bookmarked);
+    widget.onBookmark(widget.news.id).then((v) {
+      if (v) {
+        setState(() => widget.news.bookmarked = !widget.news.bookmarked);
+      }
+    });
     _bookmarkCtrl.forward(from: 0);
   }
 
@@ -132,21 +136,21 @@ class _NewsCardState extends State<NewsCard>
                           duration: const Duration(milliseconds: 200),
                           padding: EdgeInsets.all(6.w),
                           decoration: BoxDecoration(
-                            color: _bookmarked
+                            color: widget.news.bookmarked
                                 ? AppColors.brandBlue.withOpacity(0.12)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(8.r),
                             border: Border.all(
-                              color: _bookmarked
+                              color: widget.news.bookmarked
                                   ? AppColors.brandBlue.withOpacity(0.4)
                                   : Colors.transparent,
                             ),
                           ),
                           child: Icon(
-                            _bookmarked
+                            widget.news.bookmarked
                                 ? Icons.bookmark
                                 : Icons.bookmark_outline,
-                            color: _bookmarked
+                            color: widget.news.bookmarked
                                 ? AppColors.brandBlue
                                 : AppColors.authTextSecondary,
                             size: 20.sp,

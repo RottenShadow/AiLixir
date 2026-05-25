@@ -110,12 +110,22 @@ class SingleAwardViewBody extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(scientists[idx].name, style: AppTextStyles.bodyxl),
-                    Text(
-                      scientists[idx].yearWon ?? "",
-                      style: AppTextStyles.h5.copyWith(
-                        color: AppColors.awardNameGradientTop,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      spacing: 4,
+                      children: [
+                        Icon(
+                          Icons.calendar_month,
+                          color: AppColors.awardNameGradientTop,
+                          size: AppTextStyles.h5.fontSize,
+                        ),
+                        Text(
+                          scientists[idx].yearWon ?? "NA",
+                          style: AppTextStyles.h5.copyWith(
+                            color: AppColors.awardNameGradientTop,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -125,6 +135,7 @@ class SingleAwardViewBody extends StatelessWidget {
               children: [
                 SizedBox(width: 0.01.sw),
                 Icon(Icons.science, color: AppColors.awardNameGradientTop),
+                SizedBox(width: 4),
                 Text(
                   scientists[idx].shortBio,
                   style: AppTextStyles.h3.copyWith(

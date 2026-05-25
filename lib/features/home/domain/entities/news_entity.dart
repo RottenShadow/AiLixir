@@ -10,11 +10,12 @@ class NewsEntity {
   final String body;
   final String primaryAction;
   final IconData icon;
+  bool bookmarked;
 
   /// The filter category IDs this news item belongs to.
   final List<String> categories;
 
-  const NewsEntity({
+  NewsEntity({
     required this.id,
     required this.tag,
     required this.tagColor,
@@ -23,10 +24,26 @@ class NewsEntity {
     required this.body,
     required this.primaryAction,
     required this.icon,
+    this.bookmarked = false,
     this.categories = const ['all'],
   });
 
-  static const List<NewsEntity> getTestData = [
+  NewsEntity.fromJson({
+    required Map<String, dynamic> json,
+    bool bookmarked = false,
+  }) : this(
+         id: json["article"]["id"],
+         tag: "news",
+         tagColor: Color(0xFF22C55E),
+         timeAgo: json["article"]["published_at"],
+         icon: Icons.science,
+         title: json["article"]["title"],
+         body: json["article"]["summary"],
+         bookmarked: bookmarked,
+         primaryAction: "Read More",
+       );
+
+  static List<NewsEntity> getTestData = [
     NewsEntity(
       id: '1',
       tag: 'Genomics',

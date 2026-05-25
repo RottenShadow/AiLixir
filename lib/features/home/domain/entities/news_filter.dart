@@ -11,5 +11,6 @@ class NewsFilter {
     NewsFilter(id: 'clinical', label: 'Clinical Results'),
     NewsFilter(id: 'pharma', label: 'Pharma M&A'),
     NewsFilter(id: 'genomics', label: 'Genomics'),
+    NewsFilter(id: 'saved', label: 'Bookmarks'),
   ];
 }

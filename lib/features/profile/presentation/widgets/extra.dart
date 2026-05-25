@@ -66,13 +66,13 @@ Widget subscriptionCard() {
               style: AppTextStyles.labellarge,
             ),
             iconLabel(
-              "Priority Gpu Access",
+              "Unlimited Operation History",
               Icons.check_circle_outline,
               color: AppColors.sky300,
               style: AppTextStyles.labellarge,
             ),
             iconLabel(
-              "Priority Gpu Access",
+              "Advanced Multi-Target Analysis",
               Icons.check_circle_outline,
               color: AppColors.sky300,
               style: AppTextStyles.labellarge,
