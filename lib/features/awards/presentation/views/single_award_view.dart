@@ -28,18 +28,12 @@ class _SingleAwardViewState extends State<SingleAwardView> {
   }
 
   void getScientists() {
-    widget.cubit
-        .getTestScientists(widget.award.id)
-        .then((v) {
-          setState(() {
-            scientists = v;
-          });
-        })
-        .onError((_, _) {
-          setState(() {
-            err = true;
-          });
-        });
+    widget.cubit.getScientists(widget.award.id).then((v) {
+      setState(() {
+        scientists = v;
+        err = false;
+      });
+    });
   }
 
   Widget _title(String name) {

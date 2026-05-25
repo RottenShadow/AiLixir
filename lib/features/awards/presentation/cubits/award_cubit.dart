@@ -25,7 +25,7 @@ class AwardsCubit extends Cubit<AwardState> {
         emit(AwardError());
       },
       (jsonData) {
-        maxPage = jsonData["pagination"]["totalPages"];
+        maxPage = jsonData["data"]["pagination"]["totalPages"];
         emit(AwardSuccess(awards: AwardFactory.getAwardsFromJson(jsonData)));
       },
     );
@@ -76,7 +76,6 @@ class AwardsCubit extends Cubit<AwardState> {
     if (currentPage == maxPage) {
       return [];
     }
-    print("hello");
     currentPage += 1;
     var res = _repo.getTestAwards(page: currentPage);
     List<AwardModel> out = [];

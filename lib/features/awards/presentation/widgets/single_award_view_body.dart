@@ -1,7 +1,11 @@
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
+import 'package:ailixir/features/scientists/data/models/scientist_package.dart';
+import 'package:ailixir/features/scientists/presentation/cubits/scientist_credit_cubit.dart';
+import 'package:ailixir/features/scientists/presentation/views/single_scientist_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -20,7 +24,20 @@ class SingleAwardViewBody extends StatelessWidget {
         horizontal: 0.05.sw,
         vertical: 0.03.sh,
       ),
-      child: Column(spacing: 0.03.sh, children: [_winners()]),
+      child: Column(
+        spacing: 0.03.sh,
+        children: [
+          _winners((idx) {
+            context.navigateTo(
+              SingleScientistView.routeName,
+              arguments: ScientistPackage(
+                scientist: scientists[idx],
+                cubit: ScientistCreditCubit(),
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 
@@ -58,7 +75,7 @@ class SingleAwardViewBody extends StatelessWidget {
     );
   }
 
-  Widget _winners() {
+  Widget _winners(void Function(int) onTap) {
     return Expanded(
       child: GridView.count(
         crossAxisCount: 3,
@@ -67,17 +84,19 @@ class SingleAwardViewBody extends StatelessWidget {
         childAspectRatio: 2.6 / 1.777,
         shrinkWrap: true,
         children: List.generate(scientists.length, (idx) {
-          return _winnerCard(idx);
+          return _winnerCard(idx, onTap);
         }),
       ),
     );
   }
 
-  Widget _winnerCard(int idx) {
+  Widget _winnerCard(int idx, void Function(int) onTap) {
     return InkWell(
       splashColor: AppColors.awardNameGradientTop,
       borderRadius: BorderRadius.circular(12.r),
-      onTap: () {},
+      onTap: () {
+        onTap(idx);
+      },
       child: Card(
         color: AppColors.brandBlue.withAlpha((0.2 * 255).toInt()),
         child: Column(
@@ -101,6 +120,7 @@ class SingleAwardViewBody extends StatelessWidget {
                         scientists[idx].imageUrl,
                         scale: 1,
                         width: 0.08.sw,
+                        height: 0.08.sw,
                         fit: BoxFit.fill,
                       ),
                     ),
@@ -108,18 +128,19 @@ class SingleAwardViewBody extends StatelessWidget {
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 16,
                   children: [
                     Text(scientists[idx].name, style: AppTextStyles.bodyxl),
                     Row(
                       spacing: 4,
                       children: [
                         Icon(
-                          Icons.calendar_month,
+                          Icons.language,
                           color: AppColors.awardNameGradientTop,
                           size: AppTextStyles.h5.fontSize,
                         ),
                         Text(
-                          scientists[idx].yearWon ?? "NA",
+                          scientists[idx].nationality,
                           style: AppTextStyles.h5.copyWith(
                             color: AppColors.awardNameGradientTop,
                             fontWeight: FontWeight.bold,
@@ -131,13 +152,25 @@ class SingleAwardViewBody extends StatelessWidget {
                 ),
               ],
             ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Padding(
+                padding: EdgeInsetsGeometry.only(left: 20),
+                child: Text(
+                  "Field:",
+                  style: AppTextStyles.labellarge.copyWith(
+                    color: AppColors.authTextSecondary.withAlpha(153),
+                  ),
+                ),
+              ),
+            ),
             Row(
               children: [
                 SizedBox(width: 0.01.sw),
                 Icon(Icons.science, color: AppColors.awardNameGradientTop),
                 SizedBox(width: 4),
                 Text(
-                  scientists[idx].shortBio,
+                  scientists[idx].field,
                   style: AppTextStyles.h3.copyWith(
                     color: AppColors.awardNameGradientTop,
                   ),

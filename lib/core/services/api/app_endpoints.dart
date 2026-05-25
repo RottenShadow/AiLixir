@@ -1,7 +1,8 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      'https://ailixirbackend-production-8e10.up.railway.app/api/';
+      //'https://ailixirbackend-production-8e10.up.railway.app/api/';
+      'https://america-hyperlipemic-grazyna.ngrok-free.dev/api/';
 
   static const String authBaseUrl = 'auth';
 

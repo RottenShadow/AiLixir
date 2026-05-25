@@ -142,8 +142,9 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
       borderRadius: BorderRadiusGeometry.circular(12.r),
       child: Image.network(
         image,
-        width: 0.4.sw,
-        fit: BoxFit.contain,
+        width: 0.3.sw,
+        height: 0.8.sh,
+        fit: BoxFit.fill,
         alignment: Alignment.topLeft,
       ),
     );
@@ -187,7 +188,7 @@ class _ScientistCreditState extends State<ScientistCreditsViewBody> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
-            spacing: 0,
+            spacing: 0.1.sw,
             children: [
               _scientistImage(scientistImage),
               SizedBox(

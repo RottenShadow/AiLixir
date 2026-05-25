@@ -41,13 +41,20 @@ Widget awardCard(
               left: paddingValue,
               top: paddingValue,
             ),
-            child: Text(award.name, style: AppTextStyles.h2),
+            child: Text(
+              award.name,
+              style: AppTextStyles.h3,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
           Padding(
             padding: EdgeInsetsGeometry.all(paddingValue),
             child: Text(
               award.shortDesc,
               style: TextStyle(color: AppColors.authTextSecondary),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

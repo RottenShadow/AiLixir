@@ -28,7 +28,7 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
         emit(ScientistCreditError());
       },
       (jsonData) {
-        maxPage = jsonData["pagination"]["totalPages"];
+        maxPage = jsonData["data"]["pagination"]["totalPages"];
         emit(
           ScientistCreditSuccess(
             res: ScientistFactory.getScientistsFromJson(jsonData),

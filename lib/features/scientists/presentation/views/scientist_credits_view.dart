@@ -17,10 +17,10 @@ class ScientistCreditView extends StatelessWidget {
         backgroundColor: AppColors.slate1000,
       ),
       body: BlocProvider(
-        create: (context) => cubit..getTestScientists(),
+        create: (context) => cubit..getScientists(),
         child: ScientistCreditsViewBody(
           getPage: () {
-            return cubit.getPagedTestScientists();
+            return cubit.getPagedScientists();
           },
         ),
       ),

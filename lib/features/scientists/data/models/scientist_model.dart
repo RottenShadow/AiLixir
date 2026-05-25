@@ -5,12 +5,14 @@ class ScientistModel {
   final String field;
   final String shortBio;
   final String? yearWon;
+  final String nationality;
   const ScientistModel({
     required this.name,
     required this.id,
     required this.imageUrl,
     required this.shortBio,
     required this.field,
+    this.nationality = "",
     this.yearWon,
   });
   const ScientistModel.defaultScientist({
@@ -20,5 +22,6 @@ class ScientistModel {
     this.shortBio = "SHORT_BIO",
     this.field = "FIELD",
     this.yearWon = "2026",
+    this.nationality = "",
   });
 }

@@ -12,7 +12,7 @@ abstract class ScientistFactory {
           id: result["id"],
           name: result["name"],
           field: result["field"],
-          shortBio: result["short_bio"],
+          shortBio: result["short_bio"] ?? "",
           imageUrl: result["images"][0],
         ),
       );
@@ -27,15 +27,16 @@ abstract class ScientistFactory {
       return [];
     }
     List<ScientistModel> scientists = [];
-    for (Map<String, dynamic> result in json["data"]["results"]) {
+    for (Map<String, dynamic> result in json["data"]) {
       scientists.add(
         ScientistModel(
           id: result["id"],
           name: result["name"],
           field: result["field"],
-          shortBio: result["contribution"],
-          imageUrl: result["image"],
-          yearWon: result["year_won"],
+          shortBio: result["short_bio"] ?? "",
+          imageUrl: result["images"][0],
+          yearWon: "",
+          nationality: result["nationality"],
         ),
       );
     }

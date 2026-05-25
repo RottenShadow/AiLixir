@@ -18,22 +18,34 @@ class ProfileViewBody extends StatefulWidget {
 }
 
 class _ProfileViewBodyState extends State<ProfileViewBody> {
-  late ProfileModel _profile;
+  ProfileModel? _profile;
+  bool _failed = false;
   final ProfileRepo _repo = ProfileRepo();
   @override
   void initState() {
     super.initState();
     _repo.getTestProfile("").then((v) {
-      v.fold((f) {}, (profile) {
-        setState(() {
-          _profile = profile;
-        });
-      });
+      v.fold(
+        (f) {
+          _failed = true;
+        },
+        (profile) {
+          setState(() {
+            _profile = profile;
+          });
+        },
+      );
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_failed) {
+      return Center(child: Text("Failed to fetch profile"));
+    }
+    if (_profile == null) {
+      return Center(child: CircularProgressIndicator());
+    }
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsetsGeometry.symmetric(
@@ -51,7 +63,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 10,
                 children: [
-                  ProfileTitle(username: _profile.name),
+                  ProfileTitle(username: _profile?.name ?? ""),
                   iconLabel(
                     "Usage Statistis",
                     Icons.query_stats,

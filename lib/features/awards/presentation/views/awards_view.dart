@@ -17,7 +17,7 @@ class AwardsView extends StatelessWidget {
         backgroundColor: AppColors.slate1000,
       ),
       body: BlocProvider(
-        create: (context) => AwardsCubit()..getTestAwards(query),
+        create: (context) => AwardsCubit()..getAwards(1),
         child: AwardsViewBody(),
       ),
     );

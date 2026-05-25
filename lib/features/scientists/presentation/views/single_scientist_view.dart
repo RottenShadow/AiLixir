@@ -19,6 +19,7 @@ class SingleScientistView extends StatefulWidget {
 class _SingleScientistViewState extends State<SingleScientistView> {
   List<AwardModel> _awards = [];
   bool err = false;
+  bool loading = true;
   @override
   void initState() {
     super.initState();
@@ -26,18 +27,20 @@ class _SingleScientistViewState extends State<SingleScientistView> {
   }
 
   void _getAwards() {
+    loading = true;
     widget.package.cubit
-        .getTestAwards(widget.package.scientist.id)
+        .getAwards(widget.package.scientist.id)
         .then((v) {
           setState(() {
             _awards = v;
-            print(v);
+            loading = false;
             err = false;
           });
         })
         .onError((e, st) {
           setState(() {
             err = true;
+            loading = false;
           });
         });
   }
@@ -83,7 +86,7 @@ class _SingleScientistViewState extends State<SingleScientistView> {
                 ],
               ),
             )
-          : (_awards.isEmpty
+          : (loading
                 ? Center(child: CircularProgressIndicator())
                 : SingleScientistViewBody(awards: _awards)),
     );

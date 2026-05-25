@@ -11,7 +11,7 @@ class NewsRepo {
   Future<Either<Failure, List<NewsEntity>>> getBookmarks(String token) {
     return safeApiCall(() async {
       Map<String, dynamic> json = await dioService.get(
-        endpoint: "${AppEndpoints.baseUrl}api/news/saved",
+        endpoint: "${AppEndpoints.baseUrl}news/saved",
         headers: {"Authorization": "Bearer $token"},
       );
       List<NewsEntity> res = [];
@@ -25,7 +25,7 @@ class NewsRepo {
   Future<Either<Failure, bool>> saveBookmark(String token, String articleID) {
     return safeApiCall(() async {
       Map<String, dynamic> json = await dioService.post(
-        endpoint: "${AppEndpoints.baseUrl}api/news/$articleID/save",
+        endpoint: "${AppEndpoints.baseUrl}news/$articleID/save",
         headers: {"Authorization": "Bearer $token"},
       );
       return json["success"];

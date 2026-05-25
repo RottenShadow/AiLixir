@@ -33,9 +33,9 @@ abstract class AwardFactory {
           id: result["id"],
           name: result["name"],
           category: result["category"],
-          shortDesc: result["contribution"],
+          shortDesc: result["pivot"]["contribution"],
           yearWon: result["year_won"],
-          imageUrl: result["image"],
+          imageUrl: result["images"][0],
         ),
       );
     }
