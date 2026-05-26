@@ -1,6 +1,7 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
+import 'package:ailixir/features/auth/presentation/views/join_view.dart';
 import 'package:ailixir/features/auth/presentation/views/reset_password_otp_view.dart';
 import 'package:ailixir/features/auth/presentation/views/verify_email_view.dart';
 import 'package:ailixir/features/auth/presentation/views/login_view.dart';
@@ -33,6 +34,8 @@ class UserAuthListener extends StatelessWidget {
         } else if (state is UserAuthResetPasswordSuccess) {
           AppToast.showSuccessToast(context: context, message: state.message);
           context.navigateTo(LoginView.routeName);
+        } else if (state is UserAuthForceLogout) {
+          context.navigateAndClearStack(JoinView.routeName);
         }
       },
 
