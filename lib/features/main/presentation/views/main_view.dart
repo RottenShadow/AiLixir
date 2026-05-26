@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/main_view_body.dart';
+import 'package:ailixir/features/auth/presentation/widgets/user_auth_listener.dart';
 
 class MainView extends StatelessWidget {
   static const routeName = '/main';
@@ -7,6 +8,6 @@ class MainView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: MainViewBody());
+    return const Scaffold(body: UserAuthListener(child: MainViewBody()));
   }
 }

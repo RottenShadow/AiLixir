@@ -1,3 +1,4 @@
+import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/constants/app_constants.dart';
@@ -101,21 +102,21 @@ class _SplashViewBodyState extends State<SplashViewBody>
     // Reveal timing
     Future.delayed(const Duration(milliseconds: 3000), () async {
       if (mounted) {
-        var isOnbaored = SharedPreferencesService.getBool(
-          key: AppConstants.isOnboardedKey,
-        );
+        // var isOnbaored = SharedPreferencesService.getBool(
+        //   key: AppConstants.isOnboardedKey,
+        // );
         String? userAccessToken = await GetIt.I<LocalAuthDataSource>()
             .getUserToken();
 
-        if (!isOnbaored) {
-          // return context.navigateReplacementTo(OnboardingView.routeName);
-          // Replace when adding onboarding view
-          return context.navigateReplacementTo(JoinView.routeName);
-        }
+        // if (!isOnbaored) {
+        //   // return context.navigateReplacementTo(OnboardingView.routeName);
+        //   // Replace when adding onboarding view
+        //   return context.navigateReplacementTo(JoinView.routeName);
+        // }
         if (userAccessToken?.isNotEmpty ?? false) {
-          // return context.navigateReplacementTo(MainView.routeName);
+          return context.navigateReplacementTo(MainView.routeName);
           // Replace when adding main view
-          return context.navigateReplacementTo(JoinView.routeName);
+          // return context.navigateReplacementTo(JoinView.routeName);
         }
         return context.navigateReplacementTo(JoinView.routeName);
       }

@@ -2,13 +2,13 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/constants/app_constants.dart';
 // import 'package:ailixir/core/services/api/app_endpoints.dart';
 // import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.dart';
-import 'package:ailixir/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
 
 class DioInterceptors extends Interceptor {
   final Dio client;
@@ -158,7 +158,7 @@ class DioInterceptors extends Interceptor {
 
     log('🔒 Forcing logout (once)');
 
-    final authCubit = GetIt.I<AuthCubit>();
+    final authCubit = GetIt.I<UserAuthCubit>();
     await authCubit.forceLogout();
     _isLoggingOut = false;
   }

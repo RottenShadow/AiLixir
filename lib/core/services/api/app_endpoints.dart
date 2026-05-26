@@ -1,25 +1,21 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      'https://ailixirbackend-production-8e10.up.railway.app/api/';
+      'https://america-hyperlipemic-grazyna.ngrok-free.dev/api/';
 
+  // ── Auth Endpoints ──────────────────────────────────────
+  static const String userAuthBaseUrl = 'user';
   static const String authBaseUrl = 'auth';
 
-  // Auth Endpoints
-
-  static const String authSignUp = '$authBaseUrl/signup';
-  static const String authLogin = '$authBaseUrl/login';
-  static const String authResendVerificationOtp =
-      '$authBaseUrl/resend-verification-otp';
-  static const String authCompleteLoginOtp = '$authBaseUrl/complete-login-otp';
-  static const String authGoogle = 'user/$authBaseUrl/google';
-  static const String authFacebook = '$authBaseUrl/facebook';
-  static const String authForgotPassword = '$authBaseUrl/forgotPassword';
-  static const String authVerifyPasswordOtp = '$authBaseUrl/verify-otp';
-  static const String authResetPassword = '$authBaseUrl/resetpassword';
-  static const String authRefreshToken = '$authBaseUrl/refresh-token';
-  static const String authUpdatePassword = '$authBaseUrl/password';
-  static const String authLogout = '$authBaseUrl/logout';
+  static const String authGoogle = '$userAuthBaseUrl/$authBaseUrl/google';
+  static const String userLogin = '$userAuthBaseUrl/login';
+  static const String userRegister = '$userAuthBaseUrl/register';
+  static const String userVerifyEmail = '$userAuthBaseUrl/verify-email';
+  static const String userForgotPassword = '$userAuthBaseUrl/forgot-password';
+  static const String userResendVerification =
+      '$userAuthBaseUrl/resend-verification';
+  static const String userResetPassword = '$userAuthBaseUrl/reset-password';
+  static const String userLogout = '$userAuthBaseUrl/logout';
 
   // Drug Repurposing Endpoints
   static const String drugRepurposingBaseUrl =

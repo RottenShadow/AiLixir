@@ -5,11 +5,18 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/core/services/molstar_server_service.dart';
+import 'package:ailixir/core/services/molstar/molstar_server_service.dart';
 
 /// Called when the JS side reports a clamped box update.
-typedef BoxCenterCallback = void Function(
-    double cx, double cy, double cz, [double? sx, double? sy, double? sz]);
+typedef BoxCenterCallback =
+    void Function(
+      double cx,
+      double cy,
+      double cz, [
+      double? sx,
+      double? sy,
+      double? sz,
+    ]);
 
 /// Mol* viewer for the docking screen.
 class DockingMolstarViewer extends StatefulWidget {
@@ -157,9 +164,15 @@ class DockingMolstarViewerState extends State<DockingMolstarViewer> {
                   final cx = (data['cx'] as num).toDouble();
                   final cy = (data['cy'] as num).toDouble();
                   final cz = (data['cz'] as num).toDouble();
-                  final sx = data['sx'] != null ? (data['sx'] as num).toDouble() : null;
-                  final sy = data['sy'] != null ? (data['sy'] as num).toDouble() : null;
-                  final sz = data['sz'] != null ? (data['sz'] as num).toDouble() : null;
+                  final sx = data['sx'] != null
+                      ? (data['sx'] as num).toDouble()
+                      : null;
+                  final sy = data['sy'] != null
+                      ? (data['sy'] as num).toDouble()
+                      : null;
+                  final sz = data['sz'] != null
+                      ? (data['sz'] as num).toDouble()
+                      : null;
                   widget.onBoxCenterChanged?.call(cx, cy, cz, sx, sy, sz);
                 } catch (e) {
                   debugPrint(
