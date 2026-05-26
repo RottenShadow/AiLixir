@@ -29,9 +29,9 @@ void main() async {
   log(
     'test Token: ${await GetIt.I.get<SecureStorageService>().readValue(key: AppConstants.accessTokenKey)}',
   );
-  log(
-    'test Refresh Token: ${await GetIt.I.get<SecureStorageService>().readValue(key: AppConstants.refreshAccessTokenKey)}',
-  );
+  // log(
+  //   'test Refresh Token: ${await GetIt.I.get<SecureStorageService>().readValue(key: AppConstants.refreshAccessTokenKey)}',
+  // );
   Bloc.observer = CubitObserver();
 
   runApp(const AilixirApp());
