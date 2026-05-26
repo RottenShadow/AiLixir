@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.dart';
 import 'package:ailixir/features/auth/data/repos/social_auth_repo_impl.dart';
 import 'package:ailixir/features/auth/data/repos/auth_repo_impl.dart';
 import 'package:get_it/get_it.dart';
@@ -11,6 +12,7 @@ part 'user_auth_state.dart';
 class UserAuthCubit extends Cubit<UserAuthState> {
   final AuthRepoImpl _repo = GetIt.I.get<AuthRepoImpl>();
   final _socialRepo = GetIt.I.get<SocialAuthRepoImpl>();
+  final _local = GetIt.I.get<LocalAuthDataSource>();
 
   UserAuthCubit() : super(UserAuthInitial());
 
@@ -31,7 +33,7 @@ class UserAuthCubit extends Cubit<UserAuthState> {
     log('shdw: AuthLogout');
     emit(UserAuthLoading());
     await _repo.forceLogout();
-    // await _resetLazySingletons();
+    await _local.clearUserTokensAndData();
     emit(UserAuthForceLogout());
   }
 

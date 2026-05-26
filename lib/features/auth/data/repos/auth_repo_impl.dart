@@ -102,7 +102,6 @@ class AuthRepoImpl {
 
   Future<Either<Failure, String>> forceLogout() => safeApiCall(() async {
     final res = await _api.forceLogout();
-    await _local.clearUserTokensAndData();
     return res.message;
   });
 
