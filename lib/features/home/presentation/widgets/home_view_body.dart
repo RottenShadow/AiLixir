@@ -68,7 +68,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                   onFilterSelected: (id) => setState(() {
                     _selectedFilterId = id;
                     if (id == "saved") {
-                      _repo.getBookmarks("3sgdrrte").then((v) {
+                      _repo.getBookmarks("PUT TOKEN HERE").then((v) {
                         v.fold((f) {}, (v) {
                           setState(() {
                             _bookmarks = v;

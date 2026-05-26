@@ -1,18 +1,15 @@
 import 'package:ailixir/features/awards/data/models/award_package.dart';
 import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
 import 'package:ailixir/features/awards/presentation/views/single_award_view.dart';
+import 'package:ailixir/features/chatbot/presentation/views/chatbot_view.dart';
 import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:ailixir/features/profile/presentation/views/profile_view.dart';
-import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
 import 'package:ailixir/features/scientists/data/models/scientist_package.dart';
 import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:ailixir/features/scientists/presentation/views/single_scientist_view.dart';
 import 'package:ailixir/features/similarity/presentation/views/similarity_result_view.dart';
-import 'package:ailixir/features/awards/presentation/views/awards_view.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
-import 'package:ailixir/features/main/presentation/views/main_view.dart';
-import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/custom_photo_view.dart';
@@ -45,6 +42,10 @@ abstract class AppRouter {
       GoRoute(
         path: ProfileView.routeName,
         builder: (context, state) => const ProfileView(),
+      ),
+      GoRoute(
+        path: ChatbotView.routeName,
+        builder: (context, state) => const ChatbotView(),
       ),
       // Awards
       GoRoute(

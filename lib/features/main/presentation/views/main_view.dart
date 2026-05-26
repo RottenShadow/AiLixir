@@ -1,3 +1,6 @@
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
+import 'package:ailixir/core/themes/app_colors.dart';
+import 'package:ailixir/features/chatbot/presentation/views/chatbot_view.dart';
 import 'package:flutter/material.dart';
 import '../widgets/main_view_body.dart';
 
@@ -7,6 +10,15 @@ class MainView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: MainViewBody());
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.small(
+        backgroundColor: AppColors.brandBlue,
+        onPressed: () {
+          context.navigateTo(ChatbotView.routeName);
+        },
+        child: Icon(Icons.assistant),
+      ),
+      body: MainViewBody(),
+    );
   }
 }
