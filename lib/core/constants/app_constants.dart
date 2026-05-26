@@ -2,8 +2,8 @@ abstract class AppConstants {
   // Flutter Secure Storage
 
   static const String accessTokenKey = 'accessTokenKey';
-  static const String refreshAccessTokenKey = 'refreshAccessTokenKey';
-  static const String fcmTokenKey = 'fcmTokenKey';
+  // static const String refreshAccessTokenKey = 'refreshAccessTokenKey';
+  // static const String fcmTokenKey = 'fcmTokenKey';
 
   // Shared Preferences
   static const String isUserSignedInKey = 'isUserSignedInKey';
@@ -15,8 +15,8 @@ abstract class AppConstants {
   static const String userEmailKey = 'userEmailKey';
   static const String userRoleKey = 'userRoleKey';
   static const String userImageKey = 'userImageKey';
-  static const String pushNotificationsEnabledKey =
-      'pushNotificationsEnabledKey';
+  // static const String pushNotificationsEnabledKey =
+  //     'pushNotificationsEnabledKey';
 
   // Dio Bearer Token
   static const String bearer = 'Bearer ';
