@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:ailixir/core/services/molstar_server_service.dart';
+import 'package:ailixir/core/services/molstar/molstar_server_service.dart';
 
 part 'molecular_lab_state.dart';
 
