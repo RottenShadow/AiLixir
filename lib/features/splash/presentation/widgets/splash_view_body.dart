@@ -1,3 +1,4 @@
+import 'package:ailixir/features/main/presentation/views/main_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/constants/app_constants.dart';
@@ -113,9 +114,9 @@ class _SplashViewBodyState extends State<SplashViewBody>
           return context.navigateReplacementTo(JoinView.routeName);
         }
         if (userAccessToken?.isNotEmpty ?? false) {
-          // return context.navigateReplacementTo(MainView.routeName);
+          return context.navigateReplacementTo(MainView.routeName);
           // Replace when adding main view
-          return context.navigateReplacementTo(JoinView.routeName);
+          // return context.navigateReplacementTo(JoinView.routeName);
         }
         return context.navigateReplacementTo(JoinView.routeName);
       }
