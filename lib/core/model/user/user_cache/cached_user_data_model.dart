@@ -1,5 +1,4 @@
 import 'package:ailixir/core/constants/app_constants.dart';
-import 'package:ailixir/core/constants/app_strings.dart';
 import 'package:ailixir/core/services/local_storage/shared_preferences_service.dart';
 
 class CachedUserDataModel {
@@ -23,13 +22,13 @@ class CachedUserDataModel {
       id: SharedPreferencesService.getInt(key: AppConstants.userIdKey),
       name:
           SharedPreferencesService.getString(key: AppConstants.userNameKey) ??
-          AppStrings.userDefaultName,
+          'Guest',
       email:
           SharedPreferencesService.getString(key: AppConstants.userEmailKey) ??
-          AppStrings.userDefaultEmail,
+          '',
       role:
           SharedPreferencesService.getString(key: AppConstants.userRoleKey) ??
-          AppStrings.userDefaultRole,
+          '',
       avatar:
           SharedPreferencesService.getString(key: AppConstants.userImageKey) ??
           '',

@@ -9,7 +9,7 @@ import 'package:ailixir/core/cubits/app_settings/app_settings_cubit.dart';
 import 'package:ailixir/core/services/navigation/app_router.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/themes/app_themes.dart';
-import 'package:ailixir/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
+import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:ailixir/generated/l10n.dart';
 
 class AilixirApp extends StatelessWidget {
@@ -23,7 +23,7 @@ class AilixirApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) => MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => GetIt.I<AuthCubit>()),
+          BlocProvider(create: (context) => GetIt.I<UserAuthCubit>()),
           BlocProvider(create: (context) => AppSettingsCubit()),
         ],
         child: const MyMaterialApp(),

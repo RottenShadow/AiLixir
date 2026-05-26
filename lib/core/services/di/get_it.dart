@@ -1,5 +1,7 @@
-import 'package:ailixir/features/auth/data/repos/auth_repo_impl.dart';
 import 'package:ailixir/features/auth/data/repos/social_auth_repo_impl.dart';
+import 'package:ailixir/features/auth/data/repos/auth_repo_impl.dart';
+import 'package:ailixir/features/auth/data/services/auth_api_service.dart';
+import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
 import 'package:ailixir/features/drug_repurposing/data/repositories/drug_repurposing_repository.dart';
 import 'package:dio/dio.dart';
@@ -9,8 +11,6 @@ import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/services/local_storage/secure_storage_service.dart';
 import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.dart';
-import 'package:ailixir/features/auth/data/data_source/remote_auth_data_source.dart';
-import 'package:ailixir/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
 
 void getItRegisterSingleton() {
   // My Repos DataSource
@@ -21,9 +21,6 @@ void getItRegisterSingleton() {
 
   GetIt.I.registerLazySingleton<LocalAuthDataSource>(
     () => LocalAuthDataSource(secureStorage: GetIt.I.get()),
-  );
-  GetIt.I.registerLazySingleton<RemoteAuthDataSource>(
-    () => RemoteAuthDataSource(),
   );
 
   // My Services
@@ -47,18 +44,20 @@ void getItRegisterSingleton() {
 
   // My Repos
 
+  GetIt.I.registerLazySingleton<AuthApiService>(
+    () => AuthApiService(dioService: GetIt.I.get()),
+  );
+
   GetIt.I.registerLazySingleton<AuthRepoImpl>(
     () => AuthRepoImpl(
+      authApiService: GetIt.I.get(),
       localAuthDataSource: GetIt.I.get(),
-      remoteAuthDataSource: GetIt.I.get(),
-      dioService: GetIt.I.get(),
     ),
   );
 
   GetIt.I.registerLazySingleton<SocialAuthRepoImpl>(
     () => SocialAuthRepoImpl(
       localAuthDataSource: GetIt.I.get(),
-      remoteAuthDataSource: GetIt.I.get(),
       dioService: GetIt.I.get(),
     ),
   );
@@ -87,5 +86,5 @@ void getItRegisterSingleton() {
 
   // My Cubits
 
-  GetIt.I.registerLazySingleton<AuthCubit>(() => AuthCubit());
+  GetIt.I.registerLazySingleton<UserAuthCubit>(() => UserAuthCubit());
 }
