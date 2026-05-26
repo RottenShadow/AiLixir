@@ -1,10 +1,10 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/text_form_field/custom_text_form_field.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_back_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_brand_logo.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_primary_button.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_text_field.dart';
+import 'package:ailixir/core/widgets/buttons/custom_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -185,10 +185,14 @@ class _ResetPasswordOtpViewState extends State<ResetPasswordOtpView> {
                           SizedBox(height: 32.h),
 
                           // ── New password ──────────────────────────────────
-                          AuthTextField(
+                          CustomTextFormField(
                             label: 'New Password',
                             hint: '••••••••',
-                            prefixIcon: Icons.lock_outline,
+                            prefixIcon: Icon(
+                              Icons.lock_outline,
+                              color: AppColors.slate400,
+                              size: 18.sp,
+                            ),
                             controller: _passwordCtrl,
                             obscureText: _obscurePassword,
                             textInputAction: TextInputAction.next,
@@ -215,10 +219,14 @@ class _ResetPasswordOtpViewState extends State<ResetPasswordOtpView> {
                           SizedBox(height: 20.h),
 
                           // ── Confirm password ──────────────────────────────
-                          AuthTextField(
+                          CustomTextFormField(
                             label: 'Confirm Password',
                             hint: '••••••••',
-                            prefixIcon: Icons.lock_outline,
+                            prefixIcon: Icon(
+                              Icons.lock_outline,
+                              color: AppColors.slate400,
+                              size: 18.sp,
+                            ),
                             controller: _confirmCtrl,
                             obscureText: _obscureConfirm,
                             textInputAction: TextInputAction.done,
@@ -248,10 +256,10 @@ class _ResetPasswordOtpViewState extends State<ResetPasswordOtpView> {
                           SizedBox(height: 36.h),
 
                           // ── Submit ────────────────────────────────────────
-                          AuthPrimaryButton(
+                          CustomButton(
                             text: 'Update Password',
                             isLoading: isLoading,
-                            onPressed: () => _submit(context),
+                            onTap: () => _submit(context),
                           ),
                           SizedBox(height: 20.h),
 

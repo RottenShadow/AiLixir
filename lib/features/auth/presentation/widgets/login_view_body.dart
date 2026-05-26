@@ -1,13 +1,13 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/text_form_field/custom_text_form_field.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:ailixir/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:ailixir/features/auth/presentation/views/signup_view.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_back_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_brand_logo.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_primary_button.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_text_field.dart';
+import 'package:ailixir/core/widgets/buttons/custom_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -78,10 +78,14 @@ class _LoginViewBodyState extends State<LoginViewBody> {
                             ),
                           ),
                           SizedBox(height: 36.h),
-                          AuthTextField(
+                          CustomTextFormField(
                             label: 'Email',
                             hint: 'you@example.com',
-                            prefixIcon: Icons.alternate_email,
+                            prefixIcon: Icon(
+                              Icons.alternate_email,
+                              color: AppColors.slate400,
+                              size: 18.sp,
+                            ),
                             controller: _emailCtrl,
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
@@ -95,10 +99,14 @@ class _LoginViewBodyState extends State<LoginViewBody> {
                             },
                           ),
                           SizedBox(height: 24.h),
-                          AuthTextField(
+                          CustomTextFormField(
                             label: 'Password',
                             hint: '••••••••',
-                            prefixIcon: Icons.lock_outline,
+                            prefixIcon: Icon(
+                              Icons.lock_outline,
+                              color: AppColors.slate400,
+                              size: 18.sp,
+                            ),
                             controller: _passwordCtrl,
                             obscureText: _obscurePassword,
                             textInputAction: TextInputAction.done,
@@ -134,10 +142,10 @@ class _LoginViewBodyState extends State<LoginViewBody> {
                             },
                           ),
                           SizedBox(height: 36.h),
-                          AuthPrimaryButton(
+                          CustomButton(
                             text: 'Sign In',
                             isLoading: isLoading,
-                            onPressed: () => _submit(context),
+                            onTap: () => _submit(context),
                           ),
                           SizedBox(height: 24.h),
                           Row(

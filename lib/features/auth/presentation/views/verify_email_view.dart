@@ -3,7 +3,7 @@ import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_back_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_brand_logo.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_primary_button.dart';
+import 'package:ailixir/core/widgets/buttons/custom_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -169,10 +169,10 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                           onCompleted: (_) => _submit(context),
                         ),
                         SizedBox(height: 36.h),
-                        AuthPrimaryButton(
+                        CustomButton(
                           text: 'Verify Email',
                           isLoading: isLoading,
-                          onPressed: () => _submit(context),
+                          onTap: () => _submit(context),
                         ),
                         SizedBox(height: 20.h),
                         Row(

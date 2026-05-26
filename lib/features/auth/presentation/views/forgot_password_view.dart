@@ -1,10 +1,10 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/buttons/custom_button.dart';
+import 'package:ailixir/core/widgets/text_form_field/custom_text_form_field.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_back_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_brand_logo.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_primary_button.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_text_field.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -93,10 +93,14 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                             ),
                           ),
                           SizedBox(height: 32.h),
-                          AuthTextField(
+                          CustomTextFormField(
                             label: 'Email',
                             hint: 'you@example.com',
-                            prefixIcon: Icons.alternate_email,
+                            prefixIcon: Icon(
+                              Icons.alternate_email,
+                              color: AppColors.slate400,
+                              size: 18.sp,
+                            ),
                             controller: _emailCtrl,
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.done,
@@ -112,10 +116,10 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                             },
                           ),
                           SizedBox(height: 32.h),
-                          AuthPrimaryButton(
+                          CustomButton(
                             text: 'Send Reset Code',
                             isLoading: isLoading,
-                            onPressed: () => _submit(context),
+                            onTap: () => _submit(context),
                           ),
                         ],
                       ),

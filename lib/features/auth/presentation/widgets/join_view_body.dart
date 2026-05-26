@@ -6,7 +6,7 @@ import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_a
 import 'package:ailixir/features/auth/presentation/views/login_view.dart';
 import 'package:ailixir/features/auth/presentation/views/signup_view.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_brand_logo.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_primary_button.dart';
+import 'package:ailixir/core/widgets/buttons/custom_button.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -77,9 +77,9 @@ class JoinViewBody extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 36.h),
-                    AuthPrimaryButton(
+                    CustomButton(
                       text: 'Sign In',
-                      onPressed: () => context.navigateTo(LoginView.routeName),
+                      onTap: () => context.navigateTo(LoginView.routeName),
                     ),
                     SizedBox(height: 16.h),
                     OutlinedButton(
