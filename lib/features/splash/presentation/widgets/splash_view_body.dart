@@ -102,17 +102,17 @@ class _SplashViewBodyState extends State<SplashViewBody>
     // Reveal timing
     Future.delayed(const Duration(milliseconds: 3000), () async {
       if (mounted) {
-        var isOnbaored = SharedPreferencesService.getBool(
-          key: AppConstants.isOnboardedKey,
-        );
+        // var isOnbaored = SharedPreferencesService.getBool(
+        //   key: AppConstants.isOnboardedKey,
+        // );
         String? userAccessToken = await GetIt.I<LocalAuthDataSource>()
             .getUserToken();
 
-        if (!isOnbaored) {
-          // return context.navigateReplacementTo(OnboardingView.routeName);
-          // Replace when adding onboarding view
-          return context.navigateReplacementTo(JoinView.routeName);
-        }
+        // if (!isOnbaored) {
+        //   // return context.navigateReplacementTo(OnboardingView.routeName);
+        //   // Replace when adding onboarding view
+        //   return context.navigateReplacementTo(JoinView.routeName);
+        // }
         if (userAccessToken?.isNotEmpty ?? false) {
           return context.navigateReplacementTo(MainView.routeName);
           // Replace when adding main view
