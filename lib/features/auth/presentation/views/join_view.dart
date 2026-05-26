@@ -1,12 +1,6 @@
-import 'package:ailixir/features/main/presentation/views/main_view.dart';
+import 'package:ailixir/features/auth/presentation/widgets/user_auth_listener.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ailixir/core/utils/toast/app_toast.dart';
-import 'package:ailixir/features/auth/presentation/cubits/auth_cubit/auth_cubit.dart';
-import 'package:ailixir/features/auth/presentation/widgets/custom_auth_loading_overlay.dart';
-
-import 'package:ailixir/core/services/navigation/navigation_service.dart';
-import '../widgets/join_view_body.dart';
+import 'package:ailixir/features/auth/presentation/widgets/join_view_body.dart';
 
 class JoinView extends StatelessWidget {
   static const routeName = '/join';
@@ -14,20 +8,6 @@ class JoinView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: BlocListener<AuthCubit, AuthState>(
-        listener: (context, state) {
-          if (state is AuthError) {
-            AppToast.showErrorToast(context: context, message: state.msg);
-          } else if (state is AuthSuccess) {
-            AppToast.showSuccessToast(context: context, message: state.msg);
-            context.navigateReplacementTo(MainView.routeName);
-          } else if (state is AuthShowToastState) {
-            AppToast.showSuccessToast(context: context, message: state.msg);
-          }
-        },
-        child: const CustomAuthLoadingOverlay(child: JoinViewBody()),
-      ),
-    );
+    return UserAuthListener(child: const JoinViewBody());
   }
 }

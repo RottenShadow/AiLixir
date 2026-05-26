@@ -1,12 +1,17 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_split_layout.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_text_field.dart';
-import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_primary_button.dart';
+import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
+import 'package:ailixir/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:ailixir/features/auth/presentation/views/signup_view.dart';
-import 'package:ailixir/core/services/navigation/navigation_service.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_back_button.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_brand_logo.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_primary_button.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_text_field.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginViewBody extends StatefulWidget {
   const LoginViewBody({super.key});
@@ -16,152 +21,199 @@ class LoginViewBody extends StatefulWidget {
 }
 
 class _LoginViewBodyState extends State<LoginViewBody> {
-  late TextEditingController emailController;
-  late TextEditingController passwordController;
-  late GlobalKey<FormState> _formKey;
-  bool rememberMe = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _formKey = GlobalKey<FormState>();
-    emailController = TextEditingController();
-    passwordController = TextEditingController();
-  }
+  final _formKey = GlobalKey<FormState>();
+  final _emailCtrl = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
     super.dispose();
+  }
+
+  void _submit(BuildContext context) {
+    if (!_formKey.currentState!.validate()) return;
+    context.read<UserAuthCubit>().login(
+      email: _emailCtrl.text.trim(),
+      password: _passwordCtrl.text,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return AuthSplitLayout(
-      showBackButton: true,
-      leftChild: const AuthLoginMarketingContent(),
-      rightChild: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Researcher Login',
-              style: AppTextStyles.h1.copyWith(
-                fontSize: 32.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              'Access the Ailixir research platform',
-              style: AppTextStyles.bodymedium.copyWith(
-                color: AppColors.authTextSecondary,
-              ),
-            ),
-            SizedBox(height: 40.h),
-            AuthTextField(
-              label: 'Institutional Email',
-              hint: 'e.g. name@university.edu',
-              prefixIcon: Icons.alternate_email,
-              controller: emailController,
-            ),
-            SizedBox(height: 32.h),
-            AuthTextField(
-              label: 'Password',
-              hint: '••••••••',
-              prefixIcon: Icons.lock_outline,
-              obscureText: true,
-              controller: passwordController,
-              topTrailing: TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Forgot Password?',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.brandBlue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 24.h),
-            Row(
-              children: [
-                SizedBox(
-                  height: 24.w,
-                  width: 24.w,
-                  child: Checkbox(
-                    value: rememberMe,
-                    onChanged: (v) => setState(() => rememberMe = v!),
-                    side: const BorderSide(color: AppColors.brandBorder),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.r),
+    return BlocBuilder<UserAuthCubit, UserAuthState>(
+      builder: (context, state) {
+        final isLoading = state is UserAuthLoading;
+        return AuthGradientScaffold(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(vertical: 48.h, horizontal: 24.w),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const AuthBrandLogo(),
+                  SizedBox(height: 40.h),
+                  _AuthCard(
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const AuthBackButton(),
+                          SizedBox(height: 24.h),
+                          Text(
+                            'Welcome back',
+                            style: AppTextStyles.h1.copyWith(
+                              fontSize: 28.sp,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            'Sign in to your Ailixir account',
+                            style: AppTextStyles.bodymedium.copyWith(
+                              color: AppColors.authTextSecondary,
+                            ),
+                          ),
+                          SizedBox(height: 36.h),
+                          AuthTextField(
+                            label: 'Email',
+                            hint: 'you@example.com',
+                            prefixIcon: Icons.alternate_email,
+                            controller: _emailCtrl,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return 'Email is required';
+                              }
+                              if (!v.contains('@'))
+                                return 'Enter a valid email';
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 24.h),
+                          AuthTextField(
+                            label: 'Password',
+                            hint: '••••••••',
+                            prefixIcon: Icons.lock_outline,
+                            controller: _passwordCtrl,
+                            obscureText: _obscurePassword,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _submit(context),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                                color: AppColors.authTextSecondary,
+                                size: 20.sp,
+                              ),
+                              onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
+                            ),
+                            topTrailing: TextButton(
+                              onPressed: () => context.navigateTo(
+                                ForgotPasswordView.routeName,
+                              ),
+                              child: Text(
+                                'Forgot password?',
+                                style: AppTextStyles.labelmedium.copyWith(
+                                  color: AppColors.brandBlue,
+                                ),
+                              ),
+                            ),
+                            validator: (v) {
+                              if (v == null || v.isEmpty) {
+                                return 'Password is required';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 36.h),
+                          AuthPrimaryButton(
+                            text: 'Sign In',
+                            isLoading: isLoading,
+                            onPressed: () => _submit(context),
+                          ),
+                          SizedBox(height: 24.h),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Don't have an account?",
+                                style: AppTextStyles.bodymedium.copyWith(
+                                  color: AppColors.authTextSecondary,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () =>
+                                    context.navigateTo(SignupView.routeName),
+                                child: Text(
+                                  'Sign Up',
+                                  style: AppTextStyles.bodymedium.copyWith(
+                                    color: AppColors.brandBlue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 12.w),
-                Text(
-                  'Persistent Session (30 days)',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.authTextSecondary,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 40.h),
-            AuthPrimaryButton(
-              text: 'Authenticate session',
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {}
-              },
-            ),
-            SizedBox(height: 48.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'New to the network?',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.authTextSecondary,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () => context.navigateTo(SignupView.routeName),
-                  child: Text(
-                    'Create an Account',
+                  SizedBox(height: 32.h),
+                  Text(
+                    '© 2026 AILIXIR PLATFORM.',
                     style: AppTextStyles.labelsmall.copyWith(
-                      color: AppColors.brandBlue,
-                      fontWeight: FontWeight.bold,
+                      color: AppColors.authTextSecondary.withValues(alpha: 0.5),
+                      letterSpacing: 1,
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            const Divider(color: AppColors.brandBorder, height: 64),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _bottomLink('Privacy Policy'),
-                SizedBox(width: 24.w),
-                _bottomLink('Terms of Service'),
-                SizedBox(width: 24.w),
-                _bottomLink('Security Standards'),
-              ],
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
+}
 
-  Widget _bottomLink(String text) {
-    return Text(
-      text,
-      style: AppTextStyles.labelsmall.copyWith(
-        color: AppColors.authTextSecondary.withValues(alpha: 0.5),
+/// Shared gradient card used across all new auth screens.
+class _AuthCard extends StatelessWidget {
+  final Widget child;
+  const _AuthCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 520.w,
+      padding: EdgeInsets.all(40.w),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.slate800.withValues(alpha: 0.95),
+            AppColors.slate900.withValues(alpha: 0.98),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(24.r),
+        border: Border.all(color: AppColors.brandBlue.withValues(alpha: 0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.brandBlue.withValues(alpha: 0.08),
+            blurRadius: 40,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
+      child: child,
     );
   }
 }
