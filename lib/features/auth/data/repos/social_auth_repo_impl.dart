@@ -1,19 +1,19 @@
 import 'dart:developer';
 
 import 'package:ailixir/core/errors/social_auth_failure.dart';
+import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
+import 'package:ailixir/features/auth/data/model/auth/auth_token_user_response.dart';
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/errors/failure.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/helper_functions/safe_api_call.dart';
 import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.dart';
-import 'package:ailixir/features/auth/data/data_source/remote_auth_data_source.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
 
 class SocialAuthRepoImpl {
   final LocalAuthDataSource localAuthDataSource;
-  final RemoteAuthDataSource remoteAuthDataSource;
   final DioService dioService;
 
   bool _isGoogleSigninInit = false;
@@ -21,7 +21,6 @@ class SocialAuthRepoImpl {
 
   SocialAuthRepoImpl({
     required this.localAuthDataSource,
-    required this.remoteAuthDataSource,
     required this.dioService,
   });
 
@@ -63,20 +62,14 @@ class SocialAuthRepoImpl {
     return await _saveUserDataFromResponse(res);
   });
 
-  Future<String> forceLogout() async {
-    await safeApiCall(() async {
-      await dioService.post(endpoint: AppEndpoints.authLogout);
-    });
-    await localAuthDataSource.clearUserTokensAndData();
-    var msg = 'Logged out successfully';
-    return msg;
-  }
-
   Future<String> _saveUserDataFromResponse(
     Map<String, dynamic> response,
   ) async {
-    final res = remoteAuthDataSource.getUserSuccessDataFromApi(req: response);
-    await localAuthDataSource.saveAllUserData(authLoginSuccessModel: res.data!);
+    final res = BaseResponseModel<AuthTokenUserResponse>.fromJson(
+      response,
+      (req) => AuthTokenUserResponse.fromJson(req),
+    );
+    await localAuthDataSource.saveAllUserData(authTokenUserResponse: res.data!);
     log('User Data Saved: ${res.data?.user.name}');
     return res.message;
   }
