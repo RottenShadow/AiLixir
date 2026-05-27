@@ -2,7 +2,7 @@ import 'package:ailixir/core/constants/app_constants.dart';
 import 'package:ailixir/core/model/user/user_cache/cached_user_data_model.dart';
 import 'package:ailixir/core/services/local_storage/secure_storage_service.dart';
 import 'package:ailixir/core/services/local_storage/shared_preferences_service.dart';
-import 'package:ailixir/features/auth/data/model/auth_signin_response_model.dart';
+import 'package:ailixir/features/auth/data/model/auth/auth_token_user_response.dart';
 
 class LocalAuthDataSource {
   final SecureStorageService secureStorage;
@@ -10,19 +10,19 @@ class LocalAuthDataSource {
   LocalAuthDataSource({required this.secureStorage});
 
   Future<void> saveAllUserData({
-    required AuthLoginSuccessModel authLoginSuccessModel,
+    required AuthTokenUserResponse authTokenUserResponse,
   }) async {
     await saveUserData(
-      id: authLoginSuccessModel.user.id,
-      name: authLoginSuccessModel.user.name,
-      email: authLoginSuccessModel.user.email,
-      role: authLoginSuccessModel.user.role,
-      avatar: authLoginSuccessModel.user.avatar,
+      id: authTokenUserResponse.user.id,
+      name: authTokenUserResponse.user.name,
+      email: authTokenUserResponse.user.email,
+      role: authTokenUserResponse.user.role,
+      avatar: authTokenUserResponse.user.avatar,
     );
-    await updateUserAccessToken(token: authLoginSuccessModel.token);
+    await updateUserAccessToken(token: authTokenUserResponse.token);
     // await saveUserTokens(
-    //   token: authLoginSuccessModel.token,
-    //   // refreshToken: authLoginSuccessModel.refreshToken,
+    //   token: authTokenUserResponse.token,
+    //   // refreshToken: authTokenUserResponse.refreshToken,
     // );
   }
 

@@ -3,6 +3,7 @@ import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/features/chatbot/presentation/views/chatbot_view.dart';
 import 'package:flutter/material.dart';
 import '../widgets/main_view_body.dart';
+import 'package:ailixir/features/auth/presentation/widgets/user_auth_listener.dart';
 
 class MainView extends StatelessWidget {
   static const routeName = '/main';
@@ -18,7 +19,7 @@ class MainView extends StatelessWidget {
         },
         child: Icon(Icons.assistant),
       ),
-      body: MainViewBody(),
+      body: UserAuthListener(child: MainViewBody()),
     );
   }
 }
