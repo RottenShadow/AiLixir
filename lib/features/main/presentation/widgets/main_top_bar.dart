@@ -271,6 +271,9 @@ class _ProfileChip extends StatelessWidget {
         },
         itemBuilder: (_) => [
           PopupMenuItem<String>(
+            onTap: () {
+              context.navigateTo(ProfileView.routeName);
+            },
             value: 'profile',
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
             child: Row(

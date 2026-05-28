@@ -9,7 +9,10 @@ class ChatbotView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: AppColors.slate1000),
+      appBar: AppBar(
+        title: Icon(Icons.assistant),
+        backgroundColor: AppColors.slate1000,
+      ),
       body: ChatbotViewBody(),
     );
   }
