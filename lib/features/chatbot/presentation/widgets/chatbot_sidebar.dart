@@ -7,10 +7,7 @@ class ChatbotSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: AppColors.slate1000,
-        borderRadius: BorderRadius.circular(20.r),
-      ),
+      decoration: BoxDecoration(color: AppColors.slate1000),
       child: Column(
         children: [
           IconButton(
