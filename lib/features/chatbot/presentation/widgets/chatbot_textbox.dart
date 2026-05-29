@@ -1,11 +1,11 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 const String _indicator = "_";
 const Duration _waitDuration = Duration(milliseconds: 150);
 const Radius _messageRadius = Radius.circular(20);
-const double _widthPadding = 300;
 const botRadius = BorderRadiusGeometry.only(
   topRight: _messageRadius,
   bottomRight: _messageRadius,
@@ -52,6 +52,7 @@ class ChatbotTextbox extends StatefulWidget {
 class _ChatbotTextbox extends State<ChatbotTextbox> {
   String _buffer = "";
   int _textptr = 0;
+  static final double _widthPadding = 0.3.sw;
   Future<void> fillBuffer() async {
     if (_textptr >= widget.text.length) {
       widget.onBufferFilled();

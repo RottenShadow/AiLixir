@@ -39,8 +39,25 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   Widget _promptTextField() {
     return Align(
       alignment: Alignment.bottomCenter,
-      child: Card(
-        color: AppColors.cardBackground,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(20.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.white.withAlpha(155),
+              offset: const Offset(0, -2),
+              blurRadius: 1.0,
+              spreadRadius: 0.08,
+            ),
+            BoxShadow(
+              color: AppColors.black.withAlpha(155),
+              offset: const Offset(0, 2),
+              blurRadius: 5.0,
+              spreadRadius: 1.0,
+            ),
+          ],
+        ),
         child: Row(
           children: [
             Expanded(
@@ -74,12 +91,14 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
                   hintText: "Ask Something...",
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20.r),
+                    borderSide: BorderSide(width: 0, color: Colors.transparent),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20.r),
+                    borderSide: BorderSide(width: 0, color: Colors.transparent),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: AppColors.brandBlue.withAlpha(155),
-                      width: 2,
-                    ),
+                    borderSide: BorderSide(width: 0, color: Colors.transparent),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                 ),
@@ -94,7 +113,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 0.1.sw),
+      padding: EdgeInsetsGeometry.only(right: 0.02.sw),
       child: Column(
         children: [
           Expanded(
