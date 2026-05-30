@@ -27,12 +27,14 @@ class ChatbotTextbox extends StatefulWidget {
     required this.isBot,
     required this.onBufferFilled,
     required this.isError,
+    required this.isLoading,
   });
   ChatbotTextbox({
     Key? key,
     required String text,
     bool isBot = true,
     bool isError = false,
+    bool isLoading = false,
     void Function() onBufferFilled = _nop,
   }) : this._construct(
          key: key,
@@ -40,11 +42,14 @@ class ChatbotTextbox extends StatefulWidget {
          isBot: isBot,
          onBufferFilled: onBufferFilled,
          isError: isError,
+         isLoading: isLoading,
        );
+  ChatbotTextbox.loading() : this(text: ". . . .", isLoading: true);
   final List<String> text;
   final bool isBot;
   final bool isError;
   final void Function() onBufferFilled;
+  final bool isLoading;
   @override
   State<StatefulWidget> createState() => _ChatbotTextbox();
 }
@@ -55,6 +60,11 @@ class _ChatbotTextbox extends State<ChatbotTextbox> {
   static final double _widthPadding = 0.3.sw;
   Future<void> fillBuffer() async {
     if (_textptr >= widget.text.length) {
+      if (widget.isLoading) {
+        _textptr = 0;
+        _buffer = ". ";
+        return fillBuffer();
+      }
       widget.onBufferFilled();
       return;
     }

@@ -1,14 +1,19 @@
 import 'dart:io';
 
 import 'package:ailixir/core/themes/app_colors.dart';
+import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
+import 'package:ailixir/features/chatbot/presentation/cubits/chat_session_cubit.dart';
 import 'package:ailixir/features/chatbot/presentation/widgets/chatbot_textbox.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChatbotViewBody extends StatefulWidget {
-  const ChatbotViewBody({super.key});
+  final ChatSessionCubit cubit;
+  const ChatbotViewBody({super.key, required this.cubit});
   @override
   State<StatefulWidget> createState() => _ChatbotViewBodyState();
 }
@@ -51,10 +56,16 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   void _addMessage(
     String text, {
     bool isBot = true,
+    bool isErr = false,
     required void Function() onBufferFilled,
   }) {
     _messages.add(
-      ChatbotTextbox(text: text, isBot: isBot, onBufferFilled: onBufferFilled),
+      ChatbotTextbox(
+        text: text,
+        isError: isErr,
+        isBot: isBot,
+        onBufferFilled: onBufferFilled,
+      ),
     );
     setState(() {});
     SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -77,11 +88,17 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
       await Future.delayed(Duration(milliseconds: 450));
     }
     _addMessage(_textcontroller.text, isBot: false, onBufferFilled: () {});
-    _textcontroller.text = "";
     _sendingEnabled = false;
-    await Future.delayed(Duration(milliseconds: 600));
+
+    _messages.add(ChatbotTextbox.loading());
+    setState(() {});
+    String message = _textcontroller.text.toString();
+    _textcontroller.text = "";
+    ChatMessageModel responseMessage = await widget.cubit.sendMessage(message);
+    _messages.removeLast();
     _addMessage(
-      "Not Implemented Yet, Not Implemented Yet Not Implemented Yet Not Implemented Yet Not Implemented Yet",
+      responseMessage.message,
+      isErr: responseMessage.isErr,
       onBufferFilled: () {
         _sendingEnabled = true;
         setState(() {});
@@ -194,25 +211,55 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsetsGeometry.only(right: 0.02.sw),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: _messages.isNotEmpty
-            ? MainAxisAlignment.start
-            : MainAxisAlignment.center,
-        children: _messages.isNotEmpty
-            ? [
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(children: _messages),
-                  ),
+    return BlocBuilder<ChatSessionCubit, ChatSessionState>(
+      builder: (context, state) {
+        if (state is ChatSessionError) {
+          return Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Center(
+                child: Text(
+                  "Error: failed to fetch session",
+                  style: AppTextStyles.h5.copyWith(color: AppColors.red500),
                 ),
-                _promptTextField(),
-              ]
-            : [_promptTextField()],
-      ),
+              ),
+            ],
+          );
+        } else if (state is ChatSessionSuccess) {
+          return Padding(
+            padding: EdgeInsetsGeometry.only(right: 0.02.sw),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: _messages.isNotEmpty
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
+              children: _messages.isNotEmpty
+                  ? [
+                      Expanded(
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          child: Column(children: _messages),
+                        ),
+                      ),
+                      _promptTextField(),
+                    ]
+                  : [_promptTextField()],
+            ),
+          );
+        } else {
+          return Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            spacing: 10,
+            children: [
+              CircularProgressIndicator(color: AppColors.brandBlue),
+              Text("Fetching Chat Session", style: AppTextStyles.h5),
+            ],
+          );
+        }
+      },
     );
   }
 }
