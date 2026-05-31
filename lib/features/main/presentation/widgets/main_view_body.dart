@@ -7,6 +7,8 @@ import 'package:ailixir/features/generation/presentation/views/generation_view.d
 import 'package:ailixir/features/docking/presentation/views/docking_view.dart';
 import 'package:ailixir/features/molecular_dynamics/presentation/views/md_view.dart';
 import 'package:ailixir/features/drug_repurposing/presentation/views/drug_repurposing_view.dart';
+import 'package:ailixir/features/chemical_search/presentation/views/chemical_search_view.dart';
+import 'package:ailixir/features/admet/presentation/views/admet_view.dart';
 import 'package:ailixir/features/history/presentation/views/history_view.dart';
 import 'main_top_bar.dart';
 
@@ -29,7 +31,9 @@ class _MainViewBodyState extends State<MainViewBody> {
     DockingView(), // 3
     MDView(), // 4
     DrugRepurposingView(), // 5
-    HistoryView(), // 6
+    ChemicalSearchView(), // 6
+    AdmetView(), // 7
+    HistoryView(), // 8
   ];
 
   @override

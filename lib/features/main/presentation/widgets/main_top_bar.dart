@@ -12,7 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 
 // Page index constants mirror main_view_body.dart
-// 0 News Feed | 1 Molecular Lab | 2 Generation | 3 Docking | 4 MD | 5 History
+// 0 News Feed | 1 Molecular Lab | 2 Generation | 3 Docking | 4 MD | 5 Drug Repurposing | 6 Chemical Search | 7 ADMET | 8 History
 
 class MainTopBar extends StatelessWidget {
   final int selectedIndex;
@@ -26,7 +26,7 @@ class MainTopBar extends StatelessWidget {
 
   // Operations is active whenever one of its 3 sub-pages is selected
   // Operations is active whenever one of its sub-pages is selected
-  bool get _opsActive => selectedIndex >= 2 && selectedIndex <= 5;
+  bool get _opsActive => selectedIndex >= 2 && selectedIndex <= 7;
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +72,8 @@ class MainTopBar extends StatelessWidget {
           _NavItem(
             icon: Icons.history,
             label: 'History',
-            isActive: selectedIndex == 6,
-            onTap: () => onNavTap(6),
+            isActive: selectedIndex == 8,
+            onTap: () => onNavTap(8),
           ),
 
           const Spacer(),
@@ -100,6 +100,8 @@ class _OperationsDropdown extends StatelessWidget {
     (index: 3, icon: Icons.handshake_outlined, label: 'Docking'),
     (index: 4, icon: Icons.waves, label: 'MD'),
     (index: 5, icon: Icons.biotech, label: 'Drug Repurposing'),
+    (index: 6, icon: Icons.search, label: 'Chemical Search'),
+    (index: 7, icon: Icons.science, label: 'ADMET'),
   ];
 
   @override
