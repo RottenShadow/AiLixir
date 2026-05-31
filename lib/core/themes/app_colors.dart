@@ -22,6 +22,8 @@ abstract class AppColors {
   static const Color logoGradientEnd = Color(0xFF5BBBE2);
   static const Color awardNameGradientTop = Color(0xFFdfbe5d);
   static const Color awardNameGradientBottom = Color(0xFFf1d795);
+  static const Color admetPositive = Color(0xFF00FFC8);
+  static const Color admetSmiles = Color(0xFF88D4FF);
 
   // Generated
   static const Color white = Color(0xffffffff);
