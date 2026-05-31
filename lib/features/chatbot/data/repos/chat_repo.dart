@@ -8,11 +8,10 @@ import 'package:get_it/get_it.dart';
 
 class ChatRepo {
   final DioService dioService = GetIt.I.get<DioService>();
-  Future<Either<Failure, String>> getUserThread(String token) {
+  Future<Either<Failure, String>> getUserThread() {
     return safeApiCall(() async {
       Map<String, dynamic> json = await dioService.get(
         endpoint: "${AppEndpoints.baseUrl}chemistry/threads",
-        headers: {"Authorization": "Bearer $token"},
       );
       if (!json["success"]) {
         throw Exception("Server Error");
@@ -21,7 +20,6 @@ class ChatRepo {
         json =
             ((await dioService.post(
                   endpoint: "${AppEndpoints.baseUrl}chemistry/thread",
-                  headers: {"Authorization": "Bearer $token"},
                 ))
                 as Map<String, dynamic>)["data"];
       } else {
@@ -31,11 +29,10 @@ class ChatRepo {
     });
   }
 
-  Future<Either<Failure, String>> sendMessage(String token, String message) {
+  Future<Either<Failure, String>> sendMessage(String message) {
     return safeApiCall(() async {
       Map<String, dynamic> response = await dioService.post(
         endpoint: "${AppEndpoints.baseUrl}chemistry/chat",
-        headers: {"Authorization": "Bearer $token"},
       );
       if (!response["success"]) throw Exception("Server Error");
       return response["data"]["reply"];

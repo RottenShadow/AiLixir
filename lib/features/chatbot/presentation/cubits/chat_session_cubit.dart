@@ -1,6 +1,5 @@
 import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
 import 'package:ailixir/features/chatbot/data/repos/chat_repo.dart';
-import 'package:ailixir/features/scientists/data/factories/scientist_factory.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:bloc/bloc.dart';
@@ -17,7 +16,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
   int currentPage = 1;
   Future<void> getSessionThread() async {
     emit(ChatSessionLoading());
-    var res = await _repo.getUserThread("");
+    var res = await _repo.getUserThread();
     res.fold(
       (_) {
         emit(ChatSessionError());
@@ -30,7 +29,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
   }
 
   Future<ChatMessageModel> sendMessage(String message) async {
-    var res = await _repo.sendMessage("", message);
+    var res = await _repo.sendMessage(message);
     late ChatMessageModel response;
     res.fold(
       (e) {
