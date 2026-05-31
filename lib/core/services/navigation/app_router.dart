@@ -7,7 +7,6 @@ import 'package:ailixir/features/profile/presentation/views/profile_view.dart';
 import 'package:ailixir/features/scientists/data/models/scientist_package.dart';
 import 'package:ailixir/features/scientists/presentation/views/scientist_credits_view.dart';
 import 'package:ailixir/features/scientists/presentation/views/single_scientist_view.dart';
-import 'package:ailixir/features/similarity/presentation/views/similarity_result_view.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/custom_photo_view.dart';
@@ -91,12 +90,6 @@ abstract class AppRouter {
         builder: (context, state) {
           AwardPackage pkg = state.extra as AwardPackage;
           return SingleAwardView(award: pkg.award, cubit: pkg.cubit);
-        },
-      ),
-      GoRoute(
-        path: SimilarityResultView.routeName,
-        builder: (context, state) {
-          return SimilarityResultView(smileQuery: state.extra as String);
         },
       ),
 
