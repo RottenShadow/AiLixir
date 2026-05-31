@@ -18,6 +18,9 @@ abstract class AppEndpoints {
   static const String userResetPassword = '$userAuthBaseUrl/reset-password';
   static const String userLogout = '$userAuthBaseUrl/logout';
 
+  // ADMET Prediction Endpoints
+  static const String admetPredict = 'admet/predict';
+
   // Drug Repurposing Endpoints
   static const String drugRepurposingBaseUrl =
       'https://rottenshadow-test-drug-purposing.hf.space/api/v1/screen';
