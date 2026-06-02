@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
@@ -96,6 +94,8 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     _textcontroller.text = "";
     ChatMessageModel responseMessage = await widget.cubit.sendMessage(message);
     _messages.removeLast();
+    setState(() {});
+    await Future.delayed(Duration(milliseconds: 50));
     _addMessage(
       responseMessage.message,
       isErr: responseMessage.isErr,

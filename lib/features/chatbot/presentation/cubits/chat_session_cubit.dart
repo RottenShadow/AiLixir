@@ -19,7 +19,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
     var res = await _repo.getUserThread();
     res.fold(
       (_) {
-        emit(ChatSessionError());
+        emit(ChatSessionSuccess());
       },
       (s) {
         sessionId = s;
