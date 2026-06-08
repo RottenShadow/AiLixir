@@ -10,7 +10,6 @@ import 'package:ailixir/core/themes/app_text_styles.dart';
 ///
 /// 2. **Full-width primary button** — pass [text] to get the branded blue
 ///    gradient button with an optional loading spinner and arrow icon.
-///    Set [isFullWidth] to `false` to let it size to its content.
 ///
 /// All decoration properties ([backgroundColor], [gradient], [border],
 /// [borderRadius], [shape], [padding]) are fully overridable.
@@ -28,21 +27,19 @@ class CustomButton extends StatelessWidget {
   /// disables the tap. Only relevant when [text] is provided.
   final bool isLoading;
 
-  /// When [text] is provided, show the trailing arrow icon.
-  /// Defaults to `true`.
-  final bool showArrow;
+  /// When [text] is provided, show the trailing icon.
+  /// Defaults to `false`.
+  final bool showIcon;
+  final IconData icon;
 
   // ── Size ──────────────────────────────────────────────────────────────────
   final double? width;
   final double? height;
 
-  /// When `true` (default when [text] is provided) the button stretches to
-  /// fill its parent's width.
-  final bool? isFullWidth;
-
   // ── Decoration overrides ──────────────────────────────────────────────────
   final Color? backgroundColor;
   final Gradient? gradient;
+  final List<BoxShadow>? boxShadow;
   final EdgeInsetsGeometry? padding;
   final BoxShape? shape;
   final BoxBorder? border;
@@ -57,37 +54,34 @@ class CustomButton extends StatelessWidget {
     this.child,
     this.onTap,
     this.isLoading = false,
-    this.showArrow = true,
+    this.icon = Icons.arrow_forward,
+    this.showIcon = false,
     this.width,
     this.height,
-    this.isFullWidth,
     this.backgroundColor,
     this.gradient,
+    this.boxShadow,
     this.padding,
     this.shape,
     this.border,
     this.borderRadius,
     this.textStyle,
-  }) : assert(
-          text != null || child != null,
-          'Provide either text or child.',
-        );
+  }) : assert(text != null || child != null, 'Provide either text or child.');
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   bool get _isPrimary => text != null;
 
-  Gradient get _defaultGradient => const LinearGradient(
-        colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
-      );
+  Gradient get _defaultGradient =>
+      const LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF3B82F6)]);
 
   List<BoxShadow> get _defaultShadow => [
-        BoxShadow(
-          color: AppColors.brandBlue.withValues(alpha: 0.4),
-          blurRadius: 20,
-          offset: const Offset(0, 4),
-        ),
-      ];
+    BoxShadow(
+      color: AppColors.brandBlue.withValues(alpha: 0.4),
+      blurRadius: 20,
+      offset: const Offset(0, 4),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -98,20 +92,18 @@ class CustomButton extends StatelessWidget {
   // ── Primary (text) button ─────────────────────────────────────────────────
 
   Widget _buildPrimary(BuildContext context) {
-    final bool fullWidth = isFullWidth ?? true;
-    final double btnHeight = height ?? 56.h;
+    // final double btnHeight = height ?? 56.h;
+    bool isColorProvided = backgroundColor != null;
 
     return Container(
-      width: fullWidth ? double.infinity : width,
-      height: btnHeight,
+      width: width,
+      height: height,
       decoration: BoxDecoration(
         borderRadius: borderRadius ?? BorderRadius.circular(12.r),
-        gradient: gradient ?? _defaultGradient,
-        color: gradient == null && backgroundColor != null
-            ? backgroundColor
-            : null,
+        gradient: isColorProvided ? null : gradient ?? _defaultGradient,
+        color: gradient == null && isColorProvided ? backgroundColor : null,
         border: border,
-        boxShadow: _defaultShadow,
+        boxShadow: isColorProvided ? null : boxShadow ?? _defaultShadow,
       ),
       child: ElevatedButton(
         onPressed: isLoading ? null : onTap,
@@ -119,11 +111,12 @@ class CustomButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: (borderRadius as BorderRadius?) ??
-                BorderRadius.circular(12.r),
+            borderRadius:
+                (borderRadius as BorderRadius?) ?? BorderRadius.circular(12.r),
           ),
-          padding: padding as EdgeInsets? ??
-              EdgeInsets.symmetric(horizontal: 24.w),
+          padding:
+              padding as EdgeInsets? ??
+              EdgeInsets.symmetric(horizontal: 24.w, vertical: 18.h),
         ),
         child: isLoading
             ? const SizedBox(
@@ -140,16 +133,16 @@ class CustomButton extends StatelessWidget {
                 children: [
                   Text(
                     text!,
-                    style: textStyle ??
+                    style:
+                        textStyle ??
                         AppTextStyles.h4.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
-                  if (showArrow) ...[
+                  if (showIcon) ...[
                     SizedBox(width: 8.w),
-                    Icon(Icons.arrow_forward,
-                        color: Colors.white, size: 20.sp),
+                    Icon(icon, color: Colors.white, size: 20.sp),
                   ],
                 ],
               ),

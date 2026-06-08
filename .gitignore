@@ -45,5 +45,6 @@ app.*.map.json
 /android/app/release
 
 # shdw
-/assets/web/theme/
 .env
+/assets/web/theme/
+lib/core/config/env/

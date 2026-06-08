@@ -1,6 +1,6 @@
 part of 'md_cubit.dart';
 
-enum MdStatus { idle, running, completed }
+enum MdStatus { idle, running, completed, failure }
 
 @immutable
 class MdState {

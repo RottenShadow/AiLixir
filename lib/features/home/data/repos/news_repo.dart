@@ -8,11 +8,10 @@ import 'package:get_it/get_it.dart';
 
 class NewsRepo {
   final DioService dioService = GetIt.I.get<DioService>();
-  Future<Either<Failure, List<NewsEntity>>> getBookmarks(String token) {
+  Future<Either<Failure, List<NewsEntity>>> getBookmarks() {
     return safeApiCall(() async {
       Map<String, dynamic> json = await dioService.get(
         endpoint: "${AppEndpoints.baseUrl}news/saved",
-        headers: {"Authorization": "Bearer $token"},
       );
       List<NewsEntity> res = [];
       for (Map<String, dynamic> article in json["results"]) {
@@ -22,11 +21,10 @@ class NewsRepo {
     });
   }
 
-  Future<Either<Failure, bool>> saveBookmark(String token, String articleID) {
+  Future<Either<Failure, bool>> saveBookmark(String articleID) {
     return safeApiCall(() async {
       Map<String, dynamic> json = await dioService.post(
         endpoint: "${AppEndpoints.baseUrl}news/$articleID/save",
-        headers: {"Authorization": "Bearer $token"},
       );
       return json["success"];
     });

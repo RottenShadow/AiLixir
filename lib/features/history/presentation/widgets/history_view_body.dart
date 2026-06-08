@@ -3,6 +3,7 @@ import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/entities/md_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/error/custom_failure_body.dart';
 import 'package:ailixir/features/history/presentation/cubits/history_cubit/history_cubit.dart';
 import 'package:ailixir/features/history/presentation/widgets/docking_history_section.dart';
 import 'package:ailixir/features/history/presentation/widgets/ligand_history_section.dart';
@@ -19,6 +20,17 @@ class HistoryViewBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HistoryCubit, HistoryState>(
       builder: (context, state) {
+        if (state is HistoryError) {
+          return Center(
+            child: CustomFailureBody(
+              icon: Icons.error_outline,
+              msg: state.message,
+              actionLabel: 'Try Again',
+              onAction: () => context.read<HistoryCubit>().loadHistory(),
+            ),
+          );
+        }
+
         final isLoading = state is HistoryLoading || state is HistoryInitial;
 
         final ligands = state is HistoryLoaded
@@ -31,29 +43,83 @@ class HistoryViewBody extends StatelessWidget {
             ? state.mdSimulations
             : MdEntity.createFakeData();
 
-        return Skeletonizer(
-          enabled: isLoading,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Notice Banner
-                _NoticeBanner(),
-                SizedBox(height: 24.h),
+        return RefreshIndicator(
+          onRefresh: () => context.read<HistoryCubit>().loadHistory(),
+          color: AppColors.cyan400,
+          backgroundColor: AppColors.slate900,
+          child: Skeletonizer(
+            enabled: isLoading,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.history,
+                            color: AppColors.cyan400,
+                            size: 22.sp,
+                          ),
+                          SizedBox(width: 10.w),
+                          Text(
+                            'Data History',
+                            style: AppTextStyles.h2.copyWith(
+                              color: AppColors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Tooltip(
+                            message: 'Refresh',
+                            child: SizedBox(
+                              width: 32.w,
+                              height: 32.w,
+                              child: IconButton(
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  Icons.refresh,
+                                  color: AppColors.cyan400,
+                                  size: 20.sp,
+                                ),
+                                onPressed: isLoading
+                                    ? null
+                                    : () => context
+                                          .read<HistoryCubit>()
+                                          .loadHistory(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20.h),
 
-                // Ligand Generation History
-                LigandHistorySection(ligands: ligands),
-                SizedBox(height: 32.h),
+                  // Notice Banner
+                  _NoticeBanner(),
+                  SizedBox(height: 24.h),
 
-                // Docking History
-                DockingHistorySection(dockings: dockings),
-                SizedBox(height: 32.h),
+                  // Ligand Generation History
+                  LigandHistorySection(ligands: ligands),
+                  SizedBox(height: 32.h),
 
-                // MD History
-                MdHistorySection(mdSimulations: mdSims),
-                SizedBox(height: 24.h),
-              ],
+                  // Docking History
+                  DockingHistorySection(dockings: dockings),
+                  SizedBox(height: 32.h),
+
+                  // MD History
+                  MdHistorySection(mdSimulations: mdSims),
+                  SizedBox(height: 24.h),
+                ],
+              ),
             ),
           ),
         );

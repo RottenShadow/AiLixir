@@ -9,7 +9,6 @@ import 'package:ailixir/features/scientists/presentation/views/scientist_credits
 import 'package:ailixir/features/scientists/presentation/views/single_scientist_view.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
-import 'package:ailixir/core/widgets/custom_photo_view.dart';
 import 'package:ailixir/features/auth/presentation/views/forgot_password_view.dart';
 import 'package:ailixir/features/auth/presentation/views/join_view.dart';
 import 'package:ailixir/features/auth/presentation/views/login_view.dart';
@@ -98,13 +97,6 @@ abstract class AppRouter {
         path: LigandDetailsView.routeName,
         builder: (context, state) =>
             LigandDetailsView(ligand: state.extra as LigandEntity),
-      ),
-
-      // ── Misc ──────────────────────────────────────────────────────────────
-      GoRoute(
-        path: CustomPhotoView.routeName,
-        builder: (context, state) =>
-            CustomPhotoView(imageUrl: state.extra as String),
       ),
     ],
   );

@@ -68,7 +68,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                   onFilterSelected: (id) => setState(() {
                     _selectedFilterId = id;
                     if (id == "saved") {
-                      _repo.getBookmarks("PUT TOKEN HERE").then((v) {
+                      _repo.getBookmarks().then((v) {
                         v.fold((f) {}, (v) {
                           setState(() {
                             _bookmarks = v;
@@ -87,7 +87,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                     child: NewsCard(
                       news: news,
                       onBookmark: (id) async {
-                        var res = await _repo.saveBookmark("", id);
+                        var res = await _repo.saveBookmark(id);
                         bool success = false;
                         res.fold((_) {}, (v) {
                           success = v;

@@ -376,8 +376,9 @@ class _DockingViewBodyState extends State<DockingViewBody> {
                       SizedBox(height: 24.h),
 
                       // ── Log / Results ─────────────────────────────────────
-                      if (state.status == DockingStatus.polling)
-                        DockingLogPanel(logs: state.logs),
+                      if (state.logs.isNotEmpty ||
+                          state.status == DockingStatus.polling)
+                        DockingLogPanel(logs: state.logs, status: state.status),
                       if (state.status == DockingStatus.completed)
                         DockingResultsPanel(results: state.results),
                     ],

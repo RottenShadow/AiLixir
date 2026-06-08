@@ -1,11 +1,13 @@
-import 'dart:math';
+import 'package:get_it/get_it.dart';
+import 'package:ailixir/features/admet/data/repos/admet_repo.dart';
 import 'package:ailixir/features/admet/domain/entities/admet_predict_response_entity.dart';
-import 'package:ailixir/features/admet/domain/entities/admet_prediction_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'admet_state.dart';
 
 class AdmetCubit extends Cubit<AdmetState> {
+  final _repo = GetIt.I.get<AdmetRepo>();
+
   final List<String> _logs = [];
 
   AdmetCubit() : super(const AdmetIdle());
@@ -17,67 +19,53 @@ class AdmetCubit extends Cubit<AdmetState> {
     }
 
     addLog('Starting ADMET prediction pipeline...');
-    await Future.delayed(const Duration(milliseconds: 300));
-
     addLog('Validating ${smiles.length} SMILES strings...');
-    await Future.delayed(const Duration(milliseconds: 400));
 
-    addLog('Running absorption prediction model...');
-    await Future.delayed(const Duration(milliseconds: 500));
+    final result = await _repo.predictAdmet(smiles);
 
-    addLog('Running distribution prediction model...');
-    await Future.delayed(const Duration(milliseconds: 400));
+    result.fold(
+      (failure) {
+        _logs.add('[${_ts()}] ✗ Error: ${failure.message}');
+        emit(
+          AdmetError(message: failure.message, logs: List.unmodifiable(_logs)),
+        );
+      },
+      (response) {
+        _logs.add(
+          '[${_ts()}] ✓ Generated predictions for ${response.data.length} compounds.',
+        );
+        _logs.add('[${_ts()}] ✓ ADMET prediction complete.');
+        emit(AdmetSuccess(response: response, logs: List.unmodifiable(_logs)));
+      },
+    );
+  }
 
-    addLog('Running metabolism prediction model...');
-    await Future.delayed(const Duration(milliseconds: 400));
-
-    addLog('Running excretion prediction model...');
-    await Future.delayed(const Duration(milliseconds: 300));
-
-    addLog('Running toxicity prediction model...');
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    try {
-      final random = Random();
-      final predictions = smiles
-          .map(
-            (s) => AdmetPredictionEntity(
-              smiles: s.trim(),
-              absorption: -3.5 + random.nextDouble() * 2.5,
-              distribution: 0.5 + random.nextDouble() * 1.2,
-              metabolism: -0.4 + random.nextDouble() * 0.5,
-              excretion: 5.0 + random.nextDouble() * 18.0,
-              toxicity: -0.8 + random.nextDouble() * 2.0,
-            ),
-          )
-          .toList();
-
-      _logs.add(
-        '[${_ts()}] ✓ Generated predictions for ${predictions.length} compounds.',
-      );
-      _logs.add('[${_ts()}] ✓ ADMET prediction complete.');
-
-      emit(
-        AdmetSuccess(
-          response: AdmetPredictResponseEntity(
-            success: true,
-            message: 'ADMET predictions generated successfully',
-            data: predictions,
-          ),
-          logs: List.unmodifiable(_logs),
-        ),
-      );
-    } catch (e) {
-      _logs.add(
-        '[${_ts()}] ✗ Error: ${e.toString().replaceAll('Exception: ', '')}',
-      );
-      emit(
-        AdmetError(
-          message: e.toString().replaceAll('Exception: ', ''),
-          logs: List.unmodifiable(_logs),
-        ),
-      );
+  Future<void> predictAdmetFromFile(String filePath) async {
+    void addLog(String msg) {
+      _logs.add('[${_ts()}] $msg');
+      emit(AdmetLoading(logs: List.unmodifiable(_logs)));
     }
+
+    addLog('Starting ADMET prediction pipeline from file...');
+    addLog('Processing file: $filePath');
+
+    final result = await _repo.predictAdmetFromFile(filePath);
+
+    result.fold(
+      (failure) {
+        _logs.add('[${_ts()}] ✗ Error: ${failure.message}');
+        emit(
+          AdmetError(message: failure.message, logs: List.unmodifiable(_logs)),
+        );
+      },
+      (response) {
+        _logs.add(
+          '[${_ts()}] ✓ Generated predictions for ${response.data.length} compounds.',
+        );
+        _logs.add('[${_ts()}] ✓ ADMET prediction complete.');
+        emit(AdmetSuccess(response: response, logs: List.unmodifiable(_logs)));
+      },
+    );
   }
 
   void clearLogs() {

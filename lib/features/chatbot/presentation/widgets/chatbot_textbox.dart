@@ -85,7 +85,7 @@ class _ChatbotTextbox extends State<ChatbotTextbox> {
   @override
   void initState() {
     super.initState();
-    if (widget.isBot && !widget.isError) {
+    if (widget.isBot) {
       fillBuffer();
     } else {
       _buffer = widget.text.join(" ");
@@ -113,9 +113,7 @@ class _ChatbotTextbox extends State<ChatbotTextbox> {
             padding: EdgeInsetsGeometry.all(12),
             child: SelectableText(
               _buffer,
-              style: widget.isError
-                  ? AppTextStyles.medium.copyWith(color: AppColors.red500)
-                  : null,
+              style: widget.isError ? TextStyle(color: AppColors.red500) : null,
             ),
           ),
         ),

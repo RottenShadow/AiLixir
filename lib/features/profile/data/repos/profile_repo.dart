@@ -8,18 +8,15 @@ import 'package:get_it/get_it.dart';
 
 class ProfileRepo {
   final DioService dioService = GetIt.I.get<DioService>();
-  Future<Either<Failure, ProfileModel>> getProfile(String token) {
+  Future<Either<Failure, ProfileModel>> getProfile() {
     return safeApiCall(() async {
       return ProfileModel.fromJson(
-        await dioService.get(
-          endpoint: "${AppEndpoints.baseUrl}user/profile",
-          headers: {"Authorization": "Bearer $token"},
-        ),
+        await dioService.get(endpoint: "${AppEndpoints.baseUrl}user/profile"),
       );
     });
   }
 
-  Future<Either<Failure, ProfileModel>> getTestProfile(String token) async {
+  Future<Either<Failure, ProfileModel>> getTestProfile() async {
     await Future.delayed(Duration(milliseconds: 33));
     return Right<Failure, ProfileModel>(
       ProfileModel.fromJson({

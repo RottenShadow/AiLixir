@@ -1,6 +1,8 @@
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/custom_empty_body.dart';
+import 'package:ailixir/features/history/presentation/cubits/history_cubit/history_cubit.dart';
 import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_see_all_view.dart';
@@ -60,7 +62,19 @@ class LigandHistorySection extends StatelessWidget {
           ],
         ),
         SizedBox(height: 12.h),
-        ...ligands.map((l) => _LigandCard(ligand: l)),
+        if (ligands.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 24, bottom: 24),
+            child: CustomEmptyBody(
+              icon: Icons.science_outlined,
+              title: 'No Ligands Yet',
+              subTitle: 'Generated ligands will appear here.',
+              actionLabel: 'Refresh',
+              onAction: () => context.read<HistoryCubit>().loadHistory(),
+            ),
+          )
+        else
+          ...ligands.map((l) => _LigandCard(ligand: l)),
       ],
     );
   }

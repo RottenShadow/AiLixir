@@ -172,6 +172,9 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                         CustomButton(
                           text: 'Verify Email',
                           isLoading: isLoading,
+                          icon: Icons.verified_user_outlined,
+                          showIcon: true,
+                          width: double.infinity,
                           onTap: () => _submit(context),
                         ),
                         SizedBox(height: 20.h),

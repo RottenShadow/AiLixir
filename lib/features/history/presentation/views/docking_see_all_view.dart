@@ -1,6 +1,7 @@
 import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/custom_empty_body.dart';
 import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -76,11 +77,12 @@ class _DockingSeeAllViewState extends State<DockingSeeAllView> {
 
           if (state.items.isEmpty) {
             return Center(
-              child: Text(
-                'No docking results found.',
-                style: AppTextStyles.bodymedium.copyWith(
-                  color: AppColors.slate400,
-                ),
+              child: CustomEmptyBody(
+                icon: Icons.hub_outlined,
+                title: 'No Docking Results',
+                subTitle: 'No docking simulations yet.\nSubmit a docking job to see results here.',
+                actionLabel: 'Refresh',
+                onAction: () => context.read<DockingSeeAllCubit>().loadFirstPage(),
               ),
             );
           }

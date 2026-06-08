@@ -24,7 +24,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
   @override
   void initState() {
     super.initState();
-    _repo.getTestProfile("").then((v) {
+    _repo.getTestProfile().then((v) {
       v.fold(
         (f) {
           _failed = true;

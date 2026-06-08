@@ -1,5 +1,6 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:ailixir/features/molecular_dynamics/presentation/cubits/md_cubit.dart';
 import 'package:ailixir/features/molecular_dynamics/presentation/widgets/md_section_equilibration.dart';
 import 'package:ailixir/features/molecular_dynamics/presentation/widgets/md_section_force_field.dart';
@@ -15,17 +16,33 @@ class MdViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: Row(
-            children: [
-              Expanded(child: _FormColumn()),
-              _BottomBar(),
-            ],
+    return BlocListener<MdCubit, MdState>(
+      listenWhen: (prev, next) => prev.status != next.status,
+      listener: (context, state) {
+        if (state.status == MdStatus.completed) {
+          AppToast.showSuccessToast(
+            context: context,
+            message: 'Simulation completed successfully!',
+          );
+        } else if (state.status == MdStatus.failure) {
+          AppToast.showErrorToast(
+            context: context,
+            message: 'Simulation failed.',
+          );
+        }
+      },
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _FormColumn()),
+                _BottomBar(),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

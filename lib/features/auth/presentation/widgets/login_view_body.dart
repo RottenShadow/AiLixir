@@ -145,6 +145,9 @@ class _LoginViewBodyState extends State<LoginViewBody> {
                           CustomButton(
                             text: 'Sign In',
                             isLoading: isLoading,
+                            icon: Icons.login_outlined,
+                            showIcon: true,
+                            width: double.infinity,
                             onTap: () => _submit(context),
                           ),
                           SizedBox(height: 24.h),
