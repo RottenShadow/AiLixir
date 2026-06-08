@@ -6,6 +6,9 @@ on:
       - dev
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build_windows:
     name: Build Windows Release
