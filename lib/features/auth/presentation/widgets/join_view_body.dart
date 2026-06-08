@@ -79,30 +79,26 @@ class JoinViewBody extends StatelessWidget {
                     SizedBox(height: 36.h),
                     CustomButton(
                       text: 'Sign In',
+                      width: double.infinity,
+                      border: Border.all(
+                        color: AppColors.slate600.withValues(alpha: 0.6),
+                      ),
+                      backgroundColor: AppColors.slate700.withValues(
+                        alpha: 0.3,
+                      ),
                       onTap: () => context.navigateTo(LoginView.routeName),
                     ),
                     SizedBox(height: 16.h),
-                    OutlinedButton(
-                      onPressed: () => context.navigateTo(SignupView.routeName),
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: AppColors.slate700.withValues(
-                          alpha: 0.3,
-                        ),
-                        minimumSize: Size(double.infinity, 52.h),
-                        side: BorderSide(
-                          color: AppColors.slate600.withValues(alpha: 0.6),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
+                    CustomButton(
+                      text: 'Create Account',
+                      width: double.infinity,
+                      border: Border.all(
+                        color: AppColors.slate600.withValues(alpha: 0.6),
                       ),
-                      child: Text(
-                        'Create Account',
-                        style: AppTextStyles.h4.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      backgroundColor: AppColors.slate700.withValues(
+                        alpha: 0.3,
                       ),
+                      onTap: () => context.navigateTo(SignupView.routeName),
                     ),
                     SizedBox(height: 32.h),
                     Row(
@@ -136,7 +132,7 @@ class JoinViewBody extends StatelessWidget {
                         backgroundColor: AppColors.slate700.withValues(
                           alpha: 0.3,
                         ),
-                        minimumSize: Size(double.infinity, 52.h),
+                        minimumSize: Size(double.infinity, 58.h),
                         side: BorderSide(
                           color: AppColors.slate600.withValues(alpha: 0.6),
                         ),

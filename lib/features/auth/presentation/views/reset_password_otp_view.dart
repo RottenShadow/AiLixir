@@ -259,6 +259,9 @@ class _ResetPasswordOtpViewState extends State<ResetPasswordOtpView> {
                           CustomButton(
                             text: 'Update Password',
                             isLoading: isLoading,
+                            icon: Icons.password,
+                            showIcon: true,
+                            width: double.infinity,
                             onTap: () => _submit(context),
                           ),
                           SizedBox(height: 20.h),

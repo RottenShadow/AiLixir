@@ -119,6 +119,9 @@ class _ForgotPasswordViewState extends State<ForgotPasswordView> {
                           CustomButton(
                             text: 'Send Reset Code',
                             isLoading: isLoading,
+                            icon: Icons.email_outlined,
+                            showIcon: true,
+                            width: double.infinity,
                             onTap: () => _submit(context),
                           ),
                         ],

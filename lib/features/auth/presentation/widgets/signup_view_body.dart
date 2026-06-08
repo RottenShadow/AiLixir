@@ -217,6 +217,9 @@ class _SignupViewBodyState extends State<SignupViewBody> {
                           CustomButton(
                             text: 'Create Account',
                             isLoading: isLoading,
+                            icon: Icons.person_add_outlined,
+                            showIcon: true,
+                            width: double.infinity,
                             onTap: () => _submit(context),
                           ),
                           SizedBox(height: 24.h),
