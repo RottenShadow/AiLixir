@@ -9,12 +9,6 @@ part 'md_state.dart';
 class MdCubit extends Cubit<MdState> {
   MdCubit() : super(MdState(config: const MdSimulationEntity()));
 
-  Timer? _pollTimer;
-  int _pollCount = 0;
-
-  static const _pollInterval = Duration(seconds: 10);
-  static const _completionCycle = 3;
-
   // ── Config mutations ─────────────────────────────────────────────────────
 
   Future<void> pickProteinFile() async {
@@ -127,9 +121,6 @@ class MdCubit extends Cubit<MdState> {
   // ── Simulation lifecycle ─────────────────────────────────────────────────
 
   void startSimulation() {
-    _cancelTimer();
-    _pollCount = 0;
-
     emit(
       state.copyWith(
         status: MdStatus.running,
@@ -137,40 +128,24 @@ class MdCubit extends Cubit<MdState> {
       ),
     );
 
-    _poll();
-    _pollTimer = Timer.periodic(_pollInterval, (_) => _poll());
-  }
-
-  void _poll() {
-    if (isClosed) return;
-    _pollCount++;
-
-    final log = switch (_pollCount) {
-      1 => '[${_ts()}] Building simulation box with LEaP...',
-      2 => '[${_ts()}] Running energy minimization (${state.config.minimizationSteps} steps)...',
-      _ =>
-        '[${_ts()}] MD running... ${state.config.equilTemperature.toInt()} K / ${state.config.equilPressure.toStringAsFixed(2)} bar (poll $_pollCount)',
-    };
-
-    emit(state.copyWith(logs: [...state.logs, log]));
-
-    if (_pollCount >= _completionCycle) {
-      _cancelTimer();
+    Future.delayed(const Duration(seconds: 3), () {
+      if (isClosed) return;
+      final success = DateTime.now().millisecondsSinceEpoch % 2 == 0;
       emit(
         state.copyWith(
-          status: MdStatus.completed,
+          status: success ? MdStatus.completed : MdStatus.failure,
           logs: [
             ...state.logs,
-            '[${_ts()}] ✓ Simulation completed. Trajectory saved.',
+            success
+                ? '[${_ts()}] ✓ Simulation completed. Trajectory saved.'
+                : '[${_ts()}] ✗ Simulation failed.',
           ],
         ),
       );
-    }
+    });
   }
 
   void reset() {
-    _cancelTimer();
-    _pollCount = 0;
     emit(MdState(config: const MdSimulationEntity()));
   }
 
@@ -178,21 +153,10 @@ class MdCubit extends Cubit<MdState> {
     emit(state.copyWith(config: config));
   }
 
-  void _cancelTimer() {
-    _pollTimer?.cancel();
-    _pollTimer = null;
-  }
-
   String _ts() {
     final n = DateTime.now();
     return '${n.hour.toString().padLeft(2, '0')}:'
         '${n.minute.toString().padLeft(2, '0')}:'
         '${n.second.toString().padLeft(2, '0')}';
-  }
-
-  @override
-  Future<void> close() {
-    _cancelTimer();
-    return super.close();
   }
 }
