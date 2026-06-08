@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/utils/toast/app_toast.dart';
@@ -18,7 +20,7 @@ class _AdmetInputFormState extends State<AdmetInputForm> {
   final TextEditingController _smilesController = TextEditingController();
   String _inputMethod = 'manual';
   String? _fileName;
-  String? _error;
+  String? _filePath;
 
   @override
   void dispose() {
@@ -35,57 +37,74 @@ class _AdmetInputFormState extends State<AdmetInputForm> {
 
     if (result != null && result.files.single.path != null) {
       final file = result.files.single;
-      final bytes = file.bytes;
-      if (bytes != null) {
-        final content = String.fromCharCodes(bytes);
-        final lines = content
-            .split(RegExp(r'[\r\n]+'))
-            .map((l) => l.trim())
-            .where((l) => l.isNotEmpty && !l.startsWith('SMILES'))
-            .toList();
-
-        if (lines.length > 100) {
-          setState(() {
-            _error = 'File exceeds 100 row limit';
-            _fileName = null;
-          });
+      List<int>? bytes = file.bytes;
+      if (bytes == null) {
+        try {
+          bytes = await File(file.path!).readAsBytes();
+        } catch (_) {
           return;
         }
-
-        setState(() {
-          _smilesController.text = lines.join('\n');
-          _fileName = file.name;
-          _error = null;
-        });
       }
+
+      final content = String.fromCharCodes(bytes);
+      final lines = content
+          .split(RegExp(r'[\r\n]+'))
+          .map((l) => l.trim())
+          .where((l) => l.isNotEmpty && !l.startsWith('SMILES'))
+          .toList();
+
+      if (lines.length > 100) {
+        AppToast.showErrorToast(
+          context: context,
+          message: 'File exceeds maximum 100 rows limit',
+        );
+        return;
+      }
+
+      setState(() {
+        _filePath = file.path;
+        _fileName = file.name;
+      });
     }
   }
 
   void _submit() {
-    final text = _smilesController.text.trim();
-    if (text.isEmpty) {
-      AppToast.showErrorToast(
-        context: context,
-        message: 'Please enter or upload at least one SMILES string',
-      );
-      return;
+    if (_inputMethod == 'manual') {
+      final smiles = _smilesController.text
+          .trim()
+          .split(RegExp(r'[\r\n,]+'))
+          .map((l) => l.trim())
+          .where((l) => l.isNotEmpty)
+          .toList();
+
+      if (smiles.isEmpty) {
+        AppToast.showErrorToast(
+          context: context,
+          message: 'Please enter at least one SMILES string',
+        );
+        return;
+      }
+
+      if (smiles.length > 6) {
+        AppToast.showErrorToast(
+          context: context,
+          message: 'Maximum 6 SMILES allowed',
+        );
+        return;
+      }
+
+      context.read<AdmetCubit>().predictAdmet(smiles);
+    } else {
+      if (_filePath == null) {
+        AppToast.showErrorToast(
+          context: context,
+          message: 'Please upload a file with SMILES data',
+        );
+        return;
+      }
+
+      context.read<AdmetCubit>().predictAdmetFromFile(_filePath!);
     }
-
-    final smiles = text
-        .split(RegExp(r'[\r\n,]+'))
-        .map((l) => l.trim())
-        .where((l) => l.isNotEmpty)
-        .toList();
-
-    if (smiles.length > 100) {
-      AppToast.showErrorToast(
-        context: context,
-        message: 'Maximum 100 SMILES allowed',
-      );
-      return;
-    }
-
-    context.read<AdmetCubit>().predictAdmet(smiles);
   }
 
   @override
@@ -106,15 +125,9 @@ class _AdmetInputFormState extends State<AdmetInputForm> {
                 ),
                 SizedBox(width: 8.w),
                 _MethodTab(
-                  label: 'CSV',
-                  isSelected: _inputMethod == 'csv',
-                  onTap: isLoading ? null : () => setState(() => _inputMethod = 'csv'),
-                ),
-                SizedBox(width: 8.w),
-                _MethodTab(
-                  label: 'TXT',
-                  isSelected: _inputMethod == 'txt',
-                  onTap: isLoading ? null : () => setState(() => _inputMethod = 'txt'),
+                  label: 'File',
+                  isSelected: _inputMethod == 'file',
+                  onTap: isLoading ? null : () => setState(() => _inputMethod = 'file'),
                 ),
               ],
             ),
@@ -124,38 +137,14 @@ class _AdmetInputFormState extends State<AdmetInputForm> {
             else
               _FileUpload(
                 fileName: _fileName,
-                error: _error,
                 enabled: !isLoading,
                 onPick: _pickFile,
+                onRemove: () => setState(() {
+                  _fileName = null;
+                  _filePath = null;
+                }),
               ),
             SizedBox(height: 16.h),
-            if (_error != null)
-              Padding(
-                padding: EdgeInsets.only(bottom: 12.h),
-                child: Container(
-                  padding: EdgeInsets.all(12.r),
-                  decoration: BoxDecoration(
-                    color: AppColors.red500.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8.r),
-                    border: Border.all(color: AppColors.red500.withOpacity(0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.error_outline, color: AppColors.red400, size: 16.sp),
-                      SizedBox(width: 8.w),
-                      Text(
-                        _error!,
-                        style: AppTextStyles.caption.copyWith(color: AppColors.red400),
-                      ),
-                      const Spacer(),
-                      GestureDetector(
-                        onTap: () => setState(() => _error = null),
-                        child: Icon(Icons.close, color: AppColors.red400, size: 14.sp),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             _PredictButton(isLoading: isLoading, onTap: _submit),
           ],
         );
@@ -218,7 +207,7 @@ class _ManualInput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Enter SMILES (one per line)',
+          'Enter SMILES (separate by comma or new line, max 6)',
           style: AppTextStyles.caption.copyWith(
             color: AppColors.authTextSecondary,
             letterSpacing: 1,
@@ -228,14 +217,14 @@ class _ManualInput extends StatelessWidget {
         TextField(
           controller: controller,
           enabled: enabled,
-          maxLines: 12,
+          maxLines: 8,
           style: TextStyle(
             fontFamily: 'monospace',
             fontSize: 12.sp,
             color: const Color(0xFF88D4FF),
           ),
           decoration: InputDecoration(
-            hintText: 'c1ccccc1\nCCO\nCCC',
+            hintText: 'c1ccccc1, CCO, CCC',
             hintStyle: TextStyle(
               fontFamily: 'monospace',
               fontSize: 12.sp,
@@ -269,15 +258,15 @@ class _ManualInput extends StatelessWidget {
 
 class _FileUpload extends StatelessWidget {
   final String? fileName;
-  final String? error;
   final bool enabled;
   final VoidCallback onPick;
+  final VoidCallback? onRemove;
 
   const _FileUpload({
     this.fileName,
-    this.error,
     required this.enabled,
     required this.onPick,
+    this.onRemove,
   });
 
   @override
@@ -303,7 +292,7 @@ class _FileUpload extends StatelessWidget {
                 Icon(Icons.upload_file, size: 32.sp, color: const Color(0xFF00FFC8)),
                 SizedBox(height: 12.h),
                 Text(
-                  'Click to upload ${fileName != null ? fileName!.split('.').last.toUpperCase() : 'CSV or TXT'} file',
+                  'Click to upload CSV or TXT file',
                   style: AppTextStyles.labelsmall.copyWith(
                     color: const Color(0xFF00FFC8),
                     fontWeight: FontWeight.w600,
@@ -311,7 +300,7 @@ class _FileUpload extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'or drag and drop',
+                  'or drag and drop (max 100 rows)',
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.authTextSecondary.withOpacity(0.5),
                   ),
@@ -332,11 +321,17 @@ class _FileUpload extends StatelessWidget {
               children: [
                 Icon(Icons.check_circle, size: 16.sp, color: const Color(0xFF00FFC8)),
                 SizedBox(width: 8.w),
-                Text(
-                  '$fileName loaded',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.authTextSecondary,
+                Expanded(
+                  child: Text(
+                    '$fileName loaded',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.authTextSecondary,
+                    ),
                   ),
+                ),
+                GestureDetector(
+                  onTap: onRemove,
+                  child: Icon(Icons.close, size: 16.sp, color: AppColors.authTextSecondary),
                 ),
               ],
             ),
