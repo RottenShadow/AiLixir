@@ -47,4 +47,4 @@ app.*.map.json
 # shdw
 .env
 /assets/web/theme/
-lib/core/config/env/
+lib/core/config/env/*.g.dart
