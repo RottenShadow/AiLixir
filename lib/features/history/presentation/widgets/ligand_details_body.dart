@@ -2,6 +2,7 @@ import 'package:ailixir/core/entities/ligand_details_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/error/custom_failure_body.dart';
 import 'package:ailixir/features/history/presentation/cubits/ligand_details_cubit/ligand_details_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +17,19 @@ class LigandDetailsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<LigandDetailsCubit, LigandDetailsState>(
       builder: (context, state) {
+        if (state is LigandDetailsError) {
+          return Center(
+            child: CustomFailureBody(
+              icon: Icons.error_outline,
+              msg: state.message,
+              actionLabel: 'Try Again',
+              onAction: () => context
+                  .read<LigandDetailsCubit>()
+                  .loadDetails(ligand.id),
+            ),
+          );
+        }
+
         final isLoading =
             state is LigandDetailsLoading || state is LigandDetailsInitial;
         final details = state is LigandDetailsLoaded
