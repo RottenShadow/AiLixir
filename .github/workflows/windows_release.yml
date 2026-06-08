@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev
+      - main
 
 jobs:
   build_windows:
@@ -50,3 +51,36 @@ jobs:
         with:
           name: ailixir-windows-release
           path: build/windows/x64/runner/Release/
+
+      - name: Extract version from pubspec.yaml
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep '^version: ' pubspec.yaml | sed 's/version: //' | sed 's/[[:space:]]//g')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Determine release channel
+        id: channel
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "suffix=" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "suffix=-beta" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Package Release
+        shell: powershell
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath ailixir-windows-${{ steps.version.outputs.version }}${{ steps.channel.outputs.suffix }}.zip
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}${{ steps.channel.outputs.suffix }}
+          name: Release v${{ steps.version.outputs.version }}${{ steps.channel.outputs.suffix }}
+          files: ailixir-windows-${{ steps.version.outputs.version }}${{ steps.channel.outputs.suffix }}.zip
+          prerelease: ${{ steps.channel.outputs.prerelease }}
+          generate_release_notes: true
+          fail_on_unmatched_files: false
