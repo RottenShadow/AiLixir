@@ -9,8 +9,8 @@ import 'package:ailixir/core/errors/failure.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/helper_functions/safe_api_call.dart';
 import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in_all_platforms/google_sign_in_all_platforms.dart';
+import 'package:ailixir/core/config/env/env.dart';
 
 class SocialAuthRepoImpl {
   final LocalAuthDataSource localAuthDataSource;
@@ -29,8 +29,8 @@ class SocialAuthRepoImpl {
 
     try {
       if (!_isGoogleSigninInit) {
-        final clientId = dotenv.env['GOOGLE_CLIENT_ID'];
-        final clientSecret = dotenv.env['GOOGLE_CLIENT_SECRET'];
+        final clientId = Env.googleClientId;
+        final clientSecret = Env.googleClientSecret;
         final scopes = ['openid', 'email', 'profile'];
         googleSignIn = GoogleSignIn(
           params: GoogleSignInParams(

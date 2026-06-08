@@ -10,8 +10,8 @@ import 'package:ailixir/features/history/data/repos/history_repo.dart';
 import 'package:ailixir/features/admet/data/repos/admet_repo.dart';
 import 'package:ailixir/features/chemical_search/data/repos/chemical_search_repo.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
+import 'package:ailixir/core/config/env/env.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/services/local_storage/secure_storage_service.dart';
@@ -84,7 +84,7 @@ void getItRegisterSingleton() {
     final drugDioService = DioService(
       dio: drugDio,
       localAuthDataSource: GetIt.I.get(),
-      forcedToken: dotenv.env['HF_TOKEN'],
+      forcedToken: Env.hfToken,
     )..init();
     return DrugRepurposingRepository(dio: drugDioService);
   });

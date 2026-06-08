@@ -1,9 +1,7 @@
 import 'dart:developer';
 
-// import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/app.dart';
 import 'package:ailixir/core/constants/app_constants.dart';
@@ -21,7 +19,6 @@ void main() async {
   // Initialize core services
   await Future.wait([
     SharedPreferencesService.init(),
-    dotenv.load(fileName: ".env"),
     // Initialize firebase service
     // _initializeBackgroundServices(),
   ]);
