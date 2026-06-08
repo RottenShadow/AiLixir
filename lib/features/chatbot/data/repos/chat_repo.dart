@@ -29,10 +29,14 @@ class ChatRepo {
     });
   }
 
-  Future<Either<Failure, String>> sendMessage(String message) {
+  Future<Either<Failure, String>> sendMessage(
+    String message,
+    String sessionId,
+  ) {
     return safeApiCall(() async {
       Map<String, dynamic> response = await dioService.post(
         endpoint: "${AppEndpoints.baseUrl}chemistry/chat",
+        data: {"message": message, "thread_id": sessionId},
       );
       if (!response["success"]) throw Exception("Server Error");
       return response["data"]["reply"];

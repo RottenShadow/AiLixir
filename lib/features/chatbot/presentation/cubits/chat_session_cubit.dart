@@ -35,8 +35,6 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
   }
 
   Future<ChatMessageModel> sendMessage(String message) async {
-    var res = await _repo.sendMessage(message);
-    late ChatMessageModel response;
     if (AppFeatureFlag.useFakeChatbot) {
       await Future.delayed(Duration(milliseconds: 22));
       return ChatMessageModel(
@@ -44,6 +42,9 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
         isErr: false,
       );
     }
+
+    var res = await _repo.sendMessage(message, sessionId!);
+    late ChatMessageModel response;
     res.fold(
       (e) {
         response = ChatMessageModel(isErr: true, message: e.message);

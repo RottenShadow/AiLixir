@@ -1,7 +1,10 @@
+import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/profile/data/models/profile_model.dart';
+import 'package:ailixir/features/profile/data/models/profile_package.dart';
 import 'package:ailixir/features/profile/data/repos/profile_repo.dart';
+import 'package:ailixir/features/profile/presentation/views/update_profile_view.dart';
 import 'package:ailixir/features/profile/presentation/widgets/credits_island.dart';
 import 'package:ailixir/features/profile/presentation/widgets/extra.dart';
 import 'package:ailixir/features/profile/presentation/widgets/history_card.dart';
@@ -21,13 +24,13 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
   ProfileModel? _profile;
   bool _failed = false;
   final ProfileRepo _repo = ProfileRepo();
-  @override
-  void initState() {
-    super.initState();
+
+  void _getProfile() {
     _repo.getTestProfile().then((v) {
       v.fold(
         (f) {
           _failed = true;
+          setState(() {});
         },
         (profile) {
           setState(() {
@@ -36,6 +39,12 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
         },
       );
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getProfile();
   }
 
   @override
@@ -63,7 +72,23 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 10,
                 children: [
-                  ProfileTitle(username: _profile?.name ?? ""),
+                  ProfileTitle(
+                    profile: _profile!,
+                    onReturn: () {
+                      context
+                          .navigateTo(
+                            UpdateProfileView.routeName,
+                            arguments: ProfilePackage(
+                              profile: _profile!,
+                              repo: _repo,
+                            ),
+                          )
+                          .then((v) {
+                            _getProfile();
+                            setState(() {});
+                          });
+                    },
+                  ),
                   iconLabel(
                     "Usage Statistis",
                     Icons.query_stats,
