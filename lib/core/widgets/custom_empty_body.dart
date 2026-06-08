@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 
-class CustomFailureBody extends StatelessWidget {
-  final String msg;
+class CustomEmptyBody extends StatelessWidget {
+  final String title;
+  final String subTitle;
   final IconData? icon;
   final VoidCallback? onAction;
   final String? actionLabel;
-  const CustomFailureBody({
+  const CustomEmptyBody({
     super.key,
-    required this.msg,
+    required this.title,
+    required this.subTitle,
     this.icon,
     this.onAction,
     this.actionLabel,
@@ -26,17 +28,13 @@ class CustomFailureBody extends StatelessWidget {
           if (icon != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: Icon(icon, size: 48, color: AppColors.red400),
+              child: Icon(icon, size: 48, color: AppColors.gray500),
             ),
-          Text(
-            'Oops! Something went wrong.',
-            textAlign: TextAlign.center,
-            style: AppTextStyles.h4,
-          ),
+          Text(title, textAlign: TextAlign.center, style: AppTextStyles.h4),
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              msg,
+              subTitle,
               textAlign: TextAlign.center,
               style: AppTextStyles.bodylarge.copyWith(color: AppColors.gray500),
             ),
