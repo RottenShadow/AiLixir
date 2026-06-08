@@ -1,7 +1,6 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      //'https://ailixirbackend-production-8e10.up.railway.app/api/';
       'https://america-hyperlipemic-grazyna.ngrok-free.dev/api/';
 
   // ── Auth Endpoints ──────────────────────────────────────
@@ -29,4 +28,27 @@ abstract class AppEndpoints {
     final String encodedDisease = Uri.encodeComponent(diseaseName);
     return '/targets/$encodedDisease';
   }
+
+  // ── AI Generation Endpoints ───────────────────────────
+  static const String generationRun = 'ai/generation/run';
+  static String generationStatus(String jobId) => 'ai/generation/status/$jobId';
+  static String generationResults(String jobId) =>
+      'ai/generation/jobs/$jobId/results';
+  static const String ligandsExport = 'ai/ligands/export';
+  static String aiFiles(String jobId, String filename) =>
+      'ai/files/$jobId/$filename';
+
+  // ── Docking Endpoints ─────────────────────────────────
+  static const String dockingSubmit = 'docking/submit';
+  static String dockingJob(int id) => 'docking/$id';
+  static const String dockingHistory = 'docking/history';
+  static String dockingDownload(int id) => 'docking/download/$id';
+
+  // ── Chemical Search Endpoints ─────────────────────────
+  static const String chemicalSearch = 'chemical-search';
+  static const String chemicalSearchFullRag = 'chemical-search/full-rag';
+
+  // ── History Endpoints ─────────────────────────────────
+  static const String aiJobHistory = 'ai/history';
+  static const String chemistryHistory = 'chemistry/history';
 }
