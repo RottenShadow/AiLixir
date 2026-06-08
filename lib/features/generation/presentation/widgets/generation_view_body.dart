@@ -149,9 +149,10 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
 
               SizedBox(height: 32.h),
 
-              // ── Log Panel (polling) ──────────────────────────────────────
-              if (state.status == GenerationStatus.polling)
-                GenerationLogPanel(logs: state.logs),
+              // ── Log Panel ─────────────────────────────────────────────────
+              if (state.logs.isNotEmpty ||
+                  state.status == GenerationStatus.polling)
+                GenerationLogPanel(logs: state.logs, status: state.status),
 
               // ── Results Panel (completed) ────────────────────────────────
               if (state.status == GenerationStatus.completed)
