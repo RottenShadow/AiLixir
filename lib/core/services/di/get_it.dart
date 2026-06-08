@@ -4,6 +4,11 @@ import 'package:ailixir/features/auth/data/services/auth_api_service.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
 import 'package:ailixir/features/drug_repurposing/data/repositories/drug_repurposing_repository.dart';
+import 'package:ailixir/features/generation/data/repos/generation_repo.dart';
+import 'package:ailixir/features/docking/data/repos/docking_repo.dart';
+import 'package:ailixir/features/history/data/repos/history_repo.dart';
+import 'package:ailixir/features/admet/data/repos/admet_repo.dart';
+import 'package:ailixir/features/chemical_search/data/repos/chemical_search_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_it/get_it.dart';
@@ -83,6 +88,26 @@ void getItRegisterSingleton() {
     )..init();
     return DrugRepurposingRepository(dio: drugDioService);
   });
+
+  GetIt.I.registerLazySingleton<GenerationRepo>(
+    () => GenerationRepo(dioService: GetIt.I.get()),
+  );
+
+  GetIt.I.registerLazySingleton<DockingRepo>(
+    () => DockingRepo(dioService: GetIt.I.get()),
+  );
+
+  GetIt.I.registerLazySingleton<HistoryRepo>(
+    () => HistoryRepo(dioService: GetIt.I.get()),
+  );
+
+  GetIt.I.registerLazySingleton<AdmetRepo>(
+    () => AdmetRepo(dioService: GetIt.I.get()),
+  );
+
+  GetIt.I.registerLazySingleton<ChemicalSearchRepo>(
+    () => ChemicalSearchRepo(dioService: GetIt.I.get()),
+  );
 
   // My Cubits
 
