@@ -1,6 +1,7 @@
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/widgets/custom_empty_body.dart';
 import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
 import 'package:flutter/material.dart';
@@ -78,11 +79,12 @@ class _LigandSeeAllViewState extends State<LigandSeeAllView> {
 
           if (state.items.isEmpty) {
             return Center(
-              child: Text(
-                'No ligands found.',
-                style: AppTextStyles.bodymedium.copyWith(
-                  color: AppColors.slate400,
-                ),
+              child: CustomEmptyBody(
+                icon: Icons.science_outlined,
+                title: 'No Ligands Found',
+                subTitle: 'No generated ligands yet.\nStart a generation job to see results here.',
+                actionLabel: 'Refresh',
+                onAction: () => context.read<LigandSeeAllCubit>().loadFirstPage(),
               ),
             );
           }
