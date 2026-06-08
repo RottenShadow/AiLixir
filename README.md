@@ -54,22 +54,51 @@ AI-powered drug discovery platform built with Flutter — molecular docking, gen
 
 ## Setup
 
+### 1. Clone the Repository
+
 ```bash
-# Clone the repository
 git clone <repo-url>
 cd ailixir
+```
 
-# Create .env file (required)
-# GOOGLE_CLIENT_ID=<Google OAuth Client ID>
-# GOOGLE_CLIENT_SECRET=<Google OAuth Client Secret>
+### 2. Configure Environment Variables
 
-# Install dependencies
+Create a `.env` file in the project root:
+
+```env
+GOOGLE_CLIENT_ID=<Google OAuth Client ID>
+GOOGLE_CLIENT_SECRET=<Google OAuth Client Secret>
+HF_TOKEN=<Hugging Face Token> # Deprecated
+```
+
+> **Note**
+>
+> After adding or updating environment variables:
+>
+> 1. Update `lib/core/config/env/env.dart` with the corresponding `@EnviedField` entries.
+> 2. Regenerate Envied files:
+>
+> ```bash
+> dart run build_runner build
+> ```
+>
+> Learn more about Envied: https://pub.dev/packages/envied
+
+### 3. Install Dependencies
+
+```bash
 flutter pub get
+```
 
-# Generate app icons (optional)
+### 4. (Optional) Generate App Icons
+
+```bash
 flutter pub run flutter_launcher_icons
+```
 
-# Generate localization files
+### 5. Generate Localization Files
+
+```bash
 flutter gen-l10n
 ```
 
