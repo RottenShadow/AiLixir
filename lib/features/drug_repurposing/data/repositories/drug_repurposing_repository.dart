@@ -12,14 +12,6 @@ import '../models/drug_repurposing_targets_response_model.dart';
 /// This implementation calls the API directly using Dio.
 class DrugRepurposingRepository {
   final DioService dio;
-  final Dio dioInstance = Dio(
-    BaseOptions(
-      baseUrl: AppEndpoints.drugRepurposingBaseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
-      sendTimeout: const Duration(seconds: 10),
-    ),
-  );
 
   DrugRepurposingRepository({required this.dio});
 

@@ -1,7 +1,7 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      'https://america-hyperlipemic-grazyna.ngrok-free.dev/api/';
+      'https://rottenshadow-ailixir-api.hf.space/api/';
 
   // ── Auth Endpoints ──────────────────────────────────────
   static const String userAuthBaseUrl = 'user';
@@ -21,8 +21,6 @@ abstract class AppEndpoints {
   static const String admetPredict = 'admet/predict';
 
   // Drug Repurposing Endpoints
-  static const String drugRepurposingBaseUrl =
-      'https://rottenshadow-test-drug-purposing.hf.space/api/v1/screen';
   static const String drugRepurposingScreen = '/screen';
   static String drugRepurposingTargets(String diseaseName) {
     final String encodedDisease = Uri.encodeComponent(diseaseName);
