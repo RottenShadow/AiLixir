@@ -23,9 +23,8 @@ class LigandDetailsBody extends StatelessWidget {
               icon: Icons.error_outline,
               msg: state.message,
               actionLabel: 'Try Again',
-              onAction: () => context
-                  .read<LigandDetailsCubit>()
-                  .loadDetails(ligand.id),
+              onAction: () =>
+                  context.read<LigandDetailsCubit>().loadDetails(ligand),
             ),
           );
         }
@@ -79,9 +78,12 @@ class LigandDetailsBody extends StatelessWidget {
                           flex: 5,
                           child: Column(
                             children: [
-                              _CompoundIdentityCard(smiles: details.smiles),
+                              _CompoundIdentityCard(
+                                ligand: ligand,
+                                details: details,
+                              ),
                               SizedBox(height: 12.h),
-                              _DockingCard(details: details),
+                              _DockingCard(ligand: ligand, details: details),
                             ],
                           ),
                         ),
@@ -91,9 +93,9 @@ class LigandDetailsBody extends StatelessWidget {
                           flex: 5,
                           child: Column(
                             children: [
-                              _MedChemCard(details: details),
+                              _MedChemCard(ligand: ligand, details: details),
                               SizedBox(height: 12.h),
-                              _ReosFiltersCard(details: details),
+                              _MolecularPropertiesCard(ligand: ligand),
                             ],
                           ),
                         ),
@@ -103,7 +105,12 @@ class LigandDetailsBody extends StatelessWidget {
                           flex: 5,
                           child: Column(
                             children: [
-                              _GlobalSummaryCard(details: details),
+                              _GlobalSummaryCard(
+                                details: details,
+                                ligand: ligand,
+                              ),
+                              SizedBox(height: 12.h),
+                              _ReosFiltersCard(details: details),
                               SizedBox(height: 12.h),
                               _StructureValidityCard(details: details),
                             ],
@@ -168,17 +175,36 @@ class _SectionCard extends StatelessWidget {
 }
 
 class _CompoundIdentityCard extends StatelessWidget {
-  final String smiles;
-  const _CompoundIdentityCard({required this.smiles});
+  final LigandEntity ligand;
+  final LigandDetailsEntity details;
+  const _CompoundIdentityCard({required this.ligand, required this.details});
 
   @override
   Widget build(BuildContext context) {
+    final displaySmiles = ligand.canonicalSmiles ?? details.smiles;
     return _SectionCard(
       title: '1. Compound Identity',
       icon: Icons.science_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (ligand.rank != null) ...[
+            _DetailRow(label: 'Rank', value: '#${ligand.rank}'),
+          ],
+          if (ligand.valid != null)
+            Row(
+              children: [
+                _FilterBadge(
+                  label: ligand.valid! ? 'Valid' : 'Invalid',
+                  pass: ligand.valid!,
+                ),
+              ],
+            ),
+          if (ligand.nll != null)
+            _DetailRow(label: 'NLL', value: ligand.nll!.toStringAsFixed(2)),
+          if (ligand.smilesState != null)
+            _DetailRow(label: 'SMILES State', value: '${ligand.smilesState}'),
+          SizedBox(height: 8.h),
           Text(
             'SMILES NOTATION',
             style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
@@ -192,13 +218,37 @@ class _CompoundIdentityCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(6.r),
             ),
             child: Text(
-              smiles,
+              displaySmiles,
               style: AppTextStyles.bodysmall.copyWith(
                 color: AppColors.slate200,
                 fontFamily: 'monospace',
               ),
             ),
           ),
+          if (ligand.canonicalSmiles != null &&
+              ligand.canonicalSmiles != details.smiles) ...[
+            SizedBox(height: 8.h),
+            Text(
+              'Canonical SMILES',
+              style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+            ),
+            SizedBox(height: 4.h),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: AppColors.slate900,
+                borderRadius: BorderRadius.circular(6.r),
+              ),
+              child: Text(
+                ligand.canonicalSmiles!,
+                style: AppTextStyles.bodysmall.copyWith(
+                  color: AppColors.slate400,
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -206,11 +256,13 @@ class _CompoundIdentityCard extends StatelessWidget {
 }
 
 class _DockingCard extends StatelessWidget {
+  final LigandEntity ligand;
   final LigandDetailsEntity details;
-  const _DockingCard({required this.details});
+  const _DockingCard({required this.ligand, required this.details});
 
   @override
   Widget build(BuildContext context) {
+    final vina = ligand.dockingScore ?? details.vinaScore;
     return _SectionCard(
       title: '9. Docking & Scoring',
       icon: Icons.hub_outlined,
@@ -218,9 +270,15 @@ class _DockingCard extends StatelessWidget {
         children: [
           _DetailRow(
             label: 'Vina Score',
-            value: '${details.vinaScore} kcal/mol',
+            value: '${vina.toStringAsFixed(2)} kcal/mol',
           ),
-          _DetailRow(label: 'QED Score', value: details.qedScore.toString()),
+          if (ligand.predPAffMean != null)
+            _DetailRow(
+              label: 'Pred. pAff Mean',
+              value: ligand.predPAffMean!.toStringAsFixed(4),
+            ),
+          if (ligand.dockingStatus != null)
+            _DetailRow(label: 'Docking Status', value: ligand.dockingStatus!),
         ],
       ),
     );
@@ -228,11 +286,15 @@ class _DockingCard extends StatelessWidget {
 }
 
 class _MedChemCard extends StatelessWidget {
+  final LigandEntity ligand;
   final LigandDetailsEntity details;
-  const _MedChemCard({required this.details});
+  const _MedChemCard({required this.ligand, required this.details});
 
   @override
   Widget build(BuildContext context) {
+    final logp = ligand.logp ?? details.logP;
+    final tpsa = ligand.tpsa ?? details.tpsa;
+    final rotBonds = ligand.rotBonds ?? details.rotBonds;
     return _SectionCard(
       title: '5. MedChem Properties',
       icon: Icons.biotech_outlined,
@@ -242,17 +304,14 @@ class _MedChemCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _DetailRow(
-                  label: 'Valid/Connected',
-                  value: details.validConnected ? 'Valid' : 'Invalid',
-                  valueColor: details.validConnected
-                      ? AppColors.emerald400
-                      : AppColors.red400,
+                  label: 'LogP',
+                  value: logp.toStringAsFixed(4),
                 ),
               ),
               Expanded(
                 child: _DetailRow(
-                  label: 'LogP',
-                  value: details.logP.toString(),
+                  label: 'TPSA',
+                  value: '${tpsa.toStringAsFixed(2)} Å²',
                 ),
               ),
             ],
@@ -262,11 +321,16 @@ class _MedChemCard extends StatelessWidget {
               Expanded(
                 child: _DetailRow(
                   label: 'Rot. Bonds',
-                  value: details.rotBonds.toString(),
+                  value: rotBonds.toString(),
                 ),
               ),
               Expanded(
-                child: _DetailRow(label: 'TPSA', value: '${details.tpsa} Å²'),
+                child: _DetailRow(
+                  label: 'QED',
+                  value:
+                      ligand.qed?.toStringAsFixed(4) ??
+                      details.qedScore.toString(),
+                ),
               ),
             ],
           ),
@@ -298,9 +362,48 @@ class _ReosFiltersCard extends StatelessWidget {
   }
 }
 
+class _MolecularPropertiesCard extends StatelessWidget {
+  final LigandEntity ligand;
+  const _MolecularPropertiesCard({required this.ligand});
+
+  @override
+  Widget build(BuildContext context) {
+    if (ligand.saScore == null && ligand.mw == null) return const SizedBox();
+    return _SectionCard(
+      title: '6. Molecular Properties',
+      icon: Icons.analytics_outlined,
+      child: Column(
+        children: [
+          if (ligand.mw != null)
+            _DetailRow(
+              label: 'MW',
+              value: '${ligand.mw!.toStringAsFixed(2)} g/mol',
+            ),
+          Row(
+            children: [
+              Expanded(
+                child: _DetailRow(label: 'HBD', value: '${ligand.hbd ?? '-'}'),
+              ),
+              Expanded(
+                child: _DetailRow(label: 'HBA', value: '${ligand.hba ?? '-'}'),
+              ),
+            ],
+          ),
+          if (ligand.saScore != null)
+            _DetailRow(
+              label: 'SA Score',
+              value: ligand.saScore!.toStringAsFixed(4),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 class _GlobalSummaryCard extends StatelessWidget {
   final LigandDetailsEntity details;
-  const _GlobalSummaryCard({required this.details});
+  final LigandEntity ligand;
+  const _GlobalSummaryCard({required this.details, required this.ligand});
 
   @override
   Widget build(BuildContext context) {
@@ -351,6 +454,13 @@ class _GlobalSummaryCard extends StatelessWidget {
             'Checks Passed',
             style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
           ),
+          if (ligand.saScore != null) ...[
+            SizedBox(height: 12.h),
+            _DetailRow(
+              label: 'SA Score',
+              value: ligand.saScore!.toStringAsFixed(4),
+            ),
+          ],
         ],
       ),
     );
@@ -389,9 +499,8 @@ class _StructureValidityCard extends StatelessWidget {
 class _DetailRow extends StatelessWidget {
   final String label;
   final String value;
-  final Color? valueColor;
 
-  const _DetailRow({required this.label, required this.value, this.valueColor});
+  const _DetailRow({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -407,7 +516,7 @@ class _DetailRow extends StatelessWidget {
           Text(
             value,
             style: AppTextStyles.bodysmall.copyWith(
-              color: valueColor ?? AppColors.white,
+              color: AppColors.white,
               fontWeight: FontWeight.w600,
             ),
           ),
