@@ -12,7 +12,7 @@ class DockingRequestModel {
   final double sizeX;
   final double sizeY;
   final double sizeZ;
-  final double exhaustiveness;
+  final int exhaustiveness;
 
   const DockingRequestModel({
     this.proteinFilePath,
