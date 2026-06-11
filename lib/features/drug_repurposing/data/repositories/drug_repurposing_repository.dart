@@ -42,9 +42,11 @@ class DrugRepurposingRepository {
   Future<DrugRepurposingTargetsResponseEntity> getTargets(
     String diseaseName,
   ) async {
+    final name = Uri.encodeComponent(diseaseName);
     try {
-      final res = await dio.get(
-        endpoint: AppEndpoints.drugRepurposingTargets(diseaseName),
+      final res = await dio.post(
+        endpoint: AppEndpoints.drugRepurposingTargets,
+        data: {'disease_name': name},
       );
 
       return DrugRepurposingTargetsResponseModel.fromJson(res).toEntity();
