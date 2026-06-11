@@ -68,7 +68,6 @@ Create a `.env` file in the project root:
 ```env
 GOOGLE_CLIENT_ID=<Google OAuth Client ID>
 GOOGLE_CLIENT_SECRET=<Google OAuth Client Secret>
-HF_TOKEN=<Hugging Face Token> # Deprecated
 ```
 
 > **Note**
