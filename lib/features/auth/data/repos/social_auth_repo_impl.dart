@@ -41,8 +41,7 @@ class SocialAuthRepoImpl {
         );
         _isGoogleSigninInit = true;
       }
-      var auth =
-          await googleSignIn.signIn() ?? await googleSignIn.signInOnline();
+      var auth = await googleSignIn.signInOnline();
       log('auth: ${auth?.accessToken}');
       token = auth!.accessToken;
       log('google access token: $token');
