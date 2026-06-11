@@ -7,14 +7,18 @@ class AdmetPredictionModel {
   final double metabolism;
   final double excretion;
   final double toxicity;
+  final String? source;
+  final String? error;
 
   const AdmetPredictionModel({
     required this.smiles,
-    required this.absorption,
-    required this.distribution,
-    required this.metabolism,
-    required this.excretion,
-    required this.toxicity,
+    this.absorption = 0,
+    this.distribution = 0,
+    this.metabolism = 0,
+    this.excretion = 0,
+    this.toxicity = 0,
+    this.source,
+    this.error,
   });
 
   factory AdmetPredictionModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +29,8 @@ class AdmetPredictionModel {
       metabolism: (json['metabolism'] as num?)?.toDouble() ?? 0.0,
       excretion: (json['excretion'] as num?)?.toDouble() ?? 0.0,
       toxicity: (json['toxicity'] as num?)?.toDouble() ?? 0.0,
+      source: json['source'] as String?,
+      error: json['error'] as String?,
     );
   }
 
@@ -36,6 +42,8 @@ class AdmetPredictionModel {
       'metabolism': metabolism,
       'excretion': excretion,
       'toxicity': toxicity,
+      if (source != null) 'source': source,
+      if (error != null) 'error': error,
     };
   }
 
@@ -47,6 +55,8 @@ class AdmetPredictionModel {
       metabolism: metabolism,
       excretion: excretion,
       toxicity: toxicity,
+      source: source,
+      error: error,
     );
   }
 }

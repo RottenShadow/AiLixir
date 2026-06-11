@@ -60,10 +60,10 @@ class _AdmetResultsState extends State<AdmetResults> {
       builder: (context, state) {
         return switch (state) {
           AdmetSuccess(:final response) => _AdmetResultList(
-            predictions: _sorted(response.data),
+            predictions: _sorted(response.results),
             sortField: _sortField,
             sortAscending: _sortAscending,
-            count: response.data.length,
+            count: response.results.length,
             onSortChanged: (field) {
               setState(() {
                 if (_sortField == field) {

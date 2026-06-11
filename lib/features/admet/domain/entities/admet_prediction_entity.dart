@@ -5,13 +5,17 @@ class AdmetPredictionEntity {
   final double metabolism;
   final double excretion;
   final double toxicity;
+  final String? source;
+  final String? error;
 
   const AdmetPredictionEntity({
     required this.smiles,
-    required this.absorption,
-    required this.distribution,
-    required this.metabolism,
-    required this.excretion,
-    required this.toxicity,
+    this.absorption = 0,
+    this.distribution = 0,
+    this.metabolism = 0,
+    this.excretion = 0,
+    this.toxicity = 0,
+    this.source,
+    this.error,
   });
 }
