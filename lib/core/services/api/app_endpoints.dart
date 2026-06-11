@@ -21,11 +21,8 @@ abstract class AppEndpoints {
   static const String admetPredict = 'admet/predict';
 
   // Drug Repurposing Endpoints
-  static const String drugRepurposingScreen = '/screen';
-  static String drugRepurposingTargets(String diseaseName) {
-    final String encodedDisease = Uri.encodeComponent(diseaseName);
-    return '/targets/$encodedDisease';
-  }
+  static const String drugRepurposingScreen = '/drug-repurposing/screen';
+  static const String drugRepurposingTargets = '/drug-repurposing/targets';
 
   // ── AI Generation Endpoints ───────────────────────────
   static const String generationRun = 'ai/generation/run';
