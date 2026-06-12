@@ -1,62 +1,75 @@
+import 'package:dartz/dartz.dart';
+import 'package:ailixir/core/errors/failure.dart';
+import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
-import 'package:dio/dio.dart';
-import '../../../../core/services/api/app_endpoints.dart';
+import 'package:ailixir/core/utils/helper_functions/safe_api_call.dart';
+import '../../domain/entities/drug_repurposing_job_entity.dart';
+import '../../domain/entities/drug_repurposing_screen_job_entity.dart';
 import '../../domain/entities/drug_repurposing_screen_request_entity.dart';
-import '../../domain/entities/drug_repurposing_screen_response_entity.dart';
-import '../../domain/entities/drug_repurposing_targets_response_entity.dart';
+import '../../domain/entities/drug_repurposing_target_job_entity.dart';
+import '../models/drug_repurposing_job_model.dart';
+import '../models/drug_repurposing_screen_job_model.dart';
 import '../models/drug_repurposing_screen_request_model.dart';
-import '../models/drug_repurposing_screen_response_model.dart';
-import '../models/drug_repurposing_targets_response_model.dart';
+import '../models/drug_repurposing_target_job_model.dart';
 
-/// Repository class for drug repurposing operations.
-/// This implementation calls the API directly using Dio.
 class DrugRepurposingRepository {
   final DioService dio;
 
   DrugRepurposingRepository({required this.dio});
 
-  /// Screens drug candidates for a given disease.
-  Future<DrugRepurposingScreenResponseEntity> screenDrugs(
+  Future<Either<Failure, DrugRepurposingJobEntity>> submitTargetsJob({
+    required String diseaseName,
+    int topN = 10,
+  }) async {
+    return safeApiCall(() async {
+      final response = await dio.post(
+        endpoint: AppEndpoints.drugRepurposingTargets,
+        data: {'disease_name': diseaseName, 'top_n': topN},
+      );
+      return DrugRepurposingJobModel.fromJson(
+        response as Map<String, dynamic>,
+      ).toEntity();
+    });
+  }
+
+  Future<Either<Failure, DrugRepurposingTargetJobEntity>> getTargetsJobStatus(
+    int jobId,
+  ) async {
+    return safeApiCall(() async {
+      final response = await dio.get(
+        endpoint: AppEndpoints.drugRepurposingTargetsStatus(jobId),
+      );
+      return DrugRepurposingTargetJobModel.fromJson(
+        response as Map<String, dynamic>,
+      ).toEntity();
+    });
+  }
+
+  Future<Either<Failure, DrugRepurposingJobEntity>> submitScreenJob(
     DrugRepurposingScreenRequestEntity request,
   ) async {
-    try {
-      final requestModel = DrugRepurposingScreenRequestModel.fromEntity(
-        request,
-      );
-
-      final res = await dio.post(
+    return safeApiCall(() async {
+      final requestModel = DrugRepurposingScreenRequestModel.fromEntity(request);
+      final response = await dio.post(
         endpoint: AppEndpoints.drugRepurposingScreen,
         data: requestModel.toJson(),
       );
-
-      return DrugRepurposingScreenResponseModel.fromJson(res).toEntity();
-    } on DioException catch (e) {
-      final errorMessage = e.response?.data?['detail'] ?? e.message;
-      throw Exception('Drug screening failed: $errorMessage');
-    } catch (e) {
-      throw Exception('An unexpected error occurred during screening: $e');
-    }
+      return DrugRepurposingJobModel.fromJson(
+        response as Map<String, dynamic>,
+      ).toEntity();
+    });
   }
 
-  /// Fetches molecular targets for a specific [diseaseName].
-  Future<DrugRepurposingTargetsResponseEntity> getTargets(
-    String diseaseName,
+  Future<Either<Failure, DrugRepurposingScreenJobEntity>> getScreenJobStatus(
+    int jobId,
   ) async {
-    final name = Uri.encodeComponent(diseaseName);
-    try {
-      final res = await dio.post(
-        endpoint: AppEndpoints.drugRepurposingTargets,
-        data: {'disease_name': name},
+    return safeApiCall(() async {
+      final response = await dio.get(
+        endpoint: AppEndpoints.drugRepurposingScreenStatus(jobId),
       );
-
-      return DrugRepurposingTargetsResponseModel.fromJson(res).toEntity();
-    } on DioException catch (e) {
-      final errorMessage = e.response?.data?['detail'] ?? e.message;
-      throw Exception('Failed to fetch targets: $errorMessage');
-    } catch (e) {
-      throw Exception(
-        'An unexpected error occurred while fetching targets: $e',
-      );
-    }
+      return DrugRepurposingScreenJobModel.fromJson(
+        response as Map<String, dynamic>,
+      ).toEntity();
+    });
   }
 }
