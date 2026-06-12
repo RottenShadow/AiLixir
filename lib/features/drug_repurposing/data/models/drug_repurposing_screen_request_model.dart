@@ -4,8 +4,8 @@ class DrugRepurposingScreenRequestModel extends DrugRepurposingScreenRequestEnti
   const DrugRepurposingScreenRequestModel({
     required super.diseaseName,
     required super.knownDrugs,
-    required super.extraSmiles,
-    required super.topK,
+    super.minScore = 0.0,
+    super.topNTargets = 10,
   });
 
   factory DrugRepurposingScreenRequestModel.fromEntity(
@@ -14,8 +14,8 @@ class DrugRepurposingScreenRequestModel extends DrugRepurposingScreenRequestEnti
     return DrugRepurposingScreenRequestModel(
       diseaseName: entity.diseaseName,
       knownDrugs: entity.knownDrugs,
-      extraSmiles: entity.extraSmiles,
-      topK: entity.topK,
+      minScore: entity.minScore,
+      topNTargets: entity.topNTargets,
     );
   }
 
@@ -23,8 +23,8 @@ class DrugRepurposingScreenRequestModel extends DrugRepurposingScreenRequestEnti
     return {
       'disease_name': diseaseName,
       'known_drugs': knownDrugs,
-      'extra_smiles': extraSmiles,
-      'top_k': topK,
+      'min_score': minScore,
+      'top_n_targets': topNTargets,
     };
   }
 }
