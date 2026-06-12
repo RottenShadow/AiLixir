@@ -39,7 +39,7 @@ class _DrQuickFormState extends State<DrQuickForm> {
   Widget build(BuildContext context) {
     return BlocBuilder<DrQuickCubit, DrQuickState>(
       builder: (context, state) {
-        final isLoading = state is DrQuickLoading;
+        final isLoading = state is DrQuickPolling;
         return Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
