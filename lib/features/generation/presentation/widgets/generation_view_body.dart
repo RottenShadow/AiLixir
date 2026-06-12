@@ -9,14 +9,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// Available proteins for the dropdown
-const _proteins = [
-  '1AKI - Lysozyme',
-  '6LU7 - SARS-CoV-2 Mpro',
-  '3N75 - BACE1',
-  '1HSG - HIV Protease',
-  '4HHB - Hemoglobin',
-];
+// // Available proteins for the dropdown
+// const _proteins = [
+//   '1AKI - Lysozyme',
+//   '6LU7 - SARS-CoV-2 Mpro',
+//   '3N75 - BACE1',
+//   '1HSG - HIV Protease',
+//   '4HHB - Hemoglobin',
+// ];
 
 class GenerationViewBody extends StatefulWidget {
   const GenerationViewBody({super.key});
@@ -177,39 +177,132 @@ class _TargetProteinField extends StatelessWidget {
     required this.enabled,
   });
 
+  static const _proteinValue = '4WKQ - EGFR kinase + Gefitinib';
+  static const _disabledLabel = 'Other options will come soon!';
+
   @override
   Widget build(BuildContext context) {
+    final selected = value == _proteinValue;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _FieldLabel('Target Protein Selection'),
         SizedBox(height: 6.h),
-        DropdownButtonFormField<String>(
-          initialValue: value,
-          isExpanded: true,
-          dropdownColor: AppColors.slate800,
-          style: AppTextStyles.bodymedium.copyWith(color: AppColors.white),
-          decoration: _inputDecoration(hint: 'Select a protein target'),
-          items: _proteins
-              .map(
-                (p) => DropdownMenuItem(
-                  value: p,
+        ExpansionTile(
+          initiallyExpanded: value != null,
+          tilePadding: EdgeInsets.zero,
+          childrenPadding: EdgeInsets.zero,
+          collapsedShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+            side: BorderSide(color: AppColors.brandBorder),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+            side: BorderSide(color: AppColors.brandBorder),
+          ),
+          collapsedBackgroundColor: AppColors.slate800,
+          backgroundColor: AppColors.slate800,
+          title: Row(
+            children: [
+              SizedBox(width: 8.w),
+              Icon(Icons.format_shapes, size: 16.sp, color: AppColors.cyan400),
+              SizedBox(width: 8.w),
+              if (value == null)
+                Text(
+                  'Select a Target Protein',
+                  style: AppTextStyles.labelmedium.copyWith(
+                    color: AppColors.slate300,
+                  ),
+                ),
+              if (value != null) ...[
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.slate700,
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
                   child: Text(
-                    p,
-                    style: AppTextStyles.bodymedium.copyWith(
-                      color: AppColors.white,
+                    value!,
+                    style: AppTextStyles.labelmedium.copyWith(
+                      color: AppColors.slate300,
                     ),
                   ),
                 ),
-              )
-              .toList(),
-          onChanged: enabled ? onChanged : null,
-          validator: (v) => v == null ? 'Please select a target protein' : null,
-        ),
-        SizedBox(height: 6.h),
-        Text(
-          'Note: More proteins will be added soon.',
-          style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+              ],
+            ],
+          ),
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RadioGroup<String>(
+                    groupValue: value,
+                    onChanged: (v) {
+                      if (enabled && v != null) onChanged(v);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: enabled
+                              ? () => onChanged(_proteinValue)
+                              : null,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 4.h,
+                              horizontal: 4.w,
+                            ),
+                            child: Row(
+                              children: [
+                                Radio<String>(
+                                  value: _proteinValue,
+                                  activeColor: AppColors.cyan400,
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  _proteinValue,
+                                  style: AppTextStyles.bodymedium.copyWith(
+                                    color: selected
+                                        ? AppColors.white
+                                        : AppColors.slate400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 4.h,
+                      horizontal: 4.w,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.radio_button_off,
+                          size: 16.sp,
+                          color: AppColors.slate600,
+                        ),
+                        SizedBox(width: 12.w),
+                        Text(
+                          _disabledLabel,
+                          style: AppTextStyles.bodymedium.copyWith(
+                            color: AppColors.slate600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -329,6 +422,7 @@ class _DockingModeSection extends StatelessWidget {
       backgroundColor: AppColors.slate800,
       title: Row(
         children: [
+          SizedBox(width: 8.w),
           Icon(Icons.tune, size: 16.sp, color: AppColors.cyan400),
           SizedBox(width: 8.w),
           Text(
