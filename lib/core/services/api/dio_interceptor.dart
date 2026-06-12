@@ -13,13 +13,8 @@ import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.da
 class DioInterceptors extends Interceptor {
   final Dio client;
   final LocalAuthDataSource localAuthDataSource;
-  final String? forcedToken;
 
-  DioInterceptors({
-    required this.client,
-    required this.localAuthDataSource,
-    this.forcedToken,
-  });
+  DioInterceptors({required this.client, required this.localAuthDataSource});
 
   // TODO: Refactor this shit
 
@@ -43,7 +38,7 @@ class DioInterceptors extends Interceptor {
       return handler.next(options);
     }
 
-    final token = forcedToken ?? await localAuthDataSource.getUserToken();
+    final token = await localAuthDataSource.getUserToken();
 
     if (token != null) {
       options.headers[HttpHeaders.authorizationHeader] =
@@ -70,9 +65,13 @@ class DioInterceptors extends Interceptor {
 
     // Refresh request itself failed → force logout once
     if (statusCode == 401 && isRefreshRequest) {
-      if (forcedToken == null) {
-        await _forceLogoutOnce();
-      }
+      await _forceLogoutOnce();
+      return handler.next(err);
+    }
+
+    // 500 with "Route [login] not defined" → token expired / session invalid → force logout
+    if (statusCode == 500 && _isRouteLoginNotDefinedError(err)) {
+      await _forceLogoutOnce();
       return handler.next(err);
     }
 
@@ -147,6 +146,18 @@ class DioInterceptors extends Interceptor {
   //     _refreshCompleter = null;
   //   }
   // }
+
+  /// =======================
+  /// ROUTE LOGIN ERROR CHECK
+  /// =======================
+  bool _isRouteLoginNotDefinedError(DioException err) {
+    final data = err.response?.data;
+    if (data == null) return false;
+    final message = data is Map
+        ? (data['message'] as String? ?? '')
+        : data.toString();
+    return message.toLowerCase().contains('route [login] not defined');
+  }
 
   /// =======================
   /// LOGOUT (ONCE)
