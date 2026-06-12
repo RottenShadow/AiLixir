@@ -128,6 +128,7 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
                     _DockingModeSection(
                       dockingMode: _dockingMode,
                       dockTopKCtrl: _dockTopKCtrl,
+                      returnTopKCtrl: _returnTopKCtrl,
                       enabled: !isRunning,
                       onModeChanged: (mode) =>
                           setState(() => _dockingMode = mode),
@@ -373,17 +374,18 @@ class _ReturnTopKField extends StatelessWidget {
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           style: AppTextStyles.bodymedium.copyWith(color: AppColors.white),
-          decoration: _inputDecoration(hint: '100'),
+          decoration: _inputDecoration(hint: '10'),
           validator: (v) {
             if (v == null || v.trim().isEmpty) return 'Required';
             final n = int.tryParse(v.trim());
             if (n == null || n < 1) return 'Min: 1';
+            if (n > 10) return 'Max: 10';
             return null;
           },
         ),
         SizedBox(height: 4.h),
         Text(
-          'Number of top molecules to return.',
+          'Min: 1, Max: 10',
           style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
         ),
       ],
@@ -394,12 +396,14 @@ class _ReturnTopKField extends StatelessWidget {
 class _DockingModeSection extends StatelessWidget {
   final String dockingMode;
   final TextEditingController dockTopKCtrl;
+  final TextEditingController returnTopKCtrl;
   final bool enabled;
   final ValueChanged<String> onModeChanged;
 
   const _DockingModeSection({
     required this.dockingMode,
     required this.dockTopKCtrl,
+    required this.returnTopKCtrl,
     required this.enabled,
     required this.onModeChanged,
   });
@@ -499,6 +503,7 @@ class _DockingModeSection extends StatelessWidget {
                   padding: EdgeInsets.only(left: 4.w),
                   child: _DockTopKField(
                     controller: dockTopKCtrl,
+                    returnTopKCtrl: returnTopKCtrl,
                     enabled: enabled,
                   ),
                 ),
@@ -513,8 +518,13 @@ class _DockingModeSection extends StatelessWidget {
 
 class _DockTopKField extends StatelessWidget {
   final TextEditingController controller;
+  final TextEditingController returnTopKCtrl;
   final bool enabled;
-  const _DockTopKField({required this.controller, required this.enabled});
+  const _DockTopKField({
+    required this.controller,
+    required this.returnTopKCtrl,
+    required this.enabled,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -534,6 +544,10 @@ class _DockTopKField extends StatelessWidget {
             if (v == null || v.trim().isEmpty) return 'Required';
             final n = int.tryParse(v.trim());
             if (n == null || n < 1) return 'Min: 1';
+            final returnVal = int.tryParse(returnTopKCtrl.text.trim());
+            if (returnVal != null && n > returnVal) {
+              return 'Must be ≤ Return Top K';
+            }
             return null;
           },
         ),
