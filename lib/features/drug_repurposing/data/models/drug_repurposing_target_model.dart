@@ -25,7 +25,9 @@ class DrugRepurposingTargetModel extends DrugRepurposingBaseModel {
       name: (json['name'] ?? '') as String,
       associationScore: (json['score'] as num?)?.toDouble() ?? 0.0,
       uniprotId: (json['uniprot_id'] ?? '') as String,
-      pdbIds: (json['pdb_ids'] as List?)?.map((e) => e as String).toList() ?? const [],
+      pdbIds:
+          (json['pdb_ids'] as List?)?.map((e) => e as String).toList() ??
+          const [],
     );
   }
 
