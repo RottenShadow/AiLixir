@@ -2,6 +2,11 @@
 cmake_minimum_required(VERSION 3.14)
 project(ailixir LANGUAGES CXX)
 
+# Enable /await flag for MSVC to support experimental coroutine features.
+if(MSVC)
+  add_compile_options(/await)
+endif()
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "ailixir")
