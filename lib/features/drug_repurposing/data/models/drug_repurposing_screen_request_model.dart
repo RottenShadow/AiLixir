@@ -19,6 +19,20 @@ class DrugRepurposingScreenRequestModel extends DrugRepurposingScreenRequestEnti
     );
   }
 
+  factory DrugRepurposingScreenRequestModel.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return DrugRepurposingScreenRequestModel(
+      diseaseName: (json['disease_name'] ?? '') as String,
+      knownDrugs: (json['known_drugs'] as List?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      minScore: (json['min_score'] as num?)?.toDouble() ?? 0.0,
+      topNTargets: (json['top_n_targets'] as num?)?.toInt() ?? 10,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'disease_name': diseaseName,

@@ -167,6 +167,12 @@ class DrugRepurposingRepository {
         jobId: jobId,
         status: 'completed',
         createdAt: DateTime.now(),
+        input: const DrugRepurposingScreenRequestEntity(
+          diseaseName: 'Alzheimer',
+          knownDrugs: [],
+          minScore: 0,
+          topNTargets: 10,
+        ),
         output: DrugRepurposingScreenResponseEntity(
           diseaseName: 'Alzheimer',
           totalTargetsFound: 3,

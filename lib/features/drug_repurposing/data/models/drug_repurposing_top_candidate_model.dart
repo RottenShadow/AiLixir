@@ -29,7 +29,7 @@ class DrugRepurposingTopCandidateModel extends DrugRepurposingBaseModel {
       smiles: (json['smiles'] ?? '') as String,
       targetSymbol: (json['target_symbol'] ?? '') as String,
       uniprotId: (json['uniprot_id'] ?? '') as String,
-      bindingScore: (json['score'] as num?)?.toDouble() ?? 0.0,
+      bindingScore: (json['binding_score'] as num?)?.toDouble() ?? 0.0,
       rank: (json['rank'] as num?)?.toInt() ?? 0,
       status: (json['status'] ?? '') as String,
     );
