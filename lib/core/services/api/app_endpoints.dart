@@ -21,13 +21,12 @@ abstract class AppEndpoints {
   static const String admetPredict = 'admet/predict';
 
   // Drug Repurposing Endpoints
-  static const String drugRepurposingBaseUrl =
-      'https://rottenshadow-test-drug-purposing.hf.space/api/v1/screen';
-  static const String drugRepurposingScreen = '/screen';
-  static String drugRepurposingTargets(String diseaseName) {
-    final String encodedDisease = Uri.encodeComponent(diseaseName);
-    return '/targets/$encodedDisease';
-  }
+  static const String drugRepurposingScreen = '/drug-repurposing/screen';
+  static const String drugRepurposingTargets = '/drug-repurposing/targets';
+  static String drugRepurposingTargetsStatus(int jobId) =>
+      'drug-repurposing/targets/$jobId';
+  static String drugRepurposingScreenStatus(int jobId) =>
+      'drug-repurposing/screen/$jobId';
 
   // ── AI Generation Endpoints ───────────────────────────
   static const String generationRun = 'ai/generation/run';

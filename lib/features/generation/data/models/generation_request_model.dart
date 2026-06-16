@@ -9,22 +9,23 @@ class GenerationRequestModel {
   const GenerationRequestModel({
     required this.numMolecules,
     required this.returnTopK,
-    this.dockingMode = 'all',
-    this.dockTopK = 5,
+    this.dockingMode = 'off',
+    this.dockTopK = 1,
   });
 
   factory GenerationRequestModel.fromEntity(GenerationRequestEntity entity) {
     return GenerationRequestModel(
-      numMolecules: entity.numGenerations,
-      returnTopK: entity.numGenerations,
-      dockTopK: entity.numGenerations,
+      numMolecules: entity.numMolecules,
+      returnTopK: entity.returnTopK,
+      dockingMode: entity.dockingMode,
+      dockTopK: entity.dockTopK ?? entity.returnTopK,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'num_molecules': numMolecules,
-        'return_top_k': returnTopK,
-        'docking_mode': dockingMode,
-        'dock_top_k': dockTopK,
-      };
+    'num_molecules': numMolecules,
+    'return_top_k': returnTopK,
+    'docking_mode': dockingMode,
+    'dock_top_k': dockTopK,
+  };
 }

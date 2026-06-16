@@ -9,7 +9,4 @@ abstract class Env {
 
   @EnviedField(varName: 'GOOGLE_CLIENT_SECRET')
   static const String googleClientSecret = _Env.googleClientSecret;
-
-  @EnviedField(varName: 'HF_TOKEN')
-  static const String hfToken = _Env.hfToken;
 }

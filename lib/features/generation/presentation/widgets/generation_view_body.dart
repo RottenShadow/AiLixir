@@ -9,14 +9,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// Available proteins for the dropdown
-const _proteins = [
-  '1AKI - Lysozyme',
-  '6LU7 - SARS-CoV-2 Mpro',
-  '3N75 - BACE1',
-  '1HSG - HIV Protease',
-  '4HHB - Hemoglobin',
-];
+// // Available proteins for the dropdown
+// const _proteins = [
+//   '1AKI - Lysozyme',
+//   '6LU7 - SARS-CoV-2 Mpro',
+//   '3N75 - BACE1',
+//   '1HSG - HIV Protease',
+//   '4HHB - Hemoglobin',
+// ];
 
 class GenerationViewBody extends StatefulWidget {
   const GenerationViewBody({super.key});
@@ -28,15 +28,16 @@ class GenerationViewBody extends StatefulWidget {
 class _GenerationViewBodyState extends State<GenerationViewBody> {
   final _formKey = GlobalKey<FormState>();
   String? _selectedProtein;
-  final _numGenCtrl = TextEditingController(text: '100');
-  final _smilesCtrl = TextEditingController();
-  final _seedCtrl = TextEditingController();
+  final _numMoleculesCtrl = TextEditingController(text: '100');
+  final _returnTopKCtrl = TextEditingController(text: '10');
+  String _dockingMode = 'off';
+  final _dockTopKCtrl = TextEditingController(text: '5');
 
   @override
   void dispose() {
-    _numGenCtrl.dispose();
-    _smilesCtrl.dispose();
-    _seedCtrl.dispose();
+    _numMoleculesCtrl.dispose();
+    _returnTopKCtrl.dispose();
+    _dockTopKCtrl.dispose();
     super.dispose();
   }
 
@@ -44,13 +45,12 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
     if (!_formKey.currentState!.validate()) return;
     final request = GenerationRequestEntity(
       targetProtein: _selectedProtein!,
-      numGenerations: int.parse(_numGenCtrl.text.trim()),
-      smilesSeed: _smilesCtrl.text.trim().isEmpty
-          ? null
-          : _smilesCtrl.text.trim(),
-      randomSeed: _seedCtrl.text.trim().isEmpty
-          ? null
-          : int.tryParse(_seedCtrl.text.trim()),
+      numMolecules: int.parse(_numMoleculesCtrl.text.trim()),
+      returnTopK: int.parse(_returnTopKCtrl.text.trim()),
+      dockingMode: _dockingMode,
+      dockTopK: _dockingMode == 'top_k'
+          ? int.tryParse(_dockTopKCtrl.text.trim())
+          : null,
     );
     context.read<GenerationCubit>().startGeneration(request);
   }
@@ -85,7 +85,7 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Row 1: Target Protein | Number of Generations
+                    // Row 1: Target Protein | Number of Molecules
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -99,8 +99,8 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
                         ),
                         SizedBox(width: 24.w),
                         Expanded(
-                          child: _NumGenerationsField(
-                            controller: _numGenCtrl,
+                          child: _NumMoleculesField(
+                            controller: _numMoleculesCtrl,
                             enabled: !isRunning,
                           ),
                         ),
@@ -108,40 +108,40 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
                     ),
                     SizedBox(height: 20.h),
 
-                    // Row 2: SMILES Seed | Random Seed + Button
+                    // Row 2: Return Top K | (empty for spacing)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
-                          child: _SmilesSeedField(
-                            controller: _smilesCtrl,
+                          child: _ReturnTopKField(
+                            controller: _returnTopKCtrl,
                             enabled: !isRunning,
                           ),
                         ),
                         SizedBox(width: 24.w),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _RandomSeedField(
-                                controller: _seedCtrl,
-                                enabled: !isRunning,
-                              ),
-                              SizedBox(height: 20.h),
-                              _StartButton(
-                                isRunning: isRunning,
-                                onPressed: isRunning ? null : _submit,
-                                onReset:
-                                    state.status == GenerationStatus.completed
-                                    ? () => context
-                                          .read<GenerationCubit>()
-                                          .reset()
-                                    : null,
-                              ),
-                            ],
-                          ),
-                        ),
+                        const Expanded(child: SizedBox()),
                       ],
+                    ),
+                    SizedBox(height: 20.h),
+
+                    // Row 3: Docking Mode (full width, expandable)
+                    _DockingModeSection(
+                      dockingMode: _dockingMode,
+                      dockTopKCtrl: _dockTopKCtrl,
+                      returnTopKCtrl: _returnTopKCtrl,
+                      enabled: !isRunning,
+                      onModeChanged: (mode) =>
+                          setState(() => _dockingMode = mode),
+                    ),
+                    SizedBox(height: 20.h),
+
+                    // Start Button
+                    _StartButton(
+                      isRunning: isRunning,
+                      onPressed: isRunning ? null : _submit,
+                      onReset: state.status == GenerationStatus.completed
+                          ? () => context.read<GenerationCubit>().reset()
+                          : null,
                     ),
                   ],
                 ),
@@ -178,56 +178,149 @@ class _TargetProteinField extends StatelessWidget {
     required this.enabled,
   });
 
+  static const _proteinValue = '4WKQ - EGFR kinase + Gefitinib';
+  static const _disabledLabel = 'Other options will come soon!';
+
   @override
   Widget build(BuildContext context) {
+    final selected = value == _proteinValue;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _FieldLabel('Target Protein Selection'),
         SizedBox(height: 6.h),
-        DropdownButtonFormField<String>(
-          initialValue: value,
-          isExpanded: true,
-          dropdownColor: AppColors.slate800,
-          style: AppTextStyles.bodymedium.copyWith(color: AppColors.white),
-          decoration: _inputDecoration(hint: 'Select a protein target'),
-          items: _proteins
-              .map(
-                (p) => DropdownMenuItem(
-                  value: p,
+        ExpansionTile(
+          initiallyExpanded: value != null,
+          tilePadding: EdgeInsets.zero,
+          childrenPadding: EdgeInsets.zero,
+          collapsedShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+            side: BorderSide(color: AppColors.brandBorder),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.r),
+            side: BorderSide(color: AppColors.brandBorder),
+          ),
+          collapsedBackgroundColor: AppColors.slate800,
+          backgroundColor: AppColors.slate800,
+          title: Row(
+            children: [
+              SizedBox(width: 8.w),
+              Icon(Icons.format_shapes, size: 16.sp, color: AppColors.cyan400),
+              SizedBox(width: 8.w),
+              if (value == null)
+                Text(
+                  'Select a Target Protein',
+                  style: AppTextStyles.labelmedium.copyWith(
+                    color: AppColors.slate300,
+                  ),
+                ),
+              if (value != null) ...[
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.slate700,
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
                   child: Text(
-                    p,
-                    style: AppTextStyles.bodymedium.copyWith(
-                      color: AppColors.white,
+                    value!,
+                    style: AppTextStyles.labelmedium.copyWith(
+                      color: AppColors.slate300,
                     ),
                   ),
                 ),
-              )
-              .toList(),
-          onChanged: enabled ? onChanged : null,
-          validator: (v) => v == null ? 'Please select a target protein' : null,
-        ),
-        SizedBox(height: 6.h),
-        Text(
-          'Note: More proteins will be added soon.',
-          style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+              ],
+            ],
+          ),
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RadioGroup<String>(
+                    groupValue: value,
+                    onChanged: (v) {
+                      if (enabled && v != null) onChanged(v);
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: enabled
+                              ? () => onChanged(_proteinValue)
+                              : null,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 4.h,
+                              horizontal: 4.w,
+                            ),
+                            child: Row(
+                              children: [
+                                Radio<String>(
+                                  value: _proteinValue,
+                                  activeColor: AppColors.cyan400,
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  _proteinValue,
+                                  style: AppTextStyles.bodymedium.copyWith(
+                                    color: selected
+                                        ? AppColors.white
+                                        : AppColors.slate400,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 4.h,
+                      horizontal: 4.w,
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.radio_button_off,
+                          size: 16.sp,
+                          color: AppColors.slate600,
+                        ),
+                        SizedBox(width: 12.w),
+                        Text(
+                          _disabledLabel,
+                          style: AppTextStyles.bodymedium.copyWith(
+                            color: AppColors.slate600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 }
 
-class _NumGenerationsField extends StatelessWidget {
+class _NumMoleculesField extends StatelessWidget {
   final TextEditingController controller;
   final bool enabled;
-  const _NumGenerationsField({required this.controller, required this.enabled});
+  const _NumMoleculesField({required this.controller, required this.enabled});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _FieldLabel('Number of Generations'),
+        _FieldLabel('Number of Molecules'),
         SizedBox(height: 6.h),
         TextFormField(
           controller: controller,
@@ -239,7 +332,7 @@ class _NumGenerationsField extends StatelessWidget {
           validator: (v) {
             if (v == null || v.trim().isEmpty) return 'Required';
             final n = int.tryParse(v.trim());
-            if (n == null || n < 1) return 'Min: 1';
+            if (n == null || n < 10) return 'Min: 10';
             if (n > 10000) return 'Max: 10,000';
             return null;
           },
@@ -249,7 +342,7 @@ class _NumGenerationsField extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Min: 1',
+              'Min: 10',
               style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
             ),
             Text(
@@ -263,67 +356,17 @@ class _NumGenerationsField extends StatelessWidget {
   }
 }
 
-class _SmilesSeedField extends StatelessWidget {
+class _ReturnTopKField extends StatelessWidget {
   final TextEditingController controller;
   final bool enabled;
-  const _SmilesSeedField({required this.controller, required this.enabled});
+  const _ReturnTopKField({required this.controller, required this.enabled});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _FieldLabel('SMILES Seed Input'),
-        SizedBox(height: 6.h),
-        TextFormField(
-          controller: controller,
-          enabled: enabled,
-          maxLines: 5,
-          style: AppTextStyles.bodymedium.copyWith(
-            color: AppColors.white,
-            fontFamily: 'monospace',
-          ),
-          decoration: _inputDecoration(
-            hint: 'Enter SMILES string (e.g.,\nCC1=CC(=C(C=C1)C(=O)...',
-          ),
-        ),
-        SizedBox(height: 6.h),
-        Text(
-          'Provide a starting chemical structure for directed generation.',
-          style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
-        ),
-      ],
-    );
-  }
-}
-
-class _RandomSeedField extends StatelessWidget {
-  final TextEditingController controller;
-  final bool enabled;
-  const _RandomSeedField({required this.controller, required this.enabled});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            _FieldLabel('Random Seed'),
-            SizedBox(width: 6.w),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-              decoration: BoxDecoration(
-                color: AppColors.slate700,
-                borderRadius: BorderRadius.circular(4.r),
-              ),
-              child: Text(
-                'Optional',
-                style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
-              ),
-            ),
-          ],
-        ),
+        _FieldLabel('Return Top K'),
         SizedBox(height: 6.h),
         TextFormField(
           controller: controller,
@@ -331,11 +374,186 @@ class _RandomSeedField extends StatelessWidget {
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           style: AppTextStyles.bodymedium.copyWith(color: AppColors.white),
-          decoration: _inputDecoration(hint: 'e.g., 42'),
+          decoration: _inputDecoration(hint: '10'),
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'Required';
+            final n = int.tryParse(v.trim());
+            if (n == null || n < 1) return 'Min: 1';
+            if (n > 10) return 'Max: 10';
+            return null;
+          },
         ),
-        SizedBox(height: 6.h),
+        SizedBox(height: 4.h),
         Text(
-          'Fixed seed for reproducible generation results.',
+          'Min: 1, Max: 10',
+          style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+        ),
+      ],
+    );
+  }
+}
+
+class _DockingModeSection extends StatelessWidget {
+  final String dockingMode;
+  final TextEditingController dockTopKCtrl;
+  final TextEditingController returnTopKCtrl;
+  final bool enabled;
+  final ValueChanged<String> onModeChanged;
+
+  const _DockingModeSection({
+    required this.dockingMode,
+    required this.dockTopKCtrl,
+    required this.returnTopKCtrl,
+    required this.enabled,
+    required this.onModeChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ExpansionTile(
+      initiallyExpanded: dockingMode == 'top_k',
+      tilePadding: EdgeInsets.zero,
+      childrenPadding: EdgeInsets.zero,
+      collapsedShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.r),
+        side: BorderSide(color: AppColors.brandBorder),
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.r),
+        side: BorderSide(color: AppColors.brandBorder),
+      ),
+      collapsedBackgroundColor: AppColors.slate800,
+      backgroundColor: AppColors.slate800,
+      title: Row(
+        children: [
+          SizedBox(width: 8.w),
+          Icon(Icons.tune, size: 16.sp, color: AppColors.cyan400),
+          SizedBox(width: 8.w),
+          Text(
+            'Docking Mode',
+            style: AppTextStyles.labelmedium.copyWith(
+              color: AppColors.slate300,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
+            decoration: BoxDecoration(
+              color: AppColors.slate700,
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+            child: Text(
+              dockingMode.toUpperCase(),
+              style: AppTextStyles.bodyxs.copyWith(color: AppColors.cyan400),
+            ),
+          ),
+        ],
+      ),
+      children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 12.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              RadioGroup<String>(
+                groupValue: dockingMode,
+                onChanged: (v) {
+                  if (enabled && v != null) onModeChanged(v);
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: ['off', 'all', 'top_k'].map((mode) {
+                    final selected = dockingMode == mode;
+                    return InkWell(
+                      onTap: enabled ? () => onModeChanged(mode) : null,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 4.h,
+                          horizontal: 4.w,
+                        ),
+                        child: Row(
+                          children: [
+                            Radio<String>(
+                              value: mode,
+                              activeColor: AppColors.cyan400,
+                            ),
+                            SizedBox(width: 8.w),
+                            Text(
+                              mode == 'off'
+                                  ? 'Off'
+                                  : mode == 'all'
+                                  ? 'All'
+                                  : 'Top K',
+                              style: AppTextStyles.bodymedium.copyWith(
+                                color: selected
+                                    ? AppColors.white
+                                    : AppColors.slate400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+              if (dockingMode == 'top_k') ...[
+                SizedBox(height: 4.h),
+                Padding(
+                  padding: EdgeInsets.only(left: 4.w),
+                  child: _DockTopKField(
+                    controller: dockTopKCtrl,
+                    returnTopKCtrl: returnTopKCtrl,
+                    enabled: enabled,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DockTopKField extends StatelessWidget {
+  final TextEditingController controller;
+  final TextEditingController returnTopKCtrl;
+  final bool enabled;
+  const _DockTopKField({
+    required this.controller,
+    required this.returnTopKCtrl,
+    required this.enabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _FieldLabel('Dock Top K'),
+        SizedBox(height: 6.h),
+        TextFormField(
+          controller: controller,
+          enabled: enabled,
+          keyboardType: TextInputType.number,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          style: AppTextStyles.bodymedium.copyWith(color: AppColors.white),
+          decoration: _inputDecoration(hint: '5'),
+          validator: (v) {
+            if (v == null || v.trim().isEmpty) return 'Required';
+            final n = int.tryParse(v.trim());
+            if (n == null || n < 1) return 'Min: 1';
+            final returnVal = int.tryParse(returnTopKCtrl.text.trim());
+            if (returnVal != null && n > returnVal) {
+              return 'Must be ≤ Return Top K';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: 4.h),
+        Text(
+          'Number of top molecules to dock.',
           style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
         ),
       ],

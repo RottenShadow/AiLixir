@@ -9,13 +9,8 @@ import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.da
 class DioService {
   final Dio dio;
   final LocalAuthDataSource localAuthDataSource;
-  final String? forcedToken;
 
-  DioService({
-    required this.dio,
-    required this.localAuthDataSource,
-    this.forcedToken,
-  });
+  DioService({required this.dio, required this.localAuthDataSource});
 
   void init() async {
     // TODO: remove this when we get the real certificate
@@ -30,11 +25,7 @@ class DioService {
       return client;
     };
     dio.interceptors.addAll([
-      DioInterceptors(
-        client: dio,
-        localAuthDataSource: localAuthDataSource,
-        forcedToken: forcedToken,
-      ),
+      DioInterceptors(client: dio, localAuthDataSource: localAuthDataSource),
       PrettyDioLogger(),
     ]);
   }

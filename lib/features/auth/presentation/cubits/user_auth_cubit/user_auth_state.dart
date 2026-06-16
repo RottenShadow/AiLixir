@@ -45,5 +45,5 @@ final class UserAuthResetPasswordSuccess extends UserAuthState {
 /// Force logout succeeded — navigate to join.
 final class UserAuthForceLogout extends UserAuthState {
   final String msg;
-  UserAuthForceLogout({this.msg = 'Logged out Successfully!'});
+  UserAuthForceLogout({this.msg = 'Session Expired, Please Login Again!'});
 }

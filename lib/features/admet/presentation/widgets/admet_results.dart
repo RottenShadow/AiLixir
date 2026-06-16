@@ -32,6 +32,9 @@ class _AdmetResultsState extends State<AdmetResults> {
   List<AdmetPredictionEntity> _sorted(List<AdmetPredictionEntity> data) {
     final sorted = List<AdmetPredictionEntity>.from(data);
     sorted.sort((a, b) {
+      if (a.error != null && b.error != null) return 0;
+      if (a.error != null) return 1;
+      if (b.error != null) return -1;
       final aVal = _value(a);
       final bVal = _value(b);
       return _sortAscending ? aVal.compareTo(bVal) : bVal.compareTo(aVal);
@@ -60,10 +63,10 @@ class _AdmetResultsState extends State<AdmetResults> {
       builder: (context, state) {
         return switch (state) {
           AdmetSuccess(:final response) => _AdmetResultList(
-            predictions: _sorted(response.data),
+            predictions: _sorted(response.results),
             sortField: _sortField,
             sortAscending: _sortAscending,
-            count: response.data.length,
+            count: response.results.length,
             onSortChanged: (field) {
               setState(() {
                 if (_sortField == field) {

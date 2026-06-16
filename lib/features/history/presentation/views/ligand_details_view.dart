@@ -13,7 +13,7 @@ class LigandDetailsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => LigandDetailsCubit()..loadDetails(ligand.id),
+      create: (_) => LigandDetailsCubit()..loadDetails(ligand),
       child: Scaffold(body: LigandDetailsBody(ligand: ligand)),
     );
   }

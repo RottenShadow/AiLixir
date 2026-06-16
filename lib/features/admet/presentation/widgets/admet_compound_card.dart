@@ -17,7 +17,8 @@ class AdmetCompoundCard extends StatelessWidget {
   });
 
   void _copyResult(BuildContext context) {
-    final text = '''
+    final text =
+        '''
 Compound #$index
 SMILES: ${prediction.smiles}
 
@@ -41,6 +42,10 @@ Toxicity: ${prediction.toxicity.toStringAsFixed(3)}
 
   @override
   Widget build(BuildContext context) {
+    if (prediction.error != null) {
+      return _buildErrorCard(context);
+    }
+
     final toxicityColor = prediction.toxicity > 0.5
         ? AppColors.red400
         : AppColors.admetPositive;
@@ -118,9 +123,18 @@ Toxicity: ${prediction.toxicity.toStringAsFixed(3)}
             padding: EdgeInsets.fromLTRB(14.w, 0, 14.w, 14.h),
             child: Column(
               children: [
-                AdmetMetricRow(name: 'Absorption', value: prediction.absorption),
-                AdmetMetricRow(name: 'Distribution', value: prediction.distribution),
-                AdmetMetricRow(name: 'Metabolism', value: prediction.metabolism),
+                AdmetMetricRow(
+                  name: 'Absorption',
+                  value: prediction.absorption,
+                ),
+                AdmetMetricRow(
+                  name: 'Distribution',
+                  value: prediction.distribution,
+                ),
+                AdmetMetricRow(
+                  name: 'Metabolism',
+                  value: prediction.metabolism,
+                ),
                 AdmetMetricRow(name: 'Excretion', value: prediction.excretion),
                 AdmetMetricRow(name: 'Toxicity', value: prediction.toxicity),
                 SizedBox(height: 8.h),
@@ -157,6 +171,95 @@ Toxicity: ${prediction.toxicity.toStringAsFixed(3)}
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.slate900,
+        borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(color: AppColors.red500.withValues(alpha: 0.4)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(14.r),
+            child: Row(
+              children: [
+                Container(
+                  width: 32.w,
+                  height: 32.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.red500.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(
+                      color: AppColors.red500.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.warning_rounded,
+                    size: 16.sp,
+                    color: AppColors.red400,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Compound #$index — Error',
+                        style: AppTextStyles.labelsmall.copyWith(
+                          color: AppColors.red400,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        prediction.smiles,
+                        style: AppTextStyles.bodyxs.copyWith(
+                          color: AppColors.slate400,
+                          fontFamily: 'monospace',
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(color: AppColors.red500.withValues(alpha: 0.2), height: 1),
+          Padding(
+            padding: EdgeInsets.all(14.r),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.info_outline, size: 14.sp, color: AppColors.red400),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    prediction.error!,
+                    style: AppTextStyles.bodyxs.copyWith(
+                      color: AppColors.slate300,
                     ),
                   ),
                 ),

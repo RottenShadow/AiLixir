@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:ailixir/features/drug_repurposing/data/repositories/drug_repurposing_repository.dart';
 import 'package:ailixir/features/drug_repurposing/domain/entities/drug_repurposing_targets_response_entity.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,70 +7,153 @@ part 'dr_quick_state.dart';
 
 class DrQuickCubit extends Cubit<DrQuickState> {
   final DrugRepurposingRepository _repository;
-  final List<String> _logs = [];
 
   DrQuickCubit({required DrugRepurposingRepository repository})
     : _repository = repository,
       super(const DrQuickIdle());
 
+  Timer? _pollTimer;
+  int _pollCount = 0;
+  int? _currentJobId;
+
+  static const _pollInterval = Duration(seconds: 15);
+
   Future<void> getTargets(String diseaseName) async {
-    void addLog(String msg) {
-      _logs.add('[${_ts()}] $msg');
-      emit(DrQuickLoading(logs: List.unmodifiable(_logs)));
-    }
+    _cancelTimer();
+    _pollCount = 0;
+    _currentJobId = null;
 
-    addLog('Initializing target discovery for "$diseaseName"...');
-    await Future.delayed(const Duration(milliseconds: 400));
+    emit(DrQuickPolling(logs: ['[${_ts()}] Submitting target lookup job...']));
 
-    addLog('Querying disease-gene association database...');
-    await Future.delayed(const Duration(milliseconds: 600));
+    final result = await _repository.submitTargetsJob(diseaseName: diseaseName);
+    result.fold(
+      (failure) {
+        emit(
+          DrQuickError(
+            message: failure.message,
+            logs: ['[${_ts()}] Failed: ${failure.message}'],
+          ),
+        );
+      },
+      (job) {
+        _currentJobId = job.jobId;
+        final logs = [
+          '[${_ts()}] Job submitted. ID: ${job.jobId}, Status: ${job.status}',
+        ];
+        emit(DrQuickPolling(logs: logs));
+        _pollTargets();
+        _pollTimer = Timer.periodic(_pollInterval, (_) => _pollTargets());
+      },
+    );
+  }
 
-    addLog('Fetching protein targets from OpenTargets...');
+  Future<void> _pollTargets() async {
+    if (isClosed || _currentJobId == null) return;
+    _pollCount++;
 
-    try {
-      final response = await _repository.getTargets(diseaseName);
+    emit(
+      DrQuickPolling(
+        logs: [
+          ...(state.logs),
+          '[${_ts()}] Polling status... (poll $_pollCount)',
+        ],
+      ),
+    );
 
-      _logs.add(
-        '[${_ts()}] ✓ Found ${response.totalTargets} molecular targets.',
-      );
-      _logs.add('[${_ts()}] ✓ Target discovery complete.');
-
-      emit(DrQuickSuccess(response: response, logs: List.unmodifiable(_logs)));
-    } catch (e) {
-      _logs.add(
-        '[${_ts()}] ✗ Error: ${e.toString().replaceAll('Exception: ', '')}',
-      );
-      emit(
-        DrQuickError(
-          message: e.toString().replaceAll('Exception: ', ''),
-          logs: List.unmodifiable(_logs),
-        ),
-      );
-    }
+    final result = await _repository.getTargetsJobStatus(_currentJobId!);
+    result.fold(
+      (failure) {
+        emit(
+          DrQuickError(
+            message: failure.message,
+            logs: [
+              ...(state.logs),
+              '[${_ts()}] Status check failed: ${failure.message}',
+            ],
+          ),
+        );
+      },
+      (job) {
+        if (job.status == 'completed') {
+          _cancelTimer();
+          final output = job.output;
+          if (output != null) {
+            emit(
+              DrQuickSuccess(
+                response: output,
+                logs: [
+                  ...(state.logs),
+                  '[${_ts()}] ✓ Found ${output.totalTargets} molecular targets.',
+                  '[${_ts()}] ✓ Target discovery complete.',
+                ],
+              ),
+            );
+          } else {
+            emit(
+              DrQuickError(
+                message: 'Job completed but no output data.',
+                logs: [
+                  ...(state.logs),
+                  '[${_ts()}] ✗ Job completed but output is empty.',
+                ],
+              ),
+            );
+          }
+        } else if (job.status == 'failed') {
+          _cancelTimer();
+          emit(
+            DrQuickError(
+              message: 'Target lookup job failed.',
+              logs: [
+                ...(state.logs),
+                '[${_ts()}] ✗ Job failed.',
+              ],
+            ),
+          );
+        } else {
+          emit(
+            DrQuickPolling(
+              logs: [
+                ...(state.logs),
+                '[${_ts()}] Status: ${job.status}...',
+              ],
+            ),
+          );
+        }
+      },
+    );
   }
 
   void clearLogs() {
-    _logs.clear();
-    _logs.add('');
     if (state is DrQuickSuccess) {
       emit(
         DrQuickSuccess(
           response: (state as DrQuickSuccess).response,
-          logs: _logs,
+          logs: [],
         ),
       );
     } else if (state is DrQuickError) {
-      emit(DrQuickError(message: (state as DrQuickError).message, logs: _logs));
-    } else if (state is DrQuickLoading) {
-      emit(DrQuickLoading(logs: _logs));
+      emit(
+        DrQuickError(
+          message: (state as DrQuickError).message,
+          logs: [],
+        ),
+      );
     } else {
-      emit(DrQuickIdle(logs: _logs));
+      emit(const DrQuickIdle());
     }
   }
 
   void reset() {
-    _logs.clear();
+    _cancelTimer();
+    _pollCount = 0;
+    _currentJobId = null;
     emit(const DrQuickIdle());
+  }
+
+  void _cancelTimer() {
+    _pollTimer?.cancel();
+    _pollTimer = null;
   }
 
   String _ts() {
@@ -77,5 +161,11 @@ class DrQuickCubit extends Cubit<DrQuickState> {
     return '${n.hour.toString().padLeft(2, '0')}:'
         '${n.minute.toString().padLeft(2, '0')}:'
         '${n.second.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Future<void> close() {
+    _cancelTimer();
+    return super.close();
   }
 }

@@ -9,8 +9,8 @@ final class DrQuickIdle extends DrQuickState {
   const DrQuickIdle({super.logs});
 }
 
-final class DrQuickLoading extends DrQuickState {
-  const DrQuickLoading({super.logs});
+final class DrQuickPolling extends DrQuickState {
+  const DrQuickPolling({super.logs});
 }
 
 final class DrQuickSuccess extends DrQuickState {

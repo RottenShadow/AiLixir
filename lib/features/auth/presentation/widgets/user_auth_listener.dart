@@ -35,6 +35,7 @@ class UserAuthListener extends StatelessWidget {
           AppToast.showSuccessToast(context: context, message: state.message);
           context.navigateTo(LoginView.routeName);
         } else if (state is UserAuthForceLogout) {
+          AppToast.showErrorToast(context: context, message: state.msg);
           context.navigateAndClearStack(JoinView.routeName);
         }
       },

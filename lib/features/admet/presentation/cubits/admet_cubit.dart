@@ -32,7 +32,7 @@ class AdmetCubit extends Cubit<AdmetState> {
       },
       (response) {
         _logs.add(
-          '[${_ts()}] ✓ Generated predictions for ${response.data.length} compounds.',
+          '[${_ts()}] ✓ Generated predictions for ${response.results.length} compounds.',
         );
         _logs.add('[${_ts()}] ✓ ADMET prediction complete.');
         emit(AdmetSuccess(response: response, logs: List.unmodifiable(_logs)));
@@ -60,7 +60,7 @@ class AdmetCubit extends Cubit<AdmetState> {
       },
       (response) {
         _logs.add(
-          '[${_ts()}] ✓ Generated predictions for ${response.data.length} compounds.',
+          '[${_ts()}] ✓ Generated predictions for ${response.results.length} compounds.',
         );
         _logs.add('[${_ts()}] ✓ ADMET prediction complete.');
         emit(AdmetSuccess(response: response, logs: List.unmodifiable(_logs)));

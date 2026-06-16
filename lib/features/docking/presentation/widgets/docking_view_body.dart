@@ -222,7 +222,7 @@ class _DockingViewBodyState extends State<DockingViewBody> {
       sizeX: double.parse(_sxCtrl.text),
       sizeY: double.parse(_syCtrl.text),
       sizeZ: double.parse(_szCtrl.text),
-      exhaustiveness: double.tryParse(_exhaustCtrl.text) ?? 20.0,
+      exhaustiveness: int.tryParse(_exhaustCtrl.text) ?? 8,
     );
     context.read<DockingCubit>().startDocking(request);
   }

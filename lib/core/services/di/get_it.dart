@@ -11,7 +11,6 @@ import 'package:ailixir/features/admet/data/repos/admet_repo.dart';
 import 'package:ailixir/features/chemical_search/data/repos/chemical_search_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:ailixir/core/config/env/env.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/services/local_storage/secure_storage_service.dart';
@@ -34,9 +33,9 @@ void getItRegisterSingleton() {
     () => Dio(
       BaseOptions(
         baseUrl: AppEndpoints.baseUrl,
-        connectTimeout: const Duration(seconds: 3),
-        receiveTimeout: const Duration(seconds: 3),
-        sendTimeout: const Duration(seconds: 3),
+        connectTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 120),
+        sendTimeout: const Duration(seconds: 60),
       ),
     ),
   );
@@ -71,23 +70,9 @@ void getItRegisterSingleton() {
     () => AwardRepo(dioService: GetIt.I.get()),
   );
 
-  // Drug Repurposing uses its own Dio instance pointing at the HuggingFace API
-  GetIt.I.registerLazySingleton<DrugRepurposingRepository>(() {
-    final drugDio = Dio(
-      BaseOptions(
-        baseUrl: AppEndpoints.drugRepurposingBaseUrl,
-        connectTimeout: const Duration(seconds: 60),
-        receiveTimeout: const Duration(seconds: 120),
-        sendTimeout: const Duration(seconds: 60),
-      ),
-    );
-    final drugDioService = DioService(
-      dio: drugDio,
-      localAuthDataSource: GetIt.I.get(),
-      forcedToken: Env.hfToken,
-    )..init();
-    return DrugRepurposingRepository(dio: drugDioService);
-  });
+  GetIt.I.registerLazySingleton<DrugRepurposingRepository>(
+    () => DrugRepurposingRepository(dio: GetIt.I.get<DioService>()),
+  );
 
   GetIt.I.registerLazySingleton<GenerationRepo>(
     () => GenerationRepo(dioService: GetIt.I.get()),

@@ -70,9 +70,7 @@ class AdmetRepo {
         .toList();
     return Right(
       AdmetPredictResponseEntity(
-        success: true,
-        message: 'ADMET predictions generated successfully',
-        data: predictions,
+        results: predictions,
       ),
     );
   }
@@ -108,9 +106,7 @@ class AdmetRepo {
         .toList();
     return Right(
       AdmetPredictResponseEntity(
-        success: true,
-        message: 'ADMET predictions generated from file',
-        data: predictions,
+        results: predictions,
       ),
     );
   }

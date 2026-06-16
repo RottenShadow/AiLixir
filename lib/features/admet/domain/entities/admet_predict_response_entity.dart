@@ -1,13 +1,13 @@
 import 'admet_prediction_entity.dart';
 
 class AdmetPredictResponseEntity {
-  final bool success;
-  final String message;
-  final List<AdmetPredictionEntity> data;
+  final int totalProcessed;
+  final int totalSmiles;
+  final List<AdmetPredictionEntity> results;
 
   const AdmetPredictResponseEntity({
-    required this.success,
-    required this.message,
-    required this.data,
+    required this.results,
+    this.totalProcessed = 0,
+    this.totalSmiles = 0,
   });
 }

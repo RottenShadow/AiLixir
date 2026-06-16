@@ -18,8 +18,8 @@ class DrFullForm extends StatefulWidget {
 class _DrFullFormState extends State<DrFullForm> {
   final TextEditingController _diseaseController = TextEditingController();
   List<String> _knownDrugs = [];
-  List<String> _extraSmiles = [];
-  int _topK = 5;
+  double _minScore = 0.0;
+  int _topNTargets = 10;
 
   @override
   void dispose() {
@@ -39,8 +39,8 @@ class _DrFullFormState extends State<DrFullForm> {
     context.read<DrFullCubit>().screenDrugs(
       diseaseName: disease,
       knownDrugs: _knownDrugs,
-      extraSmiles: _extraSmiles,
-      topK: _topK,
+      minScore: _minScore,
+      topNTargets: _topNTargets,
     );
   }
 
@@ -48,12 +48,12 @@ class _DrFullFormState extends State<DrFullForm> {
   Widget build(BuildContext context) {
     return BlocBuilder<DrFullCubit, DrFullState>(
       builder: (context, state) {
-        final isLoading = state is DrFullLoading;
+        final isLoading = state is DrFullPolling;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row 1: Disease | Known Drugs | Extra SMILES
+            // Row 1: Disease | Known Drugs
             IntrinsicHeight(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,32 +77,28 @@ class _DrFullFormState extends State<DrFullForm> {
                           setState(() => _knownDrugs = tags),
                     ),
                   ),
-                  SizedBox(width: 16.w),
-                  Flexible(
-                    flex: 3,
-                    child: DrTagInput(
-                      label: 'Extra SMILES',
-                      hint: 'Paste SMILES string...',
-                      tags: _extraSmiles,
-                      accentColor: const Color(0xFF10B981),
-                      onTagsChanged: (tags) =>
-                          setState(() => _extraSmiles = tags),
-                    ),
-                  ),
                 ],
               ),
             ),
             SizedBox(height: 16.h),
 
-            // Row 2: Top-K slider + Run button
+            // Row 2: Min Score slider + Top N Targets slider + Run button
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: _TopKInput(
-                    value: _topK,
+                  child: _MinScoreInput(
+                    value: _minScore,
                     enabled: !isLoading,
-                    onChanged: (v) => setState(() => _topK = v),
+                    onChanged: (v) => setState(() => _minScore = v),
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: _TopNTargetsInput(
+                    value: _topNTargets,
+                    enabled: !isLoading,
+                    onChanged: (v) => setState(() => _topNTargets = v),
                   ),
                 ),
                 SizedBox(width: 24.w),
@@ -197,14 +193,14 @@ class _DiseaseInput extends StatelessWidget {
   }
 }
 
-// ── Top-K slider ──────────────────────────────────────────────────────────────
+// ── Min Score slider ──────────────────────────────────────────────────────────
 
-class _TopKInput extends StatelessWidget {
-  final int value;
+class _MinScoreInput extends StatelessWidget {
+  final double value;
   final bool enabled;
-  final ValueChanged<int> onChanged;
+  final ValueChanged<double> onChanged;
 
-  const _TopKInput({
+  const _MinScoreInput({
     required this.value,
     required this.enabled,
     required this.onChanged,
@@ -216,7 +212,75 @@ class _TopKInput extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
-          'Top-K',
+          'Min Score',
+          style: AppTextStyles.labelmedium.copyWith(
+            color: AppColors.authTextSecondary,
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: SliderTheme(
+            data: SliderThemeData(
+              activeTrackColor: const Color(0xFF22D3EE),
+              inactiveTrackColor: AppColors.slate700,
+              thumbColor: const Color(0xFF22D3EE),
+              overlayColor: const Color(0xFF22D3EE).withOpacity(0.15),
+              trackHeight: 4,
+              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7.r),
+            ),
+            child: Slider(
+              value: value,
+              min: 0.0,
+              max: 1.0,
+              divisions: 10,
+              onChanged: enabled ? onChanged : null,
+            ),
+          ),
+        ),
+        SizedBox(width: 8.w),
+        Container(
+          width: 48.w,
+          padding: EdgeInsets.symmetric(vertical: 4.h),
+          decoration: BoxDecoration(
+            color: const Color(0xFF22D3EE).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(8.r),
+            border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+          ),
+          child: Center(
+            child: Text(
+              value.toStringAsFixed(1),
+              style: AppTextStyles.labelmedium.copyWith(
+                color: const Color(0xFF22D3EE),
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Top N Targets slider ───────────────────────────────────────────────────────
+
+class _TopNTargetsInput extends StatelessWidget {
+  final int value;
+  final bool enabled;
+  final ValueChanged<int> onChanged;
+
+  const _TopNTargetsInput({
+    required this.value,
+    required this.enabled,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          'Top N',
           style: AppTextStyles.labelmedium.copyWith(
             color: AppColors.authTextSecondary,
           ),
@@ -235,15 +299,15 @@ class _TopKInput extends StatelessWidget {
             child: Slider(
               value: value.toDouble(),
               min: 1,
-              max: 10,
-              divisions: 9,
+              max: 100,
+              divisions: 99,
               onChanged: enabled ? (v) => onChanged(v.round()) : null,
             ),
           ),
         ),
         SizedBox(width: 8.w),
         Container(
-          width: 36.w,
+          width: 48.w,
           padding: EdgeInsets.symmetric(vertical: 4.h),
           decoration: BoxDecoration(
             color: const Color(0xFF10B981).withOpacity(0.12),

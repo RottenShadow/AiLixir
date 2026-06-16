@@ -67,6 +67,22 @@ class LigandModel {
       candidateName: 'Candidate #${rank.toString().padLeft(5, '0')}',
       smiles: canonicalSmiles.isNotEmpty ? canonicalSmiles : smiles,
       generatedAt: generatedAt ?? DateTime.now(),
+      rank: rank,
+      valid: valid,
+      canonicalSmiles: canonicalSmiles.isNotEmpty ? canonicalSmiles : null,
+      smilesState: smilesState,
+      nll: nll,
+      mw: mw,
+      logp: logp,
+      tpsa: tpsa,
+      hbd: hbd,
+      hba: hba,
+      rotBonds: rotBonds,
+      qed: qed,
+      saScore: saScore,
+      predPAffMean: predPAffMean,
+      dockingScore: dockingScore,
+      dockingStatus: dockingStatus,
     );
   }
 }

@@ -11,7 +11,7 @@ class DockingRequestEntity {
   final double sizeY;
   final double sizeZ;
   // Advanced
-  final double exhaustiveness;
+  final int exhaustiveness;
 
   const DockingRequestEntity({
     this.proteinFilePath,

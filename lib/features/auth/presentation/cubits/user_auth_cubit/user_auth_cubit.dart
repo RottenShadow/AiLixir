@@ -23,8 +23,8 @@ class UserAuthCubit extends Cubit<UserAuthState> {
     var res = await _socialRepo.signInWithGoogle();
 
     res.fold((f) {
-      //emit(UserAuthError(message: f.message));
-      emit(UserAuthSuccess());
+      emit(UserAuthError(message: f.message));
+      // emit(UserAuthSuccess());
     }, (msg) => emit(UserAuthSuccess()));
   }
 
