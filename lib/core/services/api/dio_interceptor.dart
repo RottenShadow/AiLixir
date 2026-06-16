@@ -6,8 +6,6 @@ import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_a
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/constants/app_constants.dart';
-// import 'package:ailixir/core/services/api/app_endpoints.dart';
-// import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/features/auth/data/data_source/local_auth_data_source.dart';
 
 class DioInterceptors extends Interceptor {
@@ -59,19 +57,16 @@ class DioInterceptors extends Interceptor {
     }
 
     final statusCode = err.response?.statusCode;
-    final isRefreshRequest = err.requestOptions.extra['refresh'] == true;
 
     log('ERROR[$statusCode] => PATH: ${err.requestOptions.path}');
 
     // Refresh request itself failed → force logout once
-    if (statusCode == 401 && isRefreshRequest) {
-      await _forceLogoutOnce();
-      return handler.next(err);
-    }
-
-    // 500 with "Route [login] not defined" → token expired / session invalid → force logout
-    if (statusCode == 500 && _isRouteLoginNotDefinedError(err)) {
-      await _forceLogoutOnce();
+    if (statusCode == 401) {
+      String msg = err.response?.data['message'] ?? 'Unknown error 401';
+      bool shouldForceLogout = msg.toLowerCase().contains('unauthenticated');
+      if (shouldForceLogout) {
+        await _forceLogoutOnce();
+      }
       return handler.next(err);
     }
 
@@ -99,64 +94,6 @@ class DioInterceptors extends Interceptor {
     // }
 
     handler.next(err);
-  }
-
-  /// =======================
-  /// REFRESH TOKEN (ONCE)
-  /// =======================
-  // Future<bool> _refreshTokenOnce(String refreshToken) async {
-  //   if (_isRefreshing) {
-  //     await _refreshCompleter?.future;
-  //     return await localAuthDataSource.getUserToken() != null;
-  //   }
-
-  //   _isRefreshing = true;
-  //   _refreshCompleter = Completer<void>();
-
-  //   try {
-  //     final res = await client.post(
-  //       AppEndpoints.authRefreshToken,
-  //       options: Options(
-  //         headers: {
-  //           HttpHeaders.authorizationHeader:
-  //               '${AppConstants.bearer}$refreshToken',
-  //         },
-  //         extra: {'refresh': true},
-  //       ),
-  //     );
-
-  //     if (res.statusCode == 200) {
-  //       final data = res.data['data'];
-
-  //       await localAuthDataSource.saveUserTokens(
-  //         token: data['token'],
-  //         refreshToken: data['refreshToken'],
-  //       );
-
-  //       return true;
-  //     }
-
-  //     return false;
-  //   } catch (e, st) {
-  //     log('Refresh failed: $e\n$st');
-  //     return false;
-  //   } finally {
-  //     _isRefreshing = false;
-  //     _refreshCompleter?.complete();
-  //     _refreshCompleter = null;
-  //   }
-  // }
-
-  /// =======================
-  /// ROUTE LOGIN ERROR CHECK
-  /// =======================
-  bool _isRouteLoginNotDefinedError(DioException err) {
-    final data = err.response?.data;
-    if (data == null) return false;
-    final message = data is Map
-        ? (data['message'] as String? ?? '')
-        : data.toString();
-    return message.toLowerCase().contains('route [login] not defined');
   }
 
   /// =======================
