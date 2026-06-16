@@ -16,7 +16,6 @@ class UpdateProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: AppColors.slate1000),
       body: UpdateProfileViewBody(repo: repo, profile: profile),
     );
   }

@@ -1,6 +1,12 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/utils/toast/app_toast.dart';
+import 'package:ailixir/core/widgets/buttons/custom_button.dart';
+import 'package:ailixir/core/widgets/text_form_field/custom_text_form_field.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_back_button.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_brand_logo.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:ailixir/features/profile/data/models/profile_model.dart';
 import 'package:ailixir/features/profile/data/repos/profile_repo.dart';
 import 'package:ailixir/features/profile/presentation/views/profile_view.dart';
@@ -24,6 +30,7 @@ class _UpdateProfileViewBodyState extends State<UpdateProfileViewBody> {
   late TextEditingController _nameController;
   late TextEditingController _instituteController;
   late TextEditingController _focusController;
+  final _formKey = GlobalKey<FormState>();
   late bool isErr;
   late bool isLoading;
   @override
@@ -40,105 +47,148 @@ class _UpdateProfileViewBodyState extends State<UpdateProfileViewBody> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsetsGeometry.symmetric(
-        vertical: 0.02.sh,
-        horizontal: 0.28.sw,
-      ),
-      child: Center(
-        child: Card(
-          color: AppColors.cardBackground,
-          child: Padding(
-            padding: EdgeInsetsGeometry.symmetric(horizontal: 50),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 40,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      "Please change the fields to your liking and submit.",
-                      style: AppTextStyles.caption,
-                    ),
-                    Spacer(),
-                    Icon(Icons.person),
-                  ],
-                ),
-                TextField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Name",
-                  ),
-                ),
-                TextField(
-                  controller: _instituteController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Institution",
-                  ),
-                ),
-                TextField(
-                  controller: _focusController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Research Focus",
-                  ),
-                ),
-                Visibility(
-                  visible: isErr,
-                  replacement: SizedBox(),
-                  child: Row(
-                    spacing: 10,
-                    children: [
-                      Icon(Icons.error, color: AppColors.red600),
-                      Text(
-                        "Failed to update profile. Please try again.",
-                        style: AppTextStyles.labelmedium.copyWith(
-                          color: AppColors.red600,
-                        ),
-                      ),
+    return AuthGradientScaffold(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(vertical: 48.h, horizontal: 24.w),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AuthBrandLogo(),
+              SizedBox(height: 40.h),
+              Container(
+                width: 560.w,
+                padding: EdgeInsets.all(40.w),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.slate800.withValues(alpha: 0.95),
+                      AppColors.slate900.withValues(alpha: 0.98),
                     ],
                   ),
-                ),
-                MaterialButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(12.r),
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(
+                    color: AppColors.brandBlue.withValues(alpha: 0.25),
                   ),
-                  onPressed: () async {
-                    isLoading = true;
-                    setState(() {});
-                    var res = await widget.repo.updateProfile(
-                      _nameController.text,
-                      _instituteController.text,
-                      _focusController.text,
-                    );
-
-                    res.fold(
-                      (e) {
-                        isLoading = false;
-                        setState(() {
-                          isErr = true;
-                        });
-                      },
-                      (v) {
-                        isLoading = false;
-                        if (v) {
-                          context.pop();
-                        } else {
-                          isErr = true;
-                          setState(() {});
-                        }
-                      },
-                    );
-                  },
-                  color: AppColors.brandBlue,
-                  child: Text("Submit"),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.brandBlue.withValues(alpha: 0.08),
+                      blurRadius: 40,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AuthBackButton(
+                      onTap: () {
+                        context.pop();
+                      },
+                    ),
+                    SizedBox(height: 24.h),
+                    Text(
+                      'Change Account Details',
+                      style: AppTextStyles.h1.copyWith(
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      'Update your field, focus and workplace',
+                      style: AppTextStyles.bodymedium.copyWith(
+                        color: AppColors.authTextSecondary,
+                      ),
+                    ),
+                    SizedBox(height: 36.h),
+                    CustomTextFormField(
+                      label: 'Name',
+                      hint: "",
+                      prefixIcon: Icon(
+                        Icons.person_outline,
+                        color: AppColors.slate400,
+                        size: 18.sp,
+                      ),
+                      controller: _nameController,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(height: 20.h),
+                    CustomTextFormField(
+                      label: 'Institution',
+                      hint: "",
+                      prefixIcon: Icon(
+                        Icons.school_outlined,
+                        color: AppColors.slate400,
+                        size: 18.sp,
+                      ),
+                      controller: _instituteController,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(height: 20.h),
+                    CustomTextFormField(
+                      label: 'Research Focus',
+                      hint: "",
+                      prefixIcon: Icon(
+                        Icons.science_outlined,
+                        color: AppColors.slate400,
+                        size: 18.sp,
+                      ),
+                      controller: _focusController,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    SizedBox(height: 20.h),
+                    SizedBox(height: 36.h),
+                    CustomButton(
+                      text: 'Update Details',
+                      isLoading: isLoading,
+                      icon: Icons.person_outlined,
+                      showIcon: true,
+                      width: double.infinity,
+                      onTap: () async {
+                        isLoading = true;
+                        var res = await widget.repo.updateProfile(
+                          _nameController.text,
+                          _instituteController.text,
+                          _focusController.text,
+                        );
+                        isLoading = false;
+                        res.fold(
+                          (f) {
+                            AppToast.showErrorToast(
+                              context: context,
+                              message: "Failed to Update Profile",
+                            );
+                          },
+                          (success) {
+                            if (success) {
+                              context.pop();
+                            } else {
+                              AppToast.showErrorToast(
+                                context: context,
+                                message: "Failed to Update Profile",
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
+                    SizedBox(height: 24.h),
+                  ],
+                ),
+              ),
+              SizedBox(height: 32.h),
+              Text(
+                '© 2026 AILIXIR PLATFORM.',
+                style: AppTextStyles.labelsmall.copyWith(
+                  color: AppColors.authTextSecondary.withValues(alpha: 0.5),
+                  letterSpacing: 1,
+                ),
+              ),
+            ],
           ),
         ),
       ),

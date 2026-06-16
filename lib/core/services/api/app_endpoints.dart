@@ -1,7 +1,6 @@
 abstract class AppEndpoints {
   // Base URLs
-  static const String baseUrl =
-      'https://america-hyperlipemic-grazyna.ngrok-free.dev/api/';
+  static const String baseUrl = 'https://ailixir.pharmaai.io/api';
 
   // ── Auth Endpoints ──────────────────────────────────────
   static const String userAuthBaseUrl = 'user';
