@@ -87,7 +87,10 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                     child: NewsCard(
                       news: news,
                       onBookmark: (id) async {
-                        var res = await _repo.saveBookmark(id);
+                        var res = news.bookmarked
+                            ? await _repo.removeBookmark(id)
+                            : await _repo.saveBookmark(id);
+                        news.bookmarked = !news.bookmarked;
                         bool success = false;
                         res.fold((_) {}, (v) {
                           success = v;

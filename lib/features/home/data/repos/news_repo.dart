@@ -29,4 +29,13 @@ class NewsRepo {
       return json["success"];
     });
   }
+
+  Future<Either<Failure, bool>> removeBookmark(String articleID) {
+    return safeApiCall(() async {
+      Map<String, dynamic> json = await dioService.delete(
+        endpoint: "${AppEndpoints.baseUrl}news/save/$articleID",
+      );
+      return json["success"];
+    });
+  }
 }
