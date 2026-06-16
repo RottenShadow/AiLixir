@@ -5,6 +5,7 @@ project(ailixir LANGUAGES CXX)
 # Enable /await flag for MSVC to support experimental coroutine features.
 if(MSVC)
   add_compile_options(/await)
+  add_definitions(-D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
 endif()
 
 # The name of the executable created for the application. Change this to change
