@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// A pure-UI entity representing a single news article card in the home feed.
 class NewsEntity {
-  final String id;
+  final int id;
   final String tag;
   final Color tagColor;
   final String timeAgo;
@@ -32,20 +32,20 @@ class NewsEntity {
     required Map<String, dynamic> json,
     bool bookmarked = false,
   }) : this(
-         id: json["article"]["id"],
+         id: json["id"],
          tag: "news",
          tagColor: Color(0xFF22C55E),
-         timeAgo: json["article"]["published_at"],
+         timeAgo: json["published_at"],
          icon: Icons.science,
-         title: json["article"]["title"],
-         body: json["article"]["summary"],
+         title: json["title"],
+         body: json["summary"],
          bookmarked: bookmarked,
          primaryAction: "Read More",
        );
 
   static List<NewsEntity> getTestData = [
     NewsEntity(
-      id: '1',
+      id: 1,
       tag: 'Genomics',
       tagColor: Color(0xFF22C55E),
       timeAgo: '2h ago',
@@ -57,7 +57,7 @@ class NewsEntity {
       categories: ['all', 'genomics', 'ai'],
     ),
     NewsEntity(
-      id: '2',
+      id: 2,
       tag: 'Clinical Trials',
       tagColor: Color(0xFF3B82F6),
       timeAgo: '5h ago',
@@ -69,7 +69,7 @@ class NewsEntity {
       categories: ['all', 'clinical'],
     ),
     NewsEntity(
-      id: '3',
+      id: 3,
       tag: 'Pharma M&A',
       tagColor: Color(0xFFF59E0B),
       timeAgo: '8h ago',
@@ -81,7 +81,7 @@ class NewsEntity {
       categories: ['all', 'pharma'],
     ),
     NewsEntity(
-      id: '4',
+      id: 4,
       tag: 'AI Breakthroughs',
       tagColor: Color(0xFFA855F7),
       timeAgo: '11h ago',

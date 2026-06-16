@@ -6,7 +6,7 @@ import 'package:ailixir/features/home/domain/entities/news_entity.dart';
 
 class NewsCard extends StatefulWidget {
   final NewsEntity news;
-  final Future<bool> Function(String) onBookmark;
+  final Future<bool> Function(int) onBookmark;
 
   const NewsCard({super.key, required this.news, required this.onBookmark});
 

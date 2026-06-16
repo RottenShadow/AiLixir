@@ -12,7 +12,6 @@ import 'right_sidebar.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 // Static news seed data  (replace with BLoC / repository later)
 // ─────────────────────────────────────────────────────────────────────────────
-List<NewsEntity> get _allNews => NewsEntity.getTestData;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -27,7 +26,11 @@ class _HomeViewBodyState extends State<HomeViewBody> {
   String _selectedFilterId = NewsFilter.all.first.id; // 'all'
   List<NewsEntity> _bookmarks = [];
   final NewsRepo _repo = NewsRepo();
+  bool _loading = false;
+  bool _err = false;
+  late ScrollController _controller;
 
+  final List<NewsEntity> _allNews = [];
   List<NewsEntity> get _filtered => _selectedFilterId == 'all'
       ? _allNews
       : (_selectedFilterId == "saved"
@@ -35,6 +38,67 @@ class _HomeViewBodyState extends State<HomeViewBody> {
             : _allNews
                   .where((n) => n.categories.contains(_selectedFilterId))
                   .toList());
+
+  void getBookmarks() {
+    _loading = true;
+    setState(() {});
+    _repo.getBookmarks().then((v) {
+      v.fold(
+        (f) {
+          _err = true;
+          _loading = false;
+          setState(() {});
+        },
+        (v) {
+          setState(() {
+            _loading = false;
+            _err = false;
+            _bookmarks = v;
+          });
+        },
+      );
+    });
+  }
+
+  void getNews() async {
+    _loading = true;
+    setState(() {});
+    var res = await _repo.getNews();
+    res.fold(
+      (f) {
+        _loading = false;
+        _err = true;
+        setState(() {});
+      },
+      (v) {
+        _allNews.addAll(v);
+        _loading = false;
+        _err = false;
+        setState(() {});
+      },
+    );
+  }
+
+  void getNewsPaginated() async {
+    setState(() {});
+    var res = await _repo.getNews();
+    res.fold((f) {}, (v) {
+      _allNews.addAll(v);
+      setState(() {});
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getNews();
+    _controller = ScrollController();
+    _controller.addListener(() {
+      if (_controller.position.pixels >= _controller.position.maxScrollExtent) {
+        getNewsPaginated();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,13 +132,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                   onFilterSelected: (id) => setState(() {
                     _selectedFilterId = id;
                     if (id == "saved") {
-                      _repo.getBookmarks().then((v) {
-                        v.fold((f) {}, (v) {
-                          setState(() {
-                            _bookmarks = v;
-                          });
-                        });
-                      });
+                      getBookmarks();
                     }
                   }),
                 ),
@@ -90,7 +148,6 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                         var res = news.bookmarked
                             ? await _repo.removeBookmark(id)
                             : await _repo.saveBookmark(id);
-                        news.bookmarked = !news.bookmarked;
                         bool success = false;
                         res.fold((_) {}, (v) {
                           success = v;
@@ -101,7 +158,42 @@ class _HomeViewBodyState extends State<HomeViewBody> {
                   ),
                 ),
 
-                if (_filtered.isEmpty)
+                Visibility(
+                  visible: _loading,
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48.h),
+                      child: CircularProgressIndicator(color: AppColors.white),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: _err,
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48.h),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Failed to fetch articles.',
+                            style: AppTextStyles.bodysmall.copyWith(
+                              color: AppColors.red600,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              _selectedFilterId == "all"
+                                  ? getNews()
+                                  : getBookmarks();
+                            },
+                            icon: Icon(Icons.refresh),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                if (_filtered.isEmpty && !_loading && !_err)
                   Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 48.h),
