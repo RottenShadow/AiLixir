@@ -8,6 +8,7 @@ class NewsEntity {
   final String timeAgo;
   final String title;
   final String body;
+  final String url;
   final String primaryAction;
   final IconData icon;
   bool bookmarked;
@@ -24,6 +25,7 @@ class NewsEntity {
     required this.body,
     required this.primaryAction,
     required this.icon,
+    this.url = "",
     this.bookmarked = false,
     this.categories = const ['all'],
   });
@@ -39,6 +41,23 @@ class NewsEntity {
          icon: Icons.science,
          title: json["title"],
          body: json["summary"],
+         bookmarked: bookmarked,
+         primaryAction: "Read More",
+         url: json["url"],
+       );
+
+  NewsEntity.fromBookmarkJson({
+    required Map<String, dynamic> json,
+    bool bookmarked = false,
+  }) : this(
+         id: json["article"]["id"],
+         url: json["article"]["url"],
+         tag: "news",
+         tagColor: Color(0xFF22C55E),
+         timeAgo: json["article"]["published_at"],
+         icon: Icons.science,
+         title: json["article"]["title"],
+         body: json["article"]["summary"],
          bookmarked: bookmarked,
          primaryAction: "Read More",
        );

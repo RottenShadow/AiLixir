@@ -33,10 +33,10 @@ class ProfileModel {
   });
   ProfileModel.fromJson(Map<String, dynamic> json)
     : this(
-        id: json["user"]["id"],
-        name: json["user"]["name"],
-        email: json["user"]["email"],
-        institution: json["user"]["profile"]["institution"],
-        focus: json["user"]["profile"]["research_focus"],
+        id: json["data"]["results"][0]["id"],
+        name: json["data"]["results"][0]["name"],
+        email: json["data"]["results"][0]["email"],
+        institution: "Harvard University",
+        focus: "Biochemistry",
       );
 }

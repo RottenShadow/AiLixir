@@ -26,7 +26,7 @@ class _ProfileViewBodyState extends State<ProfileViewBody> {
   final ProfileRepo _repo = ProfileRepo();
 
   void _getProfile() {
-    _repo.getTestProfile().then((v) {
+    _repo.getProfile().then((v) {
       v.fold(
         (f) {
           _failed = true;

@@ -17,7 +17,7 @@ class NewsRepo {
       );
       List<NewsEntity> res = [];
       for (Map<String, dynamic> article in json["data"]["results"]) {
-        res.add(NewsEntity.fromJson(json: article));
+        res.add(NewsEntity.fromBookmarkJson(json: article));
       }
       return res;
     });
@@ -26,12 +26,12 @@ class NewsRepo {
   Future<Either<Failure, List<NewsEntity>>> getNews() {
     return safeApiCall(() async {
       if (_page == 1) {
-        Map<String, dynamic> res = await dioService.get(
-          endpoint: "${AppEndpoints.baseUrl}news/refresh",
-        );
-        if (!res["success"]) {
-          throw Exception("Failed to refresh news");
-        }
+        // Map<String, dynamic> res = await dioService.get(
+        //   endpoint: "${AppEndpoints.baseUrl}news/refresh",
+        // );
+        // if (!res["success"]) {
+        //  throw Exception("Failed to refresh news");
+        // }
       }
       Map<String, dynamic> json = await dioService.get(
         endpoint: "${AppEndpoints.baseUrl}news?page=$_page&per_page=10",
@@ -60,7 +60,7 @@ class NewsRepo {
   Future<Either<Failure, bool>> removeBookmark(int articleID) {
     return safeApiCall(() async {
       Map<String, dynamic> json = await dioService.delete(
-        endpoint: "${AppEndpoints.baseUrl}news/save/$articleID",
+        endpoint: "${AppEndpoints.baseUrl}news/saved/$articleID",
       );
       return json["success"];
     });

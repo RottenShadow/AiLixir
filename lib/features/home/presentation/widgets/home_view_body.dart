@@ -31,37 +31,38 @@ class _HomeViewBodyState extends State<HomeViewBody> {
   late ScrollController _controller;
 
   final List<NewsEntity> _allNews = [];
-  List<NewsEntity> get _filtered => _selectedFilterId == 'all'
-      ? _allNews
-      : (_selectedFilterId == "saved"
-            ? _bookmarks
-            : _allNews
-                  .where((n) => n.categories.contains(_selectedFilterId))
-                  .toList());
+  List<NewsEntity> get _filtered =>
+      _selectedFilterId == 'all' ? _allNews : _bookmarks;
 
-  void getBookmarks() {
+  Future<void> getBookmarks() async {
     _loading = true;
     setState(() {});
-    _repo.getBookmarks().then((v) {
-      v.fold(
-        (f) {
-          _err = true;
+    var res = await _repo.getBookmarks();
+    res.fold(
+      (f) {
+        _err = true;
+        _loading = false;
+        setState(() {});
+      },
+      (articles) {
+        setState(() {
           _loading = false;
-          setState(() {});
-        },
-        (v) {
-          setState(() {
-            _loading = false;
-            _err = false;
-            _bookmarks = v;
-          });
-        },
-      );
-    });
+          _err = false;
+          _bookmarks = articles.map((item) {
+            item.bookmarked = true;
+            return item;
+          }).toList();
+        });
+      },
+    );
   }
 
   void getNews() async {
     _loading = true;
+    await getBookmarks();
+    var ids = _bookmarks.map((articles) {
+      return articles.id;
+    }).toList();
     setState(() {});
     var res = await _repo.getNews();
     res.fold(
@@ -71,7 +72,14 @@ class _HomeViewBodyState extends State<HomeViewBody> {
         setState(() {});
       },
       (v) {
-        _allNews.addAll(v);
+        _allNews.addAll(
+          v.map((article) {
+            if (ids.contains(article.id)) {
+              article.bookmarked = true;
+            }
+            return article;
+          }),
+        );
         _loading = false;
         _err = false;
         setState(() {});
@@ -81,9 +89,20 @@ class _HomeViewBodyState extends State<HomeViewBody> {
 
   void getNewsPaginated() async {
     setState(() {});
+    var ids = _bookmarks.map((articles) {
+      return articles.id;
+    }).toList();
+
     var res = await _repo.getNews();
     res.fold((f) {}, (v) {
-      _allNews.addAll(v);
+      _allNews.addAll(
+        v.map((article) {
+          if (ids.contains(article.id)) {
+            article.bookmarked = true;
+          }
+          return article;
+        }),
+      );
       setState(() {});
     });
   }

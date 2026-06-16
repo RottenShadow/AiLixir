@@ -1,8 +1,10 @@
+import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/home/domain/entities/news_entity.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NewsCard extends StatefulWidget {
   final NewsEntity news;
@@ -125,7 +127,23 @@ class _NewsCardState extends State<NewsCard>
                 // Actions row
                 Row(
                   children: [
-                    ActionButton(label: n.primaryAction, filled: true),
+                    ActionButton(
+                      label: n.primaryAction,
+                      filled: true,
+                      onTap: () async {
+                        Uri uri = Uri.parse(n.url);
+                        if (!await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        )) {
+                          if (!context.mounted) return;
+                          AppToast.showErrorToast(
+                            context: context,
+                            message: "Failed to open article in browser",
+                          );
+                        }
+                      },
+                    ),
                     SizedBox(width: 12.w),
                     // ─── Bookmark toggle ───────────────
                     ScaleTransition(
