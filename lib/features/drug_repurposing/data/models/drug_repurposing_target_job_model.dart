@@ -35,7 +35,10 @@ class DrugRepurposingTargetJobModel {
     }
 
     return DrugRepurposingTargetJobModel(
-      jobId: (data['job_id'] as num?)?.toInt() ?? 0,
+      jobId:
+          (data['job_id'] as num?)?.toInt() ??
+          (data['id'] as num?)?.toInt() ??
+          0,
       status: data['status'] as String? ?? 'unknown',
       output: parsedOutput,
       createdAt: parseDate(data['created_at'] as String?),
