@@ -8,7 +8,7 @@ abstract class AppFeatureFlag {
   static const bool useFakeAdmet = false;
   static const bool useFakeChemicalSearch = false;
   static const bool useFakeDrugRepurposing = false;
-  static const bool useFakeChatbot = false;
+  static const bool useFakeChatbot = true;
   static const bool useFakeAwards = false;
   static const bool useFakeScientists = false;
   static const bool useFakeNews = false;

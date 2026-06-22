@@ -36,7 +36,9 @@ class ProfileModel {
         id: json["data"]["results"][0]["id"],
         name: json["data"]["results"][0]["name"],
         email: json["data"]["results"][0]["email"],
-        institution: "Harvard University",
-        focus: "Biochemistry",
+        institution:
+            json["data"]["results"][0]["researcher"]?["university"] ?? "",
+        focus:
+            json["data"]["results"][0]["researcher"]?["specialization"] ?? "",
       );
 }

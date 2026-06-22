@@ -41,7 +41,7 @@ class NewsEntity {
          icon: Icons.science,
          title: json["title"],
          body: json["summary"],
-         bookmarked: bookmarked,
+         bookmarked: json["is_saved"],
          primaryAction: "Read More",
          url: json["url"],
        );

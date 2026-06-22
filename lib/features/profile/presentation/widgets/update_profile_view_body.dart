@@ -54,8 +54,6 @@ class _UpdateProfileViewBodyState extends State<UpdateProfileViewBody> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const AuthBrandLogo(),
-              SizedBox(height: 40.h),
               Container(
                 width: 560.w,
                 padding: EdgeInsets.all(40.w),
@@ -98,7 +96,7 @@ class _UpdateProfileViewBodyState extends State<UpdateProfileViewBody> {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      'Update your field, focus and workplace',
+                      'Update your profile information',
                       style: AppTextStyles.bodymedium.copyWith(
                         color: AppColors.authTextSecondary,
                       ),
@@ -113,31 +111,6 @@ class _UpdateProfileViewBodyState extends State<UpdateProfileViewBody> {
                         size: 18.sp,
                       ),
                       controller: _nameController,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    SizedBox(height: 20.h),
-                    CustomTextFormField(
-                      label: 'Institution',
-                      hint: "",
-                      prefixIcon: Icon(
-                        Icons.school_outlined,
-                        color: AppColors.slate400,
-                        size: 18.sp,
-                      ),
-                      controller: _instituteController,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                    ),
-                    SizedBox(height: 20.h),
-                    CustomTextFormField(
-                      label: 'Research Focus',
-                      hint: "",
-                      prefixIcon: Icon(
-                        Icons.science_outlined,
-                        color: AppColors.slate400,
-                        size: 18.sp,
-                      ),
-                      controller: _focusController,
                       textInputAction: TextInputAction.next,
                     ),
                     SizedBox(height: 20.h),

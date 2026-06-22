@@ -1,5 +1,6 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
 import 'package:ailixir/features/chatbot/presentation/cubits/chat_session_cubit.dart';
 import 'package:ailixir/features/chatbot/presentation/widgets/chatbot_textbox.dart';
@@ -87,7 +88,6 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     }
     _addMessage(_textcontroller.text, isBot: false, onBufferFilled: () {});
     _sendingEnabled = false;
-
     _messages.add(ChatbotTextbox.loading());
     setState(() {});
     String message = _textcontroller.text.toString();
@@ -96,12 +96,14 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     _messages.removeLast();
     setState(() {});
     await Future.delayed(Duration(milliseconds: 50));
+    widget.cubit.loading = true;
     _addMessage(
       responseMessage.message,
       isErr: responseMessage.isErr,
       onBufferFilled: () {
         _sendingEnabled = true;
         setState(() {});
+        widget.cubit.loading = false;
       },
     );
   }
@@ -211,55 +213,57 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ChatSessionCubit, ChatSessionState>(
-      builder: (context, state) {
-        if (state is ChatSessionError) {
-          return Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Text(
-                  "Error: failed to fetch session",
-                  style: AppTextStyles.h5.copyWith(color: AppColors.red500),
-                ),
-              ),
-            ],
-          );
-        } else if (state is ChatSessionSuccess) {
-          return Padding(
-            padding: EdgeInsetsGeometry.only(right: 0.02.sw),
-            child: Column(
+    return AuthGradientScaffold(
+      child: BlocBuilder<ChatSessionCubit, ChatSessionState>(
+        builder: (context, state) {
+          if (state is ChatSessionError) {
+            return Column(
               mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: _messages.isNotEmpty
-                  ? MainAxisAlignment.start
-                  : MainAxisAlignment.center,
-              children: _messages.isNotEmpty
-                  ? [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          child: Column(children: _messages),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    "Error: failed to fetch session",
+                    style: AppTextStyles.h5.copyWith(color: AppColors.red500),
+                  ),
+                ),
+              ],
+            );
+          } else if (state is ChatSessionSuccess) {
+            return Padding(
+              padding: EdgeInsetsGeometry.only(right: 0.02.sw),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: _messages.isNotEmpty
+                    ? MainAxisAlignment.start
+                    : MainAxisAlignment.center,
+                children: _messages.isNotEmpty
+                    ? [
+                        Expanded(
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            child: SafeArea(child: Column(children: _messages)),
+                          ),
                         ),
-                      ),
-                      _promptTextField(),
-                    ]
-                  : [_promptTextField()],
-            ),
-          );
-        } else {
-          return Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 10,
-            children: [
-              CircularProgressIndicator(color: AppColors.brandBlue),
-              Text("Fetching Chat Session", style: AppTextStyles.h5),
-            ],
-          );
-        }
-      },
+                        _promptTextField(),
+                      ]
+                    : [_promptTextField()],
+              ),
+            );
+          } else {
+            return Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              spacing: 10,
+              children: [
+                CircularProgressIndicator(color: AppColors.brandBlue),
+                Text("Fetching Chat Session", style: AppTextStyles.h5),
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 }

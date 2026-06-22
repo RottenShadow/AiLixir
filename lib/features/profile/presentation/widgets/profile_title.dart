@@ -42,14 +42,23 @@ class ProfileTitle extends StatelessWidget {
           spacing: 0.015.sh,
           children: [
             Text(profile.name, style: AppTextStyles.small),
-            iconLabel(
-              "${profile.institution} • ${profile.focus}",
-              Icons.school_outlined,
-              color: AppColors.authTextSecondary,
-              style: AppTextStyles.labelsmall.copyWith(
-                color: AppColors.authTextSecondary,
-              ),
-            ),
+            profile.institution.isEmpty
+                ? iconLabel(
+                    "Basic Researcher",
+                    Icons.person_outlined,
+                    color: AppColors.authTextSecondary,
+                    style: AppTextStyles.labelsmall.copyWith(
+                      color: AppColors.authTextSecondary,
+                    ),
+                  )
+                : iconLabel(
+                    "${profile.institution} • ${profile.focus}",
+                    Icons.school_outlined,
+                    color: AppColors.authTextSecondary,
+                    style: AppTextStyles.labelsmall.copyWith(
+                      color: AppColors.authTextSecondary,
+                    ),
+                  ),
           ],
         ),
         Spacer(),

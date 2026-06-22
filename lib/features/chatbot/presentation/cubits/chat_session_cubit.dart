@@ -13,6 +13,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
 
   final ChatRepo _repo = ChatRepo();
   late final int maxPage;
+  bool loading = false;
   String? sessionId;
   int currentPage = 1;
   Future<void> getSessionThread() async {
@@ -25,7 +26,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
     var res = await _repo.getUserThread();
     res.fold(
       (_) {
-        emit(ChatSessionError());
+        emit(ChatSessionSuccess());
       },
       (s) {
         sessionId = s;

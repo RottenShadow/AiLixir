@@ -59,10 +59,6 @@ class _HomeViewBodyState extends State<HomeViewBody> {
 
   void getNews() async {
     _loading = true;
-    await getBookmarks();
-    var ids = _bookmarks.map((articles) {
-      return articles.id;
-    }).toList();
     setState(() {});
     var res = await _repo.getNews();
     res.fold(
@@ -72,14 +68,7 @@ class _HomeViewBodyState extends State<HomeViewBody> {
         setState(() {});
       },
       (v) {
-        _allNews.addAll(
-          v.map((article) {
-            if (ids.contains(article.id)) {
-              article.bookmarked = true;
-            }
-            return article;
-          }),
-        );
+        _allNews.addAll(v);
         _loading = false;
         _err = false;
         setState(() {});
@@ -89,20 +78,9 @@ class _HomeViewBodyState extends State<HomeViewBody> {
 
   void getNewsPaginated() async {
     setState(() {});
-    var ids = _bookmarks.map((articles) {
-      return articles.id;
-    }).toList();
-
     var res = await _repo.getNews();
     res.fold((f) {}, (v) {
-      _allNews.addAll(
-        v.map((article) {
-          if (ids.contains(article.id)) {
-            article.bookmarked = true;
-          }
-          return article;
-        }),
-      );
+      _allNews.addAll(v);
       setState(() {});
     });
   }
