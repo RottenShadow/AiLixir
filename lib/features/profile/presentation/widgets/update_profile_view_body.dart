@@ -49,10 +49,11 @@ class _UpdateProfileViewBodyState extends State<UpdateProfileViewBody> {
   Widget build(BuildContext context) {
     return AuthGradientScaffold(
       child: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(vertical: 48.h, horizontal: 24.w),
+        padding: EdgeInsets.symmetric(vertical: 0.22.sh, horizontal: 24.w),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: 560.w,

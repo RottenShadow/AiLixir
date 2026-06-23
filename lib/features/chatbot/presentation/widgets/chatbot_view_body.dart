@@ -25,8 +25,8 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   late double _textBoxHeight;
   late double _padding;
   final GlobalKey _widgetKey = GlobalKey();
-  final _focusNode = FocusNode();
-
+  final _messageKey = Key("");
+  late FocusNode _focusNode;
   void setWidgetPosition() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final RenderBox? box =
@@ -50,6 +50,22 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     _padding = 200;
     _scrollController = ScrollController();
     _textcontroller = TextEditingController();
+    _focusNode = FocusNode(
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.enter &&
+            !HardwareKeyboard.instance.logicalKeysPressed.contains(
+              LogicalKeyboardKey.shiftLeft,
+            ) &&
+            !HardwareKeyboard.instance.logicalKeysPressed.contains(
+              LogicalKeyboardKey.shiftRight,
+            )) {
+          sendMessage();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+    );
   }
 
   void _addMessage(
@@ -113,8 +129,8 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
       key: _widgetKey,
       padding: EdgeInsetsGeometry.only(
         top: _messages.isEmpty ? _textBoxHeight : 0,
-        left: _padding,
-        right: _padding,
+        left: _padding + 25,
+        right: _padding + 25,
       ),
       duration: Duration(milliseconds: 400),
       curve: Curves.easeOut,
@@ -125,19 +141,15 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
           child: Container(
             decoration: BoxDecoration(
               color: AppColors.cardBackground,
-              borderRadius: BorderRadius.circular(20.r),
+              borderRadius: BorderRadius.circular(24.r),
+              border: Border.all(
+                color: AppColors.brandBlue.withValues(alpha: 0.25),
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.white.withAlpha(90),
-                  offset: const Offset(0, -2),
-                  blurRadius: 0.1,
-                  spreadRadius: 0.08,
-                ),
-                BoxShadow(
-                  color: AppColors.black.withAlpha(155),
-                  offset: const Offset(0, 2),
-                  blurRadius: 5.0,
-                  spreadRadius: 0.9,
+                  color: AppColors.brandBlue.withValues(alpha: 0.08),
+                  blurRadius: 40,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -146,47 +158,46 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
                 Expanded(
                   child: Column(
                     children: [
-                      KeyboardListener(
+                      TextField(
+                        controller: _textcontroller,
                         focusNode: _focusNode,
-                        onKeyEvent: (event) {},
-                        child: TextField(
-                          controller: _textcontroller,
-                          minLines: 1,
-                          maxLines: 3,
-                          enabled: _sendingEnabled,
-                          decoration: InputDecoration(
-                            hintText: "Ask Something...",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.r),
-                              borderSide: BorderSide(
-                                width: 0,
-                                color: Colors.transparent,
-                              ),
+                        minLines: 1,
+                        maxLines: 3,
+                        onSubmitted: (v) {},
+                        enabled: _sendingEnabled,
+                        decoration: InputDecoration(
+                          hintText: "Ask Something...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                            borderSide: BorderSide(
+                              width: 0,
+                              color: Colors.transparent,
                             ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20.r),
-                              borderSide: BorderSide(
-                                width: 0,
-                                color: Colors.transparent,
-                              ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                            borderSide: BorderSide(
+                              width: 0,
+                              color: Colors.transparent,
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 0,
-                                color: Colors.transparent,
-                              ),
-                              borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 0,
+                              color: Colors.transparent,
                             ),
-                            disabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 0,
-                                color: Colors.transparent,
-                              ),
-                              borderRadius: BorderRadius.circular(20.r),
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              width: 0,
+                              color: Colors.transparent,
                             ),
+                            borderRadius: BorderRadius.circular(20.r),
                           ),
                         ),
                       ),
+
                       Row(
                         children: [
                           IconButton(onPressed: () {}, icon: Icon(Icons.add)),
@@ -231,7 +242,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
             );
           } else if (state is ChatSessionSuccess) {
             return Padding(
-              padding: EdgeInsetsGeometry.only(right: 0.02.sw),
+              padding: EdgeInsetsGeometry.only(right: 0.004.sw),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 mainAxisAlignment: _messages.isNotEmpty

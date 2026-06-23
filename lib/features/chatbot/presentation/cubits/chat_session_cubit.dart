@@ -16,6 +16,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
   bool loading = false;
   String? sessionId;
   int currentPage = 1;
+  List<String> responses = [];
   Future<void> getSessionThread() async {
     emit(ChatSessionLoading());
     if (AppFeatureFlag.useFakeChatbot) {
@@ -38,6 +39,9 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
   Future<ChatMessageModel> sendMessage(String message) async {
     if (AppFeatureFlag.useFakeChatbot) {
       await Future.delayed(Duration(milliseconds: 22));
+      responses.add(
+        "Hello, how may I help you today? Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?",
+      );
       return ChatMessageModel(
         message: "Hello, how may I help you today?",
         isErr: false,
@@ -54,6 +58,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
         response = ChatMessageModel(isErr: false, message: s);
       },
     );
+    responses.add(response.message);
     return response;
   }
 }
