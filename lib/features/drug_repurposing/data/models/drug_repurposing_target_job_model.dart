@@ -15,17 +15,14 @@ class DrugRepurposingTargetJobModel {
   });
 
   factory DrugRepurposingTargetJobModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>? ?? json;
-
     DateTime? parseDate(String? raw) {
       if (raw == null || raw.isEmpty) return null;
       return DateTime.tryParse(raw);
     }
 
     DrugRepurposingTargetsResponseModel? parsedOutput;
-    final outputRaw = data['output'];
+    final outputRaw = json['output'];
     if (outputRaw != null && outputRaw is Map<String, dynamic>) {
-      // Wrap output fields into the expected shape for the existing model
       final wrapped = <String, dynamic>{
         'disease': outputRaw['disease'],
         'total_targets': outputRaw['total_targets'],
@@ -36,12 +33,12 @@ class DrugRepurposingTargetJobModel {
 
     return DrugRepurposingTargetJobModel(
       jobId:
-          (data['job_id'] as num?)?.toInt() ??
-          (data['id'] as num?)?.toInt() ??
+          (json['job_id'] as num?)?.toInt() ??
+          (json['id'] as num?)?.toInt() ??
           0,
-      status: data['status'] as String? ?? 'unknown',
+      status: json['status'] as String? ?? 'unknown',
       output: parsedOutput,
-      createdAt: parseDate(data['created_at'] as String?),
+      createdAt: parseDate(json['created_at'] as String?),
     );
   }
 
