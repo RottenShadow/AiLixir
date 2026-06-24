@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/errors/failure.dart';
+import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/app_feature_flag.dart';
@@ -24,10 +25,12 @@ class AdmetRepo {
       final response = await dioService.post(
         endpoint: AppEndpoints.admetPredict,
         data: {'smiles': smiles.join(', ')},
+      ) as Map<String, dynamic>;
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+        response,
+        (d) => d as Map<String, dynamic>,
       );
-      return AdmetPredictResponseModel.fromJson(
-        response as Map<String, dynamic>,
-      ).toEntity();
+      return AdmetPredictResponseModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -44,10 +47,12 @@ class AdmetRepo {
       final response = await dioService.post(
         endpoint: AppEndpoints.admetPredict,
         data: formData,
+      ) as Map<String, dynamic>;
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+        response,
+        (d) => d as Map<String, dynamic>,
       );
-      return AdmetPredictResponseModel.fromJson(
-        response as Map<String, dynamic>,
-      ).toEntity();
+      return AdmetPredictResponseModel.fromJson(base.data!).toEntity();
     });
   }
 
