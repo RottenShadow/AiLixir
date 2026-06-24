@@ -4,8 +4,14 @@ import 'package:ailixir/core/entities/md_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/error/custom_failure_body.dart';
-import 'package:ailixir/features/history/presentation/cubits/history_cubit/history_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/drug_repurposing_cubit/drug_repurposing_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/generation_history_cubit/generation_history_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/history_tab_cubit/history_tab_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/md_history_cubit/md_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/widgets/docking_history_section.dart';
+import 'package:ailixir/features/history/presentation/widgets/drug_repurposing_history_section.dart';
+import 'package:ailixir/features/history/presentation/widgets/history_tab_selector.dart';
 import 'package:ailixir/features/history/presentation/widgets/ligand_history_section.dart';
 import 'package:ailixir/features/history/presentation/widgets/md_history_section.dart';
 import 'package:flutter/material.dart';
@@ -18,113 +24,172 @@ class HistoryViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<HistoryCubit, HistoryState>(
-      builder: (context, state) {
-        if (state is HistoryError) {
-          return Center(
-            child: CustomFailureBody(
-              icon: Icons.error_outline,
-              msg: state.message,
-              actionLabel: 'Try Again',
-              onAction: () => context.read<HistoryCubit>().loadHistory(),
-            ),
-          );
-        }
+    return BlocBuilder<HistoryTabCubit, HistoryTabState>(
+      builder: (context, tabState) {
+        final selectedTab = tabState.selectedTab;
 
-        final isLoading = state is HistoryLoading || state is HistoryInitial;
-
-        final ligands = state is HistoryLoaded
-            ? state.ligands
-            : LigandEntity.createFakeData();
-        final dockings = state is HistoryLoaded
-            ? state.dockings
-            : DockingEntity.createFakeData();
-        final mdSims = state is HistoryLoaded
-            ? state.mdSimulations
-            : MdEntity.createFakeData();
-
-        return RefreshIndicator(
-          onRefresh: () => context.read<HistoryCubit>().loadHistory(),
-          color: AppColors.cyan400,
-          backgroundColor: AppColors.slate900,
-          child: Skeletonizer(
-            enabled: isLoading,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return RefreshIndicator(
+              onRefresh: () => _refreshCurrentTab(context, selectedTab),
+              color: AppColors.cyan400,
+              backgroundColor: AppColors.slate900,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.history,
-                            color: AppColors.cyan400,
-                            size: 22.sp,
-                          ),
-                          SizedBox(width: 10.w),
-                          Text(
-                            'Data History',
-                            style: AppTextStyles.h2.copyWith(
-                              color: AppColors.white,
-                            ),
-                          ),
+                          _Header(),
+                          SizedBox(height: 20.h),
+                          _NoticeBanner(),
+                          SizedBox(height: 20.h),
+                          HistoryTabSelector(),
+                          SizedBox(height: 24.h),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Tooltip(
-                            message: 'Refresh',
-                            child: SizedBox(
-                              width: 32.w,
-                              height: 32.w,
-                              child: IconButton(
-                                padding: EdgeInsets.zero,
-                                icon: Icon(
-                                  Icons.refresh,
-                                  color: AppColors.cyan400,
-                                  size: 20.sp,
-                                ),
-                                onPressed: isLoading
-                                    ? null
-                                    : () => context
-                                          .read<HistoryCubit>()
-                                          .loadHistory(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: 20.h),
-
-                  // Notice Banner
-                  _NoticeBanner(),
-                  SizedBox(height: 24.h),
-
-                  // Ligand Generation History
-                  LigandHistorySection(ligands: ligands),
-                  SizedBox(height: 32.h),
-
-                  // Docking History
-                  DockingHistorySection(dockings: dockings),
-                  SizedBox(height: 32.h),
-
-                  // MD History
-                  MdHistorySection(mdSimulations: mdSims),
-                  SizedBox(height: 24.h),
+                  SliverFillRemaining(
+                    hasScrollBody: true,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      child: _buildContent(context, selectedTab),
+                    ),
+                  ),
                 ],
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
+  }
+
+  Widget _buildContent(BuildContext context, HistoryTab selectedTab) {
+    switch (selectedTab) {
+      case HistoryTab.generation:
+        return BlocBuilder<GenerationHistoryCubit, GenerationHistoryState>(
+          builder: (context, state) {
+            return switch (state) {
+              GenerationHistoryLoading() || GenerationHistoryInitial() => Skeletonizer(
+                  enabled: true,
+                  child: LigandHistorySection(ligands: LigandEntity.createFakeData()),
+                ),
+              GenerationHistoryLoaded(:final ligands) => LigandHistorySection(ligands: ligands),
+              GenerationHistoryLoadingMore(:final ligands) =>
+                  LigandHistorySection(ligands: ligands),
+              GenerationHistoryError(:final message) => _ErrorSection(message: message),
+            };
+          },
+        );
+
+      case HistoryTab.docking:
+        return BlocBuilder<DockingHistoryCubit, DockingHistoryState>(
+          builder: (context, state) {
+            return switch (state) {
+              DockingHistoryLoading() || DockingHistoryInitial() => Skeletonizer(
+                  enabled: true,
+                  child: DockingHistorySection(dockings: DockingEntity.createFakeData()),
+                ),
+              DockingHistoryLoaded(:final dockings) => DockingHistorySection(dockings: dockings),
+              DockingHistoryLoadingMore(:final dockings) =>
+                  DockingHistorySection(dockings: dockings),
+              DockingHistoryError(:final message) => _ErrorSection(message: message),
+            };
+          },
+        );
+
+      case HistoryTab.md:
+        return BlocBuilder<MdHistoryCubit, MdHistoryState>(
+          builder: (context, state) {
+            return switch (state) {
+              MdHistoryLoading() || MdHistoryInitial() => Skeletonizer(
+                  enabled: true,
+                  child: MdHistorySection(mdSimulations: MdEntity.createFakeData()),
+                ),
+              MdHistoryLoaded(:final mdSimulations) =>
+                  MdHistorySection(mdSimulations: mdSimulations),
+              MdHistoryLoadingMore(:final mdSimulations) =>
+                  MdHistorySection(mdSimulations: mdSimulations),
+              MdHistoryError(:final message) => _ErrorSection(message: message),
+            };
+          },
+        );
+
+      case HistoryTab.drugRepurposing:
+        return const DrugRepurposingHistorySection();
+    }
+  }
+
+  Future<void> _refreshCurrentTab(BuildContext context, HistoryTab tab) async {
+    switch (tab) {
+      case HistoryTab.generation:
+        return context.read<GenerationHistoryCubit>().load();
+      case HistoryTab.docking:
+        return context.read<DockingHistoryCubit>().load();
+      case HistoryTab.md:
+        return context.read<MdHistoryCubit>().load();
+      case HistoryTab.drugRepurposing:
+        return context.read<DrugRepurposingCubit>().load();
+    }
+  }
+}
+
+class _Header extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<HistoryTabCubit, HistoryTabState>(
+      builder: (context, state) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.history, color: AppColors.cyan400, size: 22.sp),
+                SizedBox(width: 10.w),
+                Text(
+                  'Data History',
+                  style: AppTextStyles.h2.copyWith(color: AppColors.white),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Tooltip(
+                  message: 'Refresh',
+                  child: SizedBox(
+                    width: 32.w,
+                    height: 32.w,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: Icon(Icons.refresh, color: AppColors.cyan400, size: 20.sp),
+                      onPressed: () => _refreshCurrentTab(context, state.selectedTab),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _refreshCurrentTab(BuildContext context, HistoryTab tab) async {
+    switch (tab) {
+      case HistoryTab.generation:
+        return context.read<GenerationHistoryCubit>().load();
+      case HistoryTab.docking:
+        return context.read<DockingHistoryCubit>().load();
+      case HistoryTab.md:
+        return context.read<MdHistoryCubit>().load();
+      case HistoryTab.drugRepurposing:
+        return context.read<DrugRepurposingCubit>().load();
+    }
   }
 }
 
@@ -149,6 +214,23 @@ class _NoticeBanner extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ErrorSection extends StatelessWidget {
+  final String message;
+  const _ErrorSection({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: CustomFailureBody(
+        icon: Icons.error_outline,
+        msg: message,
+        actionLabel: 'Try Again',
+        onAction: () {},
       ),
     );
   }
