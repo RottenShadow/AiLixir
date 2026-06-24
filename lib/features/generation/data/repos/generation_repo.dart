@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/errors/failure.dart';
+import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/app_feature_flag.dart';
@@ -29,9 +30,11 @@ class GenerationRepo {
         endpoint: AppEndpoints.generationRun,
         data: model.toJson(),
       );
-      return GenerationJobStatusModel.fromJson(
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response as Map<String, dynamic>,
-      ).toEntity();
+        (d) => d as Map<String, dynamic>,
+      );
+      return GenerationJobStatusModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -45,9 +48,11 @@ class GenerationRepo {
       final response = await dioService.get(
         endpoint: AppEndpoints.generationStatus(jobId),
       );
-      return GenerationJobStatusModel.fromJson(
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response as Map<String, dynamic>,
-      ).toEntity();
+        (d) => d as Map<String, dynamic>,
+      );
+      return GenerationJobStatusModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -61,9 +66,11 @@ class GenerationRepo {
       final response = await dioService.get(
         endpoint: AppEndpoints.generationResults(jobId),
       );
-      return GenerationResultModel.fromJson(
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response as Map<String, dynamic>,
-      ).toEntity();
+        (d) => d as Map<String, dynamic>,
+      );
+      return GenerationResultModel.fromJson(base.data!).toEntity();
     });
   }
 
