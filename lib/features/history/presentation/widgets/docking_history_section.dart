@@ -2,8 +2,7 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
-import 'package:ailixir/features/history/presentation/cubits/history_cubit/history_cubit.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/docking_see_all_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +15,7 @@ class DockingHistorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: dockings.isEmpty ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -36,7 +36,7 @@ class DockingHistorySection extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => BlocProvider(
-                      create: (_) => DockingSeeAllCubit()..loadFirstPage(),
+                      create: (_) => DockingHistoryCubit()..loadAll(),
                       child: const DockingSeeAllView(),
                     ),
                   ),
@@ -53,14 +53,13 @@ class DockingHistorySection extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         if (dockings.isEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 24),
-            child: CustomEmptyBody(
-              icon: Icons.hub_outlined,
-              title: 'No Docking Results',
-              subTitle: 'Docking simulation results will appear here.',
-              actionLabel: 'Refresh',
-              onAction: () => context.read<HistoryCubit>().loadHistory(),
+          Expanded(
+            child: Center(
+              child: CustomEmptyBody(
+                icon: Icons.hub_outlined,
+                title: 'No Docking Results',
+                subTitle: 'Docking simulation results will appear here.',
+              ),
             ),
           )
         else

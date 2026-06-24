@@ -2,7 +2,7 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,7 +28,7 @@ class _DockingSeeAllViewState extends State<DockingSeeAllView> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      context.read<DockingSeeAllCubit>().loadNextPage();
+      context.read<DockingHistoryCubit>().loadMore();
     }
   }
 
@@ -61,9 +61,11 @@ class _DockingSeeAllViewState extends State<DockingSeeAllView> {
           ],
         ),
       ),
-      body: BlocBuilder<DockingSeeAllCubit, SeeAllState<DockingEntity>>(
+      body: BlocBuilder<DockingHistoryCubit, DockingHistoryState>(
         builder: (context, state) {
-          if (state.status == SeeAllStatus.loading) {
+          final cubit = context.read<DockingHistoryCubit>();
+
+          if (state is DockingHistoryLoading) {
             return Skeletonizer(
               enabled: true,
               child: _DockingList(
@@ -75,23 +77,43 @@ class _DockingSeeAllViewState extends State<DockingSeeAllView> {
             );
           }
 
-          if (state.items.isEmpty) {
-            return Center(
-              child: CustomEmptyBody(
-                icon: Icons.hub_outlined,
-                title: 'No Docking Results',
-                subTitle: 'No docking simulations yet.\nSubmit a docking job to see results here.',
-                actionLabel: 'Refresh',
-                onAction: () => context.read<DockingSeeAllCubit>().loadFirstPage(),
+          if (state is DockingHistoryError) {
+            return SizedBox.expand(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.error_outline,
+                  title: 'Error',
+                  subTitle: state.message,
+                  actionLabel: 'Retry',
+                  onAction: () => cubit.loadAll(),
+                ),
+              ),
+            );
+          }
+
+          final items = state is DockingHistoryLoaded
+              ? state.dockings
+              : (state as DockingHistoryLoadingMore).dockings;
+
+          if (items.isEmpty) {
+            return SizedBox.expand(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.hub_outlined,
+                  title: 'No Docking Results',
+                  subTitle: 'No docking simulations yet.\nSubmit a docking job to see results here.',
+                  actionLabel: 'Refresh',
+                  onAction: () => cubit.loadAll(),
+                ),
               ),
             );
           }
 
           return _DockingList(
-            items: state.items,
+            items: items,
             scrollController: _scrollController,
-            isLoadingMore: state.status == SeeAllStatus.loadingMore,
-            hasMore: state.hasMore,
+            isLoadingMore: state is DockingHistoryLoadingMore,
+            hasMore: cubit.hasMore,
           );
         },
       ),
