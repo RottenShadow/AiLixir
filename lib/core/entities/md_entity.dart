@@ -7,6 +7,8 @@ class MdEntity {
   final String forcefield;
   final String duration;
   final MdStatus status;
+  final String? proteinName;
+  final String? ligandName;
 
   const MdEntity({
     required this.id,
@@ -15,6 +17,8 @@ class MdEntity {
     required this.forcefield,
     required this.duration,
     required this.status,
+    this.proteinName,
+    this.ligandName,
   });
 
   static List<MdEntity> createFakeData() {
@@ -26,6 +30,8 @@ class MdEntity {
         forcefield: 'AMBER1\n4SB',
         duration: '100\nns',
         status: MdStatus.completed,
+        proteinName: '4w52.pdb',
+        ligandName: 'ligand.pdb',
       ),
       MdEntity(
         id: '2',
@@ -34,6 +40,8 @@ class MdEntity {
         forcefield: 'CHARMM\n36m',
         duration: '50 ns',
         status: MdStatus.completed,
+        proteinName: '1bna.pdb',
+        ligandName: 'stl.pdb',
       ),
     ];
   }
