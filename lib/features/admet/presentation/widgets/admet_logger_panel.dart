@@ -91,7 +91,10 @@ class _TerminalContainer extends StatelessWidget {
           Expanded(
             child: SelectionArea(
               child: logs.isNotEmpty
-                  ? _TerminalLogs(logs: logs)
+                  ? _TerminalLogs(
+                      logs: logs,
+                      scrollController: scrollController,
+                    )
                   : _EmptyTerminal(),
             ),
           ),
@@ -102,54 +105,53 @@ class _TerminalContainer extends StatelessWidget {
 }
 
 class _TerminalLogs extends StatelessWidget {
-  const _TerminalLogs({required this.logs});
+  const _TerminalLogs({required this.logs, this.scrollController});
   final List<String> logs;
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topLeft,
-      child: Padding(
-        padding: EdgeInsets.all(8.sp),
-        child: SingleChildScrollView(
-          controller: ScrollController(),
-          child: SelectableText.rich(
-            TextSpan(
-              style: TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 11.sp,
-                height: 1.5,
-              ),
-              children: logs.map((log) {
-                final isError = log.contains('✗');
-                final isSuccess = log.contains('✓');
-                final color = isError
-                    ? AppColors.red400
-                    : isSuccess
-                        ? const Color(0xFF10B981)
-                        : AppColors.slate400;
-                final prefix = isError
-                    ? '✗'
-                    : isSuccess
-                        ? '✓'
-                        : '›';
-
-                return TextSpan(
-                  children: [
-                    TextSpan(
-                      text: '$prefix ',
-                      style: TextStyle(color: color, fontWeight: FontWeight.w700),
-                    ),
-                    TextSpan(
-                      text: '${log.replaceAll('✓ ', '').replaceAll('✗ ', '')}\n',
-                      style: TextStyle(color: color.withOpacity(0.85)),
-                    ),
-                  ],
-                );
-              }).toList(),
+    return SingleChildScrollView(
+      controller: scrollController,
+      padding: EdgeInsets.all(8.sp),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: SelectableText.rich(
+          TextSpan(
+            style: TextStyle(
+              fontFamily: 'monospace',
+              fontSize: 11.sp,
+              height: 1.5,
             ),
-            scrollPhysics: const ClampingScrollPhysics(),
+            children: logs.map((log) {
+              final isError = log.contains('✗');
+              final isSuccess = log.contains('✓');
+              final color = isError
+                  ? AppColors.red400
+                  : isSuccess
+                  ? const Color(0xFF10B981)
+                  : AppColors.slate400;
+              final prefix = isError
+                  ? '✗'
+                  : isSuccess
+                  ? '✓'
+                  : '›';
+
+              return TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$prefix ',
+                    style: TextStyle(color: color, fontWeight: FontWeight.w700),
+                  ),
+                  TextSpan(
+                    text: '${log.replaceAll('✓ ', '').replaceAll('✗ ', '')}\n',
+                    style: TextStyle(color: color.withOpacity(0.85)),
+                  ),
+                ],
+              );
+            }).toList(),
           ),
+          scrollPhysics: const ClampingScrollPhysics(),
         ),
       ),
     );
@@ -186,18 +188,18 @@ class _TerminalHeader extends StatelessWidget {
     final statusColor = isError
         ? AppColors.red400
         : isSuccess
-            ? const Color(0xFF10B981)
-            : isLoading
-                ? const Color(0xFF22D3EE)
-                : AppColors.slate500;
+        ? const Color(0xFF10B981)
+        : isLoading
+        ? const Color(0xFF22D3EE)
+        : AppColors.slate500;
 
     final statusLabel = isError
         ? 'ERROR'
         : isSuccess
-            ? 'COMPLETE'
-            : isLoading
-                ? 'RUNNING'
-                : 'IDLE';
+        ? 'COMPLETE'
+        : isLoading
+        ? 'RUNNING'
+        : 'IDLE';
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
