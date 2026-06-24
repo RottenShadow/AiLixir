@@ -2,7 +2,7 @@ import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/generation_history_cubit/generation_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,7 +30,7 @@ class _LigandSeeAllViewState extends State<LigandSeeAllView> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      context.read<LigandSeeAllCubit>().loadNextPage();
+      context.read<GenerationHistoryCubit>().loadMore();
     }
   }
 
@@ -63,9 +63,11 @@ class _LigandSeeAllViewState extends State<LigandSeeAllView> {
           ],
         ),
       ),
-      body: BlocBuilder<LigandSeeAllCubit, SeeAllState<LigandEntity>>(
+      body: BlocBuilder<GenerationHistoryCubit, GenerationHistoryState>(
         builder: (context, state) {
-          if (state.status == SeeAllStatus.loading) {
+          final cubit = context.read<GenerationHistoryCubit>();
+
+          if (state is GenerationHistoryLoading) {
             return Skeletonizer(
               enabled: true,
               child: _LigandList(
@@ -77,23 +79,43 @@ class _LigandSeeAllViewState extends State<LigandSeeAllView> {
             );
           }
 
-          if (state.items.isEmpty) {
-            return Center(
-              child: CustomEmptyBody(
-                icon: Icons.science_outlined,
-                title: 'No Ligands Found',
-                subTitle: 'No generated ligands yet.\nStart a generation job to see results here.',
-                actionLabel: 'Refresh',
-                onAction: () => context.read<LigandSeeAllCubit>().loadFirstPage(),
+          if (state is GenerationHistoryError) {
+            return SizedBox.expand(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.error_outline,
+                  title: 'Error',
+                  subTitle: state.message,
+                  actionLabel: 'Retry',
+                  onAction: () => cubit.loadAll(),
+                ),
+              ),
+            );
+          }
+
+          final items = state is GenerationHistoryLoaded
+              ? state.ligands
+              : (state as GenerationHistoryLoadingMore).ligands;
+
+          if (items.isEmpty) {
+            return SizedBox.expand(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.science_outlined,
+                  title: 'No Ligands Found',
+                  subTitle: 'No generated ligands yet.\nStart a generation job to see results here.',
+                  actionLabel: 'Refresh',
+                  onAction: () => cubit.loadAll(),
+                ),
               ),
             );
           }
 
           return _LigandList(
-            items: state.items,
+            items: items,
             scrollController: _scrollController,
-            isLoadingMore: state.status == SeeAllStatus.loadingMore,
-            hasMore: state.hasMore,
+            isLoadingMore: state is GenerationHistoryLoadingMore,
+            hasMore: cubit.hasMore,
           );
         },
       ),

@@ -2,8 +2,7 @@ import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
-import 'package:ailixir/features/history/presentation/cubits/history_cubit/history_cubit.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/features/history/presentation/cubits/generation_history_cubit/generation_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_see_all_view.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +17,7 @@ class LigandHistorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: ligands.isEmpty ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -44,7 +44,7 @@ class LigandHistorySection extends StatelessWidget {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (_) => BlocProvider(
-                          create: (_) => LigandSeeAllCubit()..loadFirstPage(),
+                          create: (_) => GenerationHistoryCubit()..loadAll(),
                           child: const LigandSeeAllView(),
                         ),
                       ),
@@ -63,14 +63,13 @@ class LigandHistorySection extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         if (ligands.isEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 24),
-            child: CustomEmptyBody(
-              icon: Icons.science_outlined,
-              title: 'No Ligands Yet',
-              subTitle: 'Generated ligands will appear here.',
-              actionLabel: 'Refresh',
-              onAction: () => context.read<HistoryCubit>().loadHistory(),
+          Expanded(
+            child: Center(
+              child: CustomEmptyBody(
+                icon: Icons.science_outlined,
+                title: 'No Ligands Yet',
+                subTitle: 'Generated ligands will appear here.',
+              ),
             ),
           )
         else
