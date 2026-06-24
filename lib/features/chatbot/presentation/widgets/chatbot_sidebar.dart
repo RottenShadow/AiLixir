@@ -11,9 +11,12 @@ class ChatbotSidebar extends StatelessWidget {
   const ChatbotSidebar({super.key, required this.cubit});
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Container(
-        decoration: BoxDecoration(color: AppColors.slate900),
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.slate900,
+        border: Border(right: BorderSide(color: AppColors.brandBorder)),
+      ),
+      child: SafeArea(
         child: Column(
           children: [
             Padding(
@@ -21,19 +24,29 @@ class ChatbotSidebar extends StatelessWidget {
               child: Image.asset(AppImages.logo, width: 30),
             ),
             IconButton(
+              hoverColor: AppColors.brandBlue.withAlpha(50),
+
               onPressed: () {
                 if (!cubit.loading) {
                   context.pop();
                 }
               },
-              tooltip: "Return to Home",
+              //tooltip: "Return to Home",
               icon: Icon(Icons.arrow_back),
             ),
             IconButton(
+              hoverColor: AppColors.brandBlue.withAlpha(50),
               onPressed: () async {
-                final String? selectedResult = await showDialog<String>(
+                final String? selectedResult = await showGeneralDialog<String>(
                   context: context,
-                  builder: (BuildContext context) {
+                  barrierDismissible: true,
+                  barrierLabel: "Dismiss Search",
+                  transitionDuration: const Duration(milliseconds: 300),
+                  transitionBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                        return FadeTransition(opacity: animation, child: child);
+                      },
+                  pageBuilder: (context, animation, secondaryAnimation) {
                     return ChatSearchDialog(
                       onSearch: (v) {
                         return cubit.responses.where((res) {
@@ -53,18 +66,22 @@ class ChatbotSidebar extends StatelessWidget {
                   }
                 }
               },
-              tooltip: "Search Messages",
+              //tooltip: "Search Messages",
               icon: Icon(Icons.search),
             ),
             IconButton(
+              hoverColor: AppColors.brandBlue.withAlpha(50),
+
               onPressed: () {},
-              tooltip: "Conversations",
+              //tooltip: "Conversations",
               icon: Icon(Icons.chat),
             ),
             Spacer(),
             IconButton(
+              hoverColor: AppColors.brandBlue.withAlpha(50),
+
               onPressed: () {},
-              tooltip: "Settings",
+              //tooltip: "Settings",
               icon: Icon(Icons.settings),
             ),
           ],

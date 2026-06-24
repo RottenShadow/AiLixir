@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
@@ -9,6 +11,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+const int _animationDuration = 800;
 
 class ChatbotViewBody extends StatefulWidget {
   final ChatSessionCubit cubit;
@@ -25,22 +29,20 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   late double _textBoxHeight;
   late double _padding;
   final GlobalKey _widgetKey = GlobalKey();
-  final _messageKey = Key("");
   late FocusNode _focusNode;
   void setWidgetPosition() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final RenderBox? box =
-          _widgetKey.currentContext?.findRenderObject() as RenderBox?;
-      if (box != null) {
-        final Offset globalPosition = box.localToGlobal(Offset.zero);
-        final double y = globalPosition.dy;
-        final double screenHeight = MediaQuery.of(context).size.height;
-        final double distanceFromBottom = screenHeight - (y + box.size.height);
-        _textBoxHeight = distanceFromBottom + box.size.height * 1.8;
-        _padding = 0;
-        setState(() {});
-      }
-    });
+    final RenderBox? box =
+        _widgetKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box != null) {
+      final Offset globalPosition = box.localToGlobal(Offset.zero);
+      final double y = globalPosition.dy;
+      final view = PlatformDispatcher.instance.views.first;
+      final double screenHeight = view.physicalSize.height;
+      final double distanceFromBottom =
+          screenHeight - (y + box.size.height * 2);
+      _textBoxHeight = distanceFromBottom + box.size.height - 5;
+      setState(() {});
+    }
   }
 
   @override
@@ -100,7 +102,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     }
     if (_messages.isEmpty) {
       setWidgetPosition();
-      await Future.delayed(Duration(milliseconds: 450));
+      await Future.delayed(Duration(milliseconds: _animationDuration + 50));
     }
     _addMessage(_textcontroller.text, isBot: false, onBufferFilled: () {});
     _sendingEnabled = false;
@@ -129,11 +131,11 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
       key: _widgetKey,
       padding: EdgeInsetsGeometry.only(
         top: _messages.isEmpty ? _textBoxHeight : 0,
-        left: _padding + 25,
-        right: _padding + 25,
+        left: _padding,
+        right: _padding,
       ),
-      duration: Duration(milliseconds: 400),
-      curve: Curves.easeOut,
+      duration: Duration(milliseconds: _animationDuration),
+      curve: Curves.easeInOutSine,
       child: Padding(
         padding: EdgeInsetsGeometry.only(bottom: 20),
         child: Align(
@@ -228,17 +230,34 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
       child: BlocBuilder<ChatSessionCubit, ChatSessionState>(
         builder: (context, state) {
           if (state is ChatSessionError) {
-            return Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Text(
-                    "Error: failed to fetch session",
-                    style: AppTextStyles.h5.copyWith(color: AppColors.red500),
+            return Padding(
+              padding: EdgeInsetsGeometry.symmetric(
+                vertical: 0.43.sh,
+                horizontal: 0.35.sw,
+              ),
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: AppColors.red700, width: 2),
+                  borderRadius: BorderRadiusGeometry.circular(12.r),
+                ),
+                color: AppColors.red200,
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 10,
+                    children: [
+                      Icon(Icons.error, color: AppColors.red700),
+                      Text(
+                        "Error: failed to fetch session",
+                        style: AppTextStyles.h5.copyWith(
+                          color: AppColors.red700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             );
           } else if (state is ChatSessionSuccess) {
             return Padding(
@@ -253,7 +272,14 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
                         Expanded(
                           child: SingleChildScrollView(
                             controller: _scrollController,
-                            child: SafeArea(child: Column(children: _messages)),
+                            child: SafeArea(
+                              child: Padding(
+                                padding: EdgeInsetsGeometry.symmetric(
+                                  horizontal: 200,
+                                ),
+                                child: Column(children: _messages),
+                              ),
+                            ),
                           ),
                         ),
                         _promptTextField(),
@@ -262,15 +288,17 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
               ),
             );
           } else {
-            return Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 10,
-              children: [
-                CircularProgressIndicator(color: AppColors.brandBlue),
-                Text("Fetching Chat Session", style: AppTextStyles.h5),
-              ],
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                spacing: 10,
+                children: [
+                  CircularProgressIndicator(color: AppColors.brandBlue),
+                  Text("Fetching Chat Session", style: AppTextStyles.h5),
+                ],
+              ),
             );
           }
         },

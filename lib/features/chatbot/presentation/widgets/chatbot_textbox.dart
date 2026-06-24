@@ -7,16 +7,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 const String _indicator = "_";
 const Duration _waitDuration = Duration(milliseconds: 150);
 const Radius _messageRadius = Radius.circular(20);
-const botRadius = BorderRadiusGeometry.only(
-  topRight: _messageRadius,
-  bottomRight: _messageRadius,
-  bottomLeft: _messageRadius,
-);
-
+const Radius _messageIndicatorRadius = Radius.circular(5);
 const userRadius = BorderRadiusGeometry.only(
   topLeft: _messageRadius,
   bottomRight: _messageRadius,
   bottomLeft: _messageRadius,
+  topRight: _messageRadius,
 );
 
 void _nop() {}
@@ -113,21 +109,21 @@ class _ChatbotTextbox extends State<ChatbotTextbox> {
       ),
       child: Align(
         alignment: widget.isBot ? Alignment.centerLeft : Alignment.centerRight,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: widget.isBot ? botRadius : userRadius,
-          ),
-          color: widget.isBot
-              ? AppColors.cardBackground
-              : AppColors.brandBlue.withAlpha(155),
-          child: Padding(
-            padding: EdgeInsetsGeometry.all(12),
-            child: SelectableText(
-              _buffer,
-              style: widget.isError ? TextStyle(color: AppColors.red500) : null,
-            ),
-          ),
-        ),
+        child: !widget.isBot
+            ? Card(
+                shape: RoundedRectangleBorder(borderRadius: userRadius),
+                color: AppColors.brandBlue.withAlpha(155),
+                child: Padding(
+                  padding: EdgeInsetsGeometry.all(12),
+                  child: SelectableText(_buffer),
+                ),
+              )
+            : SelectableText(
+                _buffer,
+                style: widget.isError
+                    ? TextStyle(color: AppColors.red500)
+                    : null,
+              ),
       ),
     );
   }
