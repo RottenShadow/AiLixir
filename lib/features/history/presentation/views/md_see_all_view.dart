@@ -1,7 +1,8 @@
 import 'package:ailixir/core/entities/md_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/core/widgets/custom_empty_body.dart';
+import 'package:ailixir/features/history/presentation/cubits/md_history_cubit/md_history_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,7 +29,7 @@ class _MdSeeAllViewState extends State<MdSeeAllView> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      context.read<MdSeeAllCubit>().loadNextPage();
+      context.read<MdHistoryCubit>().loadMore();
     }
   }
 
@@ -61,9 +62,11 @@ class _MdSeeAllViewState extends State<MdSeeAllView> {
           ],
         ),
       ),
-      body: BlocBuilder<MdSeeAllCubit, SeeAllState<MdEntity>>(
+      body: BlocBuilder<MdHistoryCubit, MdHistoryState>(
         builder: (context, state) {
-          if (state.status == SeeAllStatus.loading) {
+          final cubit = context.read<MdHistoryCubit>();
+
+          if (state is MdHistoryLoading) {
             return Skeletonizer(
               enabled: true,
               child: _MdTable(
@@ -75,22 +78,41 @@ class _MdSeeAllViewState extends State<MdSeeAllView> {
             );
           }
 
-          if (state.items.isEmpty) {
+          if (state is MdHistoryError) {
             return Center(
-              child: Text(
-                'No simulations found.',
-                style: AppTextStyles.bodymedium.copyWith(
-                  color: AppColors.slate400,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 24.w),
+                child: Text(
+                  state.message,
+                  style: AppTextStyles.bodymedium.copyWith(
+                    color: AppColors.red400,
+                  ),
+                ),
+              ),
+            );
+          }
+
+          final items = state is MdHistoryLoaded
+              ? state.mdSimulations
+              : (state as MdHistoryLoadingMore).mdSimulations;
+
+          if (items.isEmpty) {
+            return SizedBox.expand(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.blur_on,
+                  title: 'No MD Simulations Found',
+                  subTitle: 'No MD simulations yet.\nSubmit a simulation to see results here.',
                 ),
               ),
             );
           }
 
           return _MdTable(
-            items: state.items,
+            items: items,
             scrollController: _scrollController,
-            isLoadingMore: state.status == SeeAllStatus.loadingMore,
-            hasMore: state.hasMore,
+            isLoadingMore: state is MdHistoryLoadingMore,
+            hasMore: cubit.hasMore,
           );
         },
       ),
