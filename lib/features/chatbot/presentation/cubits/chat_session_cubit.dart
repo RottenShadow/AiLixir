@@ -1,6 +1,7 @@
 import 'package:ailixir/core/utils/app_feature_flag.dart';
 import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
 import 'package:ailixir/features/chatbot/data/repos/chat_repo.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:bloc/bloc.dart';
@@ -13,10 +14,18 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
 
   final ChatRepo _repo = ChatRepo();
   late final int maxPage;
+  final TextEditingController searchController = TextEditingController();
   bool loading = false;
   String? sessionId;
   int currentPage = 1;
-  List<String> responses = [];
+  void onSearch(String txt) {
+    if (txt.isNotEmpty) {
+      emit(ChatSessionSearch());
+    } else {
+      emit(ChatSessionSuccess());
+    }
+  }
+
   Future<void> getSessionThread() async {
     emit(ChatSessionLoading());
     if (AppFeatureFlag.useFakeChatbot) {
@@ -39,9 +48,6 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
   Future<ChatMessageModel> sendMessage(String message) async {
     if (AppFeatureFlag.useFakeChatbot) {
       await Future.delayed(Duration(milliseconds: 22));
-      responses.add(
-        "Hello, how may I help you today? Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?",
-      );
       return ChatMessageModel(
         message: "Hello, how may I help you today?",
         isErr: false,
@@ -58,7 +64,6 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
         response = ChatMessageModel(isErr: false, message: s);
       },
     );
-    responses.add(response.message);
     return response;
   }
 }

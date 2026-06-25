@@ -10,3 +10,5 @@ class ChatSessionLoading extends ChatSessionState {}
 class ChatSessionError extends ChatSessionState {}
 
 class ChatSessionSuccess extends ChatSessionState {}
+
+class ChatSessionSearch extends ChatSessionState {}

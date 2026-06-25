@@ -7,7 +7,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 const String _indicator = "_";
 const Duration _waitDuration = Duration(milliseconds: 150);
 const Radius _messageRadius = Radius.circular(20);
-const Radius _messageIndicatorRadius = Radius.circular(5);
 const userRadius = BorderRadiusGeometry.only(
   topLeft: _messageRadius,
   bottomRight: _messageRadius,
@@ -18,13 +17,14 @@ const userRadius = BorderRadiusGeometry.only(
 void _nop() {}
 
 class ChatbotTextbox extends StatefulWidget {
-  const ChatbotTextbox._construct({
+  ChatbotTextbox._construct({
     super.key,
     required this.text,
     required this.isBot,
     required this.onBufferFilled,
     required this.isError,
     required this.isLoading,
+    required this.isNotSearched,
   });
   ChatbotTextbox({
     Key? key,
@@ -32,6 +32,7 @@ class ChatbotTextbox extends StatefulWidget {
     bool isBot = true,
     bool isError = false,
     bool isLoading = false,
+    bool isNotSearched = true,
     void Function() onBufferFilled = _nop,
   }) : this._construct(
          key: key,
@@ -40,10 +41,20 @@ class ChatbotTextbox extends StatefulWidget {
          onBufferFilled: onBufferFilled,
          isError: isError,
          isLoading: isLoading,
+         isNotSearched: isNotSearched,
        );
   ChatbotTextbox.loading() : this(text: ". . . .", isLoading: true);
+  ChatbotTextbox.fromOther(ChatbotTextbox other)
+    : this(
+        text: other.text.join(" "),
+        isBot: other.isBot,
+        isError: other.isError,
+        onBufferFilled: other.onBufferFilled,
+        isNotSearched: false,
+      );
   final List<String> text;
   final bool isBot;
+  bool isNotSearched;
   final bool isError;
   final void Function() onBufferFilled;
   final bool isLoading;
@@ -85,7 +96,7 @@ class _ChatbotTextbox extends State<ChatbotTextbox> {
   @override
   void initState() {
     super.initState();
-    if (widget.isBot) {
+    if (widget.isBot && widget.isNotSearched) {
       fillBuffer();
     } else {
       _buffer = widget.text.join(" ");
