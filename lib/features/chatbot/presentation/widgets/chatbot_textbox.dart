@@ -25,6 +25,7 @@ class ChatbotTextbox extends StatefulWidget {
     required this.isError,
     required this.isLoading,
     required this.isNotSearched,
+    required this.comparisonText,
   });
   ChatbotTextbox({
     Key? key,
@@ -37,6 +38,7 @@ class ChatbotTextbox extends StatefulWidget {
   }) : this._construct(
          key: key,
          text: text.split(" "),
+         comparisonText: text.toLowerCase(),
          isBot: isBot,
          onBufferFilled: onBufferFilled,
          isError: isError,
@@ -53,6 +55,7 @@ class ChatbotTextbox extends StatefulWidget {
         isNotSearched: false,
       );
   final List<String> text;
+  final String comparisonText;
   final bool isBot;
   bool isNotSearched;
   final bool isError;

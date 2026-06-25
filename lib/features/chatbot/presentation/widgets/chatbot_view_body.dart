@@ -340,6 +340,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
             ),
           );
         } else if (state is ChatSessionSuccess) {
+          _sendingEnabled = true;
           return Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
@@ -382,6 +383,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
             ),
           );
         } else if (state is ChatSessionSearch) {
+          _sendingEnabled = false;
           return Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
@@ -417,13 +419,10 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
                                     message.isNotSearched = false;
                                     bool visible =
                                         message.isBot &&
-                                        message.text
-                                            .join(" ")
-                                            .toLowerCase()
-                                            .contains(
-                                              widget.cubit.searchController.text
-                                                  .toLowerCase(),
-                                            );
+                                        message.comparisonText.contains(
+                                          widget.cubit.searchController.text
+                                              .toLowerCase(),
+                                        );
                                     return Column(
                                       children: [
                                         Visibility(
