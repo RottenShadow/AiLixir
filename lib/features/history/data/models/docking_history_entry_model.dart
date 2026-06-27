@@ -1,5 +1,5 @@
-import 'dart:math';
 import 'package:ailixir/core/entities/docking_entity.dart';
+import 'package:ailixir/core/entities/docking_score_entity.dart';
 
 class DockingHistoryInputsModel {
   final String protein;
@@ -16,18 +16,24 @@ class DockingHistoryInputsModel {
 }
 
 class DockingHistoryResultsModel {
-  final List<double> vinaScores;
+  final List<DockingScoreEntity> scores;
   final String? downloadUrl;
 
   const DockingHistoryResultsModel({
-    required this.vinaScores,
+    required this.scores,
     this.downloadUrl,
   });
 
   factory DockingHistoryResultsModel.fromJson(Map<String, dynamic> json) {
     return DockingHistoryResultsModel(
-      vinaScores: (json['vina_scores'] as List<dynamic>?)
-              ?.map((e) => (e as num).toDouble())
+      scores: (json['scores'] as List<dynamic>?)
+              ?.map((e) => DockingScoreEntity(
+                    affinity: (e['affinity'] as num?)?.toDouble() ?? 0.0,
+                    inter: (e['inter'] as num?)?.toDouble() ?? 0.0,
+                    intra: (e['intra'] as num?)?.toDouble() ?? 0.0,
+                    torsions: (e['torsions'] as num?)?.toDouble() ?? 0.0,
+                    unbound: (e['unbound'] as num?)?.toDouble() ?? 0.0,
+                  ))
               .toList() ??
           [],
       downloadUrl: json['download_url'] as String?,
@@ -71,8 +77,11 @@ class DockingHistoryEntryModel {
   }
 
   DockingEntity toEntity() {
-    final vinaScore = results?.vinaScores.isNotEmpty == true
-        ? results!.vinaScores.reduce(max)
+    final scoreList = results?.scores ?? [];
+    final bestScore = scoreList.isNotEmpty
+        ? scoreList.map((s) => s.affinity).reduce(
+              (a, b) => a < b ? a : b,
+            )
         : 0.0;
 
     return DockingEntity(
@@ -81,7 +90,8 @@ class DockingHistoryEntryModel {
       targetName: inputs.protein,
       jobId: 'JOB-$jobId',
       createdAt: createdAt,
-      vinaScore: vinaScore,
+      vinaScore: bestScore,
+      scores: scoreList,
     );
   }
 }

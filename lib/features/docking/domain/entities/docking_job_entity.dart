@@ -1,3 +1,5 @@
+import 'package:ailixir/core/entities/docking_score_entity.dart';
+
 class DockingJobInputsEntity {
   final String protein;
   final String? ligand;
@@ -9,11 +11,11 @@ class DockingJobInputsEntity {
 }
 
 class DockingJobResultsEntity {
-  final List<double> vinaScores;
+  final List<DockingScoreEntity> scores;
   final String? downloadUrl;
 
   const DockingJobResultsEntity({
-    required this.vinaScores,
+    required this.scores,
     this.downloadUrl,
   });
 }

@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:ailixir/core/entities/docking_score_entity.dart';
 import 'package:ailixir/core/errors/failure.dart';
 import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
@@ -22,7 +23,9 @@ class DockingRepo {
       return _fakeSubmitJob();
     }
     return safeApiCall(() async {
-      final formData = await DockingRequestModel.fromEntity(request).toFormData();
+      final formData = await DockingRequestModel.fromEntity(
+        request,
+      ).toFormData();
       final response = await dioService.post(
         endpoint: AppEndpoints.dockingSubmit,
         data: formData,
@@ -79,7 +82,29 @@ class DockingRepo {
           ligand: 'CC1=CC(=C(C=C1C)C(=O)NC2=CC=C(C=C2)C(F)(F)F)C',
         ),
         results: DockingJobResultsEntity(
-          vinaScores: [-10.4, -9.2, -8.7],
+          scores: [
+            const DockingScoreEntity(
+              affinity: -10.4,
+              inter: -8.802,
+              intra: -0.354,
+              torsions: 1.495,
+              unbound: -0.354,
+            ),
+            const DockingScoreEntity(
+              affinity: -9.2,
+              inter: -8.655,
+              intra: -0.258,
+              torsions: 1.454,
+              unbound: -0.354,
+            ),
+            const DockingScoreEntity(
+              affinity: -8.7,
+              inter: -7.924,
+              intra: -0.607,
+              torsions: 1.389,
+              unbound: -0.354,
+            ),
+          ],
           downloadUrl: null,
         ),
         createdAt: DateTime.now(),

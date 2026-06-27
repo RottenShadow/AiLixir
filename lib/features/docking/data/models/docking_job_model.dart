@@ -1,3 +1,4 @@
+import 'package:ailixir/core/entities/docking_score_entity.dart';
 import 'package:ailixir/features/docking/domain/entities/docking_job_entity.dart';
 
 class DockingJobInputsModel {
@@ -18,19 +19,55 @@ class DockingJobInputsModel {
   }
 }
 
+class DockingScoreModel {
+  final double affinity;
+  final double inter;
+  final double intra;
+  final double torsions;
+  final double unbound;
+
+  const DockingScoreModel({
+    required this.affinity,
+    required this.inter,
+    required this.intra,
+    required this.torsions,
+    required this.unbound,
+  });
+
+  factory DockingScoreModel.fromJson(Map<String, dynamic> json) {
+    return DockingScoreModel(
+      affinity: (json['affinity'] as num?)?.toDouble() ?? 0.0,
+      inter: (json['inter'] as num?)?.toDouble() ?? 0.0,
+      intra: (json['intra'] as num?)?.toDouble() ?? 0.0,
+      torsions: (json['torsions'] as num?)?.toDouble() ?? 0.0,
+      unbound: (json['unbound'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+
+  DockingScoreEntity toEntity() {
+    return DockingScoreEntity(
+      affinity: affinity,
+      inter: inter,
+      intra: intra,
+      torsions: torsions,
+      unbound: unbound,
+    );
+  }
+}
+
 class DockingJobResultsModel {
-  final List<double> vinaScores;
+  final List<DockingScoreModel> scores;
   final String? downloadUrl;
 
   const DockingJobResultsModel({
-    required this.vinaScores,
+    required this.scores,
     this.downloadUrl,
   });
 
   factory DockingJobResultsModel.fromJson(Map<String, dynamic> json) {
     return DockingJobResultsModel(
-      vinaScores: (json['vina_scores'] as List<dynamic>?)
-              ?.map((e) => (e as num).toDouble())
+      scores: (json['scores'] as List<dynamic>?)
+              ?.map((e) => DockingScoreModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
       downloadUrl: json['download_url'] as String?,
@@ -39,7 +76,7 @@ class DockingJobResultsModel {
 
   DockingJobResultsEntity toEntity() {
     return DockingJobResultsEntity(
-      vinaScores: vinaScores,
+      scores: scores.map((e) => e.toEntity()).toList(),
       downloadUrl: downloadUrl,
     );
   }
