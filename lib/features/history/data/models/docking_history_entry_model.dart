@@ -61,6 +61,7 @@ class DockingHistoryEntryModel {
       createdAt: createdAt,
       vinaScore: bestScore,
       scores: scores,
+      downloadUrl: downloadUrl,
     );
   }
 }

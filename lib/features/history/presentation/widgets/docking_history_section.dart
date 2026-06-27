@@ -2,6 +2,7 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
+import 'package:ailixir/features/docking/presentation/widgets/docking_download_view.dart';
 import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/docking_see_all_view.dart';
 import 'package:flutter/material.dart';
@@ -109,7 +110,6 @@ class _DockingCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Icon(Icons.history, color: AppColors.slate500, size: 16.sp),
             ],
           ),
           SizedBox(height: 4.h),
@@ -123,9 +123,41 @@ class _DockingCard extends StatelessWidget {
             value: '${docking.vinaScore.toStringAsFixed(3)} kcal/mol',
           ),
           SizedBox(height: 4.h),
-          Text(
-            '${docking.scores.length} poses',
-            style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+          Row(
+            children: [
+              Text(
+                '${docking.scores.length} poses',
+                style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: docking.downloadUrl != null
+                    ? () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              DockingDownloadView(url: docking.downloadUrl!),
+                        ),
+                      )
+                    : null,
+                child: Container(
+                  width: 30.w,
+                  height: 30.w,
+                  decoration: BoxDecoration(
+                    color: docking.downloadUrl != null
+                        ? AppColors.slate700
+                        : AppColors.slate800,
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Icon(
+                    Icons.download_outlined,
+                    color: docking.downloadUrl != null
+                        ? AppColors.slate300
+                        : AppColors.slate600,
+                    size: 14.sp,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

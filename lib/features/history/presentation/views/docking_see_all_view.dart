@@ -2,6 +2,7 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
+import 'package:ailixir/features/docking/presentation/widgets/docking_download_view.dart';
 import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -245,6 +246,34 @@ class _DockingRow extends StatelessWidget {
             ],
           ),
           SizedBox(width: 12.w),
+          GestureDetector(
+            onTap: docking.downloadUrl != null
+                ? () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => DockingDownloadView(
+                          url: docking.downloadUrl!,
+                        ),
+                      ),
+                    )
+                : null,
+            child: Container(
+              width: 34.w,
+              height: 34.w,
+              decoration: BoxDecoration(
+                color: docking.downloadUrl != null
+                    ? AppColors.slate700
+                    : AppColors.slate800,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(
+                Icons.download_outlined,
+                color: docking.downloadUrl != null
+                    ? AppColors.slate300
+                    : AppColors.slate600,
+                size: 16.sp,
+              ),
+            ),
+          ),
         ],
       ),
     );

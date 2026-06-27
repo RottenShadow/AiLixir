@@ -8,6 +8,7 @@ class DockingEntity {
   final DateTime createdAt;
   final double vinaScore;
   final List<DockingScoreEntity> scores;
+  final String? downloadUrl;
 
   const DockingEntity({
     required this.id,
@@ -17,6 +18,7 @@ class DockingEntity {
     required this.createdAt,
     required this.vinaScore,
     this.scores = const [],
+    this.downloadUrl,
   });
 
   static List<DockingEntity> createFakeData() {

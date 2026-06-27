@@ -2,6 +2,7 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/entities/docking_score_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/features/docking/presentation/widgets/docking_download_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -61,10 +62,23 @@ class _DockingResultCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Icon(
-                Icons.download_outlined,
-                color: AppColors.slate400,
-                size: 16.sp,
+              GestureDetector(
+                onTap: result.downloadUrl != null
+                    ? () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => DockingDownloadView(
+                              url: result.downloadUrl!,
+                            ),
+                          ),
+                        )
+                    : null,
+                child: Icon(
+                  Icons.download_outlined,
+                  color: result.downloadUrl != null
+                      ? AppColors.cyan400
+                      : AppColors.slate600,
+                  size: 16.sp,
+                ),
               ),
             ],
           ),

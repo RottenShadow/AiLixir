@@ -108,6 +108,7 @@ class DockingCubit extends Cubit<DockingState> {
               createdAt: job.createdAt ?? DateTime.now(),
               vinaScore: bestScore,
               scores: scores,
+              downloadUrl: job.downloadUrl,
             ),
           ];
           emit(
