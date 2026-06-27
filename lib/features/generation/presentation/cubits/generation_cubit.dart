@@ -172,6 +172,33 @@ class GenerationCubit extends Cubit<GenerationState> {
     );
   }
 
+  Future<void> cancelJob() async {
+    final jobId = _currentJobId;
+    if (jobId == null) return;
+
+    emit(state.copyWith(
+      logs: [...state.logs, '[${_timestamp()}] Cancelling job...'],
+    ));
+
+    final result = await repo.cancelJob(jobId);
+    result.fold(
+      (failure) {
+        emit(state.copyWith(
+          logs: [
+            ...state.logs,
+            '[${_timestamp()}] Failed to cancel: ${failure.message}',
+          ],
+        ));
+      },
+      (_) {
+        _cancelTimer();
+        _pollCount = 0;
+        _currentJobId = null;
+        emit(const GenerationState());
+      },
+    );
+  }
+
   void reset() {
     _cancelTimer();
     _pollCount = 0;
