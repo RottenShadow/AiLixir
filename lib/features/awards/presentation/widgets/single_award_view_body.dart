@@ -108,9 +108,9 @@ class SingleAwardViewBody extends StatelessWidget {
                   alignment: Alignment.topLeft,
                   child: Padding(
                     padding: EdgeInsetsGeometry.fromLTRB(
+                      0.02.sw,
                       0.03.sw,
-                      0.03.sw,
-                      0.01.sw,
+                      0.02.sw,
                       0.03.sw,
                     ),
                     child: ClipRRect(
@@ -119,7 +119,7 @@ class SingleAwardViewBody extends StatelessWidget {
                       child: Image.network(
                         scientists[idx].imageUrl,
                         scale: 1,
-                        width: 0.08.sw,
+                        width: 0.09.sw,
                         height: 0.08.sw,
                         fit: BoxFit.fill,
                       ),

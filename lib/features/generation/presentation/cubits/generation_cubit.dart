@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:ailixir/core/entities/generation_files_entity.dart';
 import 'package:ailixir/core/entities/generation_request_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/features/generation/data/repos/generation_repo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:meta/meta.dart';
 
 part 'generation_state.dart';
 
@@ -17,6 +18,7 @@ class GenerationCubit extends Cubit<GenerationState> {
   int _pollCount = 0;
 
   static const _pollInterval = Duration(seconds: 15);
+  static const _maxPollAttempts = 3;
 
   String? _currentJobId;
 
@@ -71,6 +73,20 @@ class GenerationCubit extends Cubit<GenerationState> {
     if (isClosed || _currentJobId == null) return;
     _pollCount++;
 
+    if (_pollCount > _maxPollAttempts) {
+      _cancelTimer();
+      emit(
+        state.copyWith(
+          status: GenerationStatus.idle,
+          logs: [
+            ...state.logs,
+            '[${_timestamp()}] Max polling attempts reached ($_maxPollAttempts). Returning to idle. You can check progress in history.',
+          ],
+        ),
+      );
+      return;
+    }
+
     emit(
       state.copyWith(
         logs: [
@@ -101,10 +117,7 @@ class GenerationCubit extends Cubit<GenerationState> {
           emit(
             state.copyWith(
               status: GenerationStatus.idle,
-              logs: [
-                ...state.logs,
-                '[${_timestamp()}] Job failed.',
-              ],
+              logs: [...state.logs, '[${_timestamp()}] Job failed.'],
             ),
           );
         } else {
@@ -126,10 +139,7 @@ class GenerationCubit extends Cubit<GenerationState> {
 
     emit(
       state.copyWith(
-        logs: [
-          ...state.logs,
-          '[${_timestamp()}] Fetching results...',
-        ],
+        logs: [...state.logs, '[${_timestamp()}] Fetching results...'],
       ),
     );
 
@@ -155,6 +165,7 @@ class GenerationCubit extends Cubit<GenerationState> {
               '[${_timestamp()}] Results received. ${generationResult.ligands.length} ligands.',
             ],
             results: generationResult.ligands,
+            files: generationResult.files,
           ),
         );
       },

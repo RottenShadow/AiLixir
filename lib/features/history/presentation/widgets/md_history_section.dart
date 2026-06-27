@@ -1,7 +1,8 @@
 import 'package:ailixir/core/entities/md_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/core/widgets/custom_empty_body.dart';
+import 'package:ailixir/features/history/presentation/cubits/md_history_cubit/md_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/md_see_all_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,6 +16,7 @@ class MdHistorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: mdSimulations.isEmpty ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -35,7 +37,7 @@ class MdHistorySection extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => BlocProvider(
-                      create: (_) => MdSeeAllCubit()..loadFirstPage(),
+                      create: (_) => MdHistoryCubit()..loadAll(),
                       child: const MdSeeAllView(),
                     ),
                   ),
@@ -51,73 +53,83 @@ class MdHistorySection extends StatelessWidget {
           ],
         ),
         SizedBox(height: 12.h),
-        Container(
-          decoration: BoxDecoration(
-            color: AppColors.slate800,
-            borderRadius: BorderRadius.circular(10.r),
-            border: Border.all(color: AppColors.brandBorder),
-          ),
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        'Simulation Task',
-                        style: AppTextStyles.labelsmall.copyWith(
-                          color: AppColors.slate500,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        'Forcefield',
-                        style: AppTextStyles.labelsmall.copyWith(
-                          color: AppColors.slate500,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        'Duration',
-                        style: AppTextStyles.labelsmall.copyWith(
-                          color: AppColors.slate500,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Text(
-                        'Status',
-                        style: AppTextStyles.labelsmall.copyWith(
-                          color: AppColors.slate500,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        'Artifacts',
-                        style: AppTextStyles.labelsmall.copyWith(
-                          color: AppColors.slate500,
-                        ),
-                        textAlign: TextAlign.end,
-                      ),
-                    ),
-                  ],
-                ),
+        if (mdSimulations.isEmpty)
+          Expanded(
+            child: Center(
+              child: CustomEmptyBody(
+                icon: Icons.blur_on,
+                title: 'No MD Simulations Yet',
+                subTitle: 'Molecular dynamics results will appear here.',
               ),
-              Divider(color: AppColors.brandBorder, height: 1),
-              ...mdSimulations.map((md) => _MdRow(md: md)),
-            ],
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.slate800,
+              borderRadius: BorderRadius.circular(10.r),
+              border: Border.all(color: AppColors.brandBorder),
+            ),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Simulation Task',
+                          style: AppTextStyles.labelsmall.copyWith(
+                            color: AppColors.slate500,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Forcefield',
+                          style: AppTextStyles.labelsmall.copyWith(
+                            color: AppColors.slate500,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Duration',
+                          style: AppTextStyles.labelsmall.copyWith(
+                            color: AppColors.slate500,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text(
+                          'Status',
+                          style: AppTextStyles.labelsmall.copyWith(
+                            color: AppColors.slate500,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          'Artifacts',
+                          style: AppTextStyles.labelsmall.copyWith(
+                            color: AppColors.slate500,
+                          ),
+                          textAlign: TextAlign.end,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Divider(color: AppColors.brandBorder, height: 1),
+                ...mdSimulations.map((md) => _MdRow(md: md)),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }

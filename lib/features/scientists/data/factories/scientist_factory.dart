@@ -27,7 +27,7 @@ abstract class ScientistFactory {
       return [];
     }
     List<ScientistModel> scientists = [];
-    for (Map<String, dynamic> result in json["data"]) {
+    for (Map<String, dynamic> result in json["data"]["results"]) {
       scientists.add(
         ScientistModel(
           id: result["id"],

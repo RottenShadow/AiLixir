@@ -16,12 +16,13 @@ class ChatRepo {
       if (!json["success"]) {
         throw Exception("Server Error");
       }
-      if ((json["data"] as List<Map<String, dynamic>>).isEmpty) {
-        json =
-            ((await dioService.post(
-                  endpoint: "${AppEndpoints.baseUrl}chemistry/thread",
-                ))
-                as Map<String, dynamic>)["data"];
+      if ((json["data"]).isEmpty) {
+        json = ((await dioService.post(
+          endpoint: "${AppEndpoints.baseUrl}chemistry/thread",
+        )))["data"];
+        if (!json["success"]) {
+          throw Exception("Server Error");
+        }
       } else {
         json = json["data"][0];
       }
@@ -29,10 +30,14 @@ class ChatRepo {
     });
   }
 
-  Future<Either<Failure, String>> sendMessage(String message) {
+  Future<Either<Failure, String>> sendMessage(
+    String message,
+    String sessionId,
+  ) {
     return safeApiCall(() async {
       Map<String, dynamic> response = await dioService.post(
         endpoint: "${AppEndpoints.baseUrl}chemistry/chat",
+        data: {"message": message, "thread_id": sessionId},
       );
       if (!response["success"]) throw Exception("Server Error");
       return response["data"]["reply"];

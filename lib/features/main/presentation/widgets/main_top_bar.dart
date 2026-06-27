@@ -1,7 +1,6 @@
 import 'package:ailixir/core/services/navigation/navigation_service.dart';
 import 'package:ailixir/core/widgets/gradient_text.dart';
 import 'package:ailixir/features/profile/presentation/views/profile_view.dart';
-import 'package:ailixir/core/widgets/gradient_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
@@ -97,8 +96,8 @@ class _OperationsDropdown extends StatelessWidget {
 
   static const _items = [
     (index: 2, icon: Icons.auto_awesome, label: 'New Generation'),
-    (index: 3, icon: Icons.handshake_outlined, label: 'Docking'),
-    (index: 4, icon: Icons.waves, label: 'MD'),
+    (index: 3, icon: Icons.hub_outlined, label: 'Docking'),
+    (index: 4, icon: Icons.blur_on, label: 'MD'),
     (index: 5, icon: Icons.biotech, label: 'Drug Repurposing'),
     (index: 6, icon: Icons.search, label: 'Chemical Search'),
     (index: 7, icon: Icons.science, label: 'ADMET'),

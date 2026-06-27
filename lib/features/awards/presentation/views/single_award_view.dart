@@ -5,7 +5,6 @@ import 'package:ailixir/features/awards/presentation/cubits/award_cubit.dart';
 import 'package:ailixir/features/awards/presentation/widgets/single_award_view_body.dart';
 import 'package:ailixir/features/scientists/data/models/scientist_model.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
 class SingleAwardView extends StatefulWidget {
   static const routeName = "/singleaward";
@@ -20,7 +19,7 @@ class SingleAwardView extends StatefulWidget {
 
 class _SingleAwardViewState extends State<SingleAwardView> {
   List<ScientistModel> scientists = [];
-  bool err = false;
+  late bool _isloading;
   @override
   void initState() {
     super.initState();
@@ -28,10 +27,11 @@ class _SingleAwardViewState extends State<SingleAwardView> {
   }
 
   void getScientists() {
+    _isloading = true;
     widget.cubit.getScientists(widget.award.id).then((v) {
       setState(() {
         scientists = v;
-        err = false;
+        _isloading = false;
       });
     });
   }
@@ -65,7 +65,7 @@ class _SingleAwardViewState extends State<SingleAwardView> {
         title: _title(widget.award.name),
         backgroundColor: AppColors.slate1000,
       ),
-      body: err
+      body: widget.cubit.isErr
           ? Center(
               child: Column(
                 children: [
@@ -82,7 +82,7 @@ class _SingleAwardViewState extends State<SingleAwardView> {
                 ],
               ),
             )
-          : (scientists.isEmpty
+          : (_isloading
                 ? Center(child: CircularProgressIndicator())
                 : SingleAwardViewBody(
                     award: widget.award,

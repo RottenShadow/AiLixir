@@ -1,3 +1,4 @@
+import 'package:ailixir/core/utils/app_feature_flag.dart';
 import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
 import 'package:ailixir/features/chatbot/data/repos/chat_repo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,10 +13,17 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
 
   final ChatRepo _repo = ChatRepo();
   late final int maxPage;
+  bool loading = false;
   String? sessionId;
   int currentPage = 1;
+  List<String> responses = [];
   Future<void> getSessionThread() async {
     emit(ChatSessionLoading());
+    if (AppFeatureFlag.useFakeChatbot) {
+      await Future.delayed(Duration(milliseconds: 22));
+      emit(ChatSessionSuccess());
+      return;
+    }
     var res = await _repo.getUserThread();
     res.fold(
       (_) {
@@ -29,7 +37,18 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
   }
 
   Future<ChatMessageModel> sendMessage(String message) async {
-    var res = await _repo.sendMessage(message);
+    if (AppFeatureFlag.useFakeChatbot) {
+      await Future.delayed(Duration(milliseconds: 22));
+      responses.add(
+        "Hello, how may I help you today? Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?Hello, how may I help you today?",
+      );
+      return ChatMessageModel(
+        message: "Hello, how may I help you today?",
+        isErr: false,
+      );
+    }
+
+    var res = await _repo.sendMessage(message, sessionId!);
     late ChatMessageModel response;
     res.fold(
       (e) {
@@ -39,20 +58,7 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
         response = ChatMessageModel(isErr: false, message: s);
       },
     );
+    responses.add(response.message);
     return response;
-  }
-
-  Future<void> getTestScientists() async {
-    emit(ChatSessionLoading());
-    var res = await _repo.getTestThreads("");
-    res.fold(
-      (_) {
-        emit(ChatSessionError());
-      },
-      (jsonData) {
-        sessionId = jsonData.thread_id;
-        emit(ChatSessionSuccess());
-      },
-    );
   }
 }

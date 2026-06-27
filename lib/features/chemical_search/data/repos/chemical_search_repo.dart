@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/errors/failure.dart';
+import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/app_feature_flag.dart';
@@ -27,10 +28,13 @@ class ChemicalSearchRepo {
       final response = await dioService.post(
         endpoint: endpoint,
         data: {'smiles': smiles, 'top_k': topK},
+      ) as Map<String, dynamic>;
+
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+        response,
+        (d) => d is Map<String, dynamic> ? d : response,
       );
-      return ChemicalSearchResponseModel.fromJson(
-        response as Map<String, dynamic>,
-      ).toEntity();
+      return ChemicalSearchResponseModel.fromJson(base.data!).toEntity();
     });
   }
 

@@ -1,4 +1,5 @@
 import 'package:ailixir/core/services/api/dio_service.dart';
+import 'package:ailixir/core/utils/app_feature_flag.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/presentation/factories/award_factory.dart';
 import 'package:ailixir/features/scientists/data/factories/scientist_factory.dart';
@@ -21,6 +22,9 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
   late final int maxPage;
   int currentPage = 1;
   Future<void> getScientists() async {
+    if (AppFeatureFlag.useFakeScientists) {
+      return getTestScientists();
+    }
     emit(ScientistCreditLoading());
     var res = await _repo.getScientists();
     res.fold(
@@ -57,6 +61,9 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
   }
 
   Future<List<ScientistModel>> getPagedScientists() async {
+    if (AppFeatureFlag.useFakeScientists) {
+      return getPagedTestScientists();
+    }
     if (maxPage <= currentPage) {
       await Future.delayed(Duration(milliseconds: 33));
       return [];
@@ -85,6 +92,9 @@ class ScientistCreditCubit extends Cubit<ScientistCreditState> {
   }
 
   Future<List<AwardModel>> getAwards(int sciId) async {
+    if (AppFeatureFlag.useFakeAwards) {
+      return getTestAwards(sciId);
+    }
     var res = await _repo.getAwards(sciId);
     return res.fold(
       (_) {
