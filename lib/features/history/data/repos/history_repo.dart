@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/entities/docking_entity.dart';
+import 'package:ailixir/core/entities/docking_score_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/entities/ligand_details_entity.dart';
 import 'package:ailixir/core/entities/md_entity.dart';
@@ -53,13 +54,19 @@ class HistoryRepo {
 
   static final _fakeDockingPool = List.generate(40, (i) {
     final t = _fakeDockingTargets[i % _fakeDockingTargets.length];
+    final baseScore = t.$3 - (i % 3) * 0.3;
     return DockingEntity(
       id: '${i + 1}',
       targetId: t.$1,
       targetName: t.$2,
       jobId: 'JOB-${1000 + i}-${44000 + i * 7}',
       createdAt: DateTime.now().subtract(Duration(days: i + 1)),
-      vinaScore: t.$3 - (i % 3) * 0.3,
+      vinaScore: baseScore,
+      scores: [
+        DockingScoreEntity(affinity: baseScore, inter: -8.8, intra: -0.35, torsions: 1.50, unbound: -0.35),
+        DockingScoreEntity(affinity: baseScore + 0.6, inter: -8.7, intra: -0.26, torsions: 1.45, unbound: -0.35),
+        DockingScoreEntity(affinity: baseScore + 1.2, inter: -7.9, intra: -0.61, torsions: 1.39, unbound: -0.35),
+      ],
     );
   });
 
@@ -147,7 +154,6 @@ class HistoryRepo {
       return PaginatedDataWithExtra<DockingEntity, dynamic>.fromJson(
         base.data as Map<String, dynamic>,
         (e) => DockingHistoryEntryModel.fromJson(e).toEntity(),
-        resultsKey: 'data',
       );
     });
   }
