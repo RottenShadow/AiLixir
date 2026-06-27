@@ -230,46 +230,25 @@ class _DockingRow extends StatelessWidget {
               ],
             ),
           ),
-          // Vina Score
-          _ScoreChip(label: 'Vina', value: docking.vinaScore.toString()),
-          SizedBox(width: 12.w),
-          // Download
-          Container(
-            width: 34.w,
-            height: 34.w,
-            decoration: BoxDecoration(
-              color: AppColors.slate700,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Icon(
-              Icons.download_outlined,
-              color: AppColors.slate300,
-              size: 16.sp,
-            ),
+          // Score
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${docking.vinaScore.toStringAsFixed(3)} kcal/mol',
+                style: AppTextStyles.h5.copyWith(color: AppColors.cyan400),
+              ),
+              Text(
+                '${docking.scores.length} poses',
+                style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+              ),
+            ],
           ),
+          SizedBox(width: 12.w),
         ],
       ),
     );
   }
 }
 
-class _ScoreChip extends StatelessWidget {
-  final String label;
-  final String value;
-  const _ScoreChip({required this.label, required this.value});
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
-        ),
-        SizedBox(height: 2.h),
-        Text(value, style: AppTextStyles.h5.copyWith(color: AppColors.cyan400)),
-      ],
-    );
-  }
-}

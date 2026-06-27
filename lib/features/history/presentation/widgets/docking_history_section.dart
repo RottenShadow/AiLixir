@@ -117,28 +117,15 @@ class _DockingCard extends StatelessWidget {
             'Job ID: ${docking.jobId}',
             style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
           ),
-          SizedBox(height: 16.h),
-          Row(
-            children: [
-              _StatItem(
-                label: 'Vina Score',
-                value: docking.vinaScore.toString(),
-              ),
-              const Spacer(),
-              Container(
-                width: 36.w,
-                height: 36.w,
-                decoration: BoxDecoration(
-                  color: AppColors.slate700,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Icon(
-                  Icons.download_outlined,
-                  color: AppColors.slate300,
-                  size: 16.sp,
-                ),
-              ),
-            ],
+          SizedBox(height: 12.h),
+          _StatItem(
+            label: 'Best Affinity',
+            value: '${docking.vinaScore.toStringAsFixed(3)} kcal/mol',
+          ),
+          SizedBox(height: 4.h),
+          Text(
+            '${docking.scores.length} poses',
+            style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
           ),
         ],
       ),
