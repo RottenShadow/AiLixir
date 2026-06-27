@@ -1,3 +1,4 @@
+import 'package:ailixir/core/entities/generation_files_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 
 class GenerationJobHistoryEntity {
@@ -11,7 +12,7 @@ class GenerationJobHistoryEntity {
   final int dockTopK;
   final String? stage;
   final String? summary;
-  final String? files;
+  final GenerationFilesEntity? files;
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<LigandEntity> ligands;
