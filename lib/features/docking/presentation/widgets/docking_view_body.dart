@@ -373,6 +373,8 @@ class _DockingViewBodyState extends State<DockingViewBody> {
                               onReset: isDone
                                   ? () {
                                       context.read<DockingCubit>().reset();
+                                      _clearProtein();
+                                      _clearLigand();
                                       _viewerKey.currentState?.clearAll();
                                     }
                                   : null,
