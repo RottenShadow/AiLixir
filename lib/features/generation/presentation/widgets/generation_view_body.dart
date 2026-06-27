@@ -156,7 +156,10 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
 
               // ── Results Panel (completed) ────────────────────────────────
               if (state.status == GenerationStatus.completed)
-                GenerationResultsPanel(ligands: state.results),
+                GenerationResultsPanel(
+                  ligands: state.results,
+                  files: state.files,
+                ),
             ],
           ),
         );
