@@ -2,7 +2,7 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/entities/docking_score_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/docking/presentation/widgets/docking_download_view.dart';
+import 'package:ailixir/core/widgets/file_download_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -65,12 +65,11 @@ class _DockingResultCard extends StatelessWidget {
               GestureDetector(
                 onTap: result.downloadUrl != null
                     ? () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => DockingDownloadView(
-                              url: result.downloadUrl!,
-                            ),
-                          ),
-                        )
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              FileDownloadView(url: result.downloadUrl!),
+                        ),
+                      )
                     : null,
                 child: Icon(
                   Icons.download_outlined,
@@ -150,15 +149,56 @@ class _ScoreRow extends StatelessWidget {
     final bg = isBest ? AppColors.emerald900.withValues(alpha: 0.15) : null;
     return Container(
       padding: EdgeInsets.symmetric(vertical: 3.h, horizontal: 4.w),
-      decoration: bg != null ? BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4.r)) : null,
+      decoration: bg != null
+          ? BoxDecoration(color: bg, borderRadius: BorderRadius.circular(4.r))
+          : null,
       child: Row(
         children: [
-          Expanded(flex: 1, child: Text('#${index + 1}', style: AppTextStyles.bodyxs.copyWith(color: color))),
-          Expanded(flex: 3, child: Text(score.affinity.toStringAsFixed(3), style: AppTextStyles.bodyxs.copyWith(color: color, fontWeight: isBest ? FontWeight.w700 : null))),
-          Expanded(flex: 3, child: Text(score.inter.toStringAsFixed(3), style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400))),
-          Expanded(flex: 3, child: Text(score.intra.toStringAsFixed(3), style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400))),
-          Expanded(flex: 3, child: Text(score.torsions.toStringAsFixed(3), style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400))),
-          Expanded(flex: 3, child: Text(score.unbound.toStringAsFixed(3), style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400))),
+          Expanded(
+            flex: 1,
+            child: Text(
+              '#${index + 1}',
+              style: AppTextStyles.bodyxs.copyWith(color: color),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              score.affinity.toStringAsFixed(3),
+              style: AppTextStyles.bodyxs.copyWith(
+                color: color,
+                fontWeight: isBest ? FontWeight.w700 : null,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              score.inter.toStringAsFixed(3),
+              style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              score.intra.toStringAsFixed(3),
+              style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              score.torsions.toStringAsFixed(3),
+              style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              score.unbound.toStringAsFixed(3),
+              style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+            ),
+          ),
         ],
       ),
     );

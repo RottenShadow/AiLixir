@@ -2,7 +2,7 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
-import 'package:ailixir/features/docking/presentation/widgets/docking_download_view.dart';
+import 'package:ailixir/core/widgets/file_download_view.dart';
 import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/docking_see_all_view.dart';
 import 'package:flutter/material.dart';
@@ -135,7 +135,7 @@ class _DockingCard extends StatelessWidget {
                     ? () => Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (_) =>
-                              DockingDownloadView(url: docking.downloadUrl!),
+                              FileDownloadView(url: docking.downloadUrl!),
                         ),
                       )
                     : null,

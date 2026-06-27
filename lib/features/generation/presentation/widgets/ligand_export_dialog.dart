@@ -1,8 +1,8 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/utils/toast/app_toast.dart';
+import 'package:ailixir/core/widgets/file_download_view.dart';
 import 'package:ailixir/features/generation/data/repos/generation_repo.dart';
-import 'package:ailixir/features/generation/presentation/widgets/generation_download_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
@@ -52,7 +52,7 @@ class _LigandExportDialogState extends State<LigandExportDialog> {
           navigator.push(
             MaterialPageRoute(
               builder: (_) =>
-                  GenerationDownloadView(url: url, title: 'Download Ligand'),
+                  FileDownloadView(url: url, title: 'Download Ligand'),
             ),
           );
         } else {

@@ -1,7 +1,7 @@
 import 'package:ailixir/core/entities/generation_files_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
-import 'package:ailixir/features/generation/presentation/widgets/generation_download_view.dart';
+import 'package:ailixir/core/widgets/file_download_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -48,7 +48,7 @@ class BulkExportDialog extends StatelessWidget {
                         navigator.pop();
                         navigator.push(
                           MaterialPageRoute(
-                            builder: (_) => GenerationDownloadView(
+                            builder: (_) => FileDownloadView(
                               url: entry.$2.downloadUrl,
                               title: 'Download ${entry.$1}',
                             ),
