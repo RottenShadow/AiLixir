@@ -41,7 +41,7 @@ class DrugRepurposingHistorySection extends StatelessWidget {
                 Expanded(
                   child: Center(
                     child: CustomEmptyBody(
-                      icon: Icons.medication_outlined,
+                      icon: Icons.biotech_outlined,
                       title: 'No History Yet',
                       subTitle: 'Drug repurposing jobs will appear here.',
                     ),
@@ -91,7 +91,7 @@ class DrugRepurposingHistorySection extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.medication_outlined, color: AppColors.amber400, size: 20.sp),
+            Icon(Icons.biotech_outlined, color: AppColors.amber400, size: 20.sp),
             SizedBox(width: 8.w),
             Text(
               'Drug Repurposing History',

@@ -26,11 +26,7 @@ class GenerationResultsPanel extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.science_outlined,
-                  color: AppColors.cyan400,
-                  size: 20.sp,
-                ),
+                Icon(Icons.auto_awesome, color: AppColors.cyan400, size: 20.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Generated SMILES',

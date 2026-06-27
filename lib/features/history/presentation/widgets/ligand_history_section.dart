@@ -33,11 +33,7 @@ class LigandHistorySection extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.science_outlined,
-                  color: AppColors.cyan400,
-                  size: 20.sp,
-                ),
+                Icon(Icons.auto_awesome, color: AppColors.cyan400, size: 20.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Ligand Generation History',
@@ -74,7 +70,7 @@ class LigandHistorySection extends StatelessWidget {
           Expanded(
             child: Center(
               child: CustomEmptyBody(
-                icon: Icons.science_outlined,
+                icon: Icons.auto_awesome,
                 title: 'No Ligands Yet',
                 subTitle: 'Generated ligands will appear here.',
               ),
@@ -334,7 +330,6 @@ class _JobCard extends StatelessWidget {
       },
     );
   }
-
 }
 
 class _StatusIcon extends StatelessWidget {
@@ -385,5 +380,3 @@ class _StatusChip extends StatelessWidget {
     );
   }
 }
-
-

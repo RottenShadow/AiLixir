@@ -104,7 +104,7 @@ class _LigandSeeAllViewState extends State<LigandSeeAllView> {
             return SizedBox.expand(
               child: Center(
                 child: CustomEmptyBody(
-                  icon: Icons.science_outlined,
+                  icon: Icons.auto_awesome,
                   title: 'No Jobs Found',
                   subTitle:
                       'No generation jobs yet.\nStart a generation job to see results here.',

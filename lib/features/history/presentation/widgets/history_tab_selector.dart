@@ -18,14 +18,14 @@ class HistoryTabSelector extends StatelessWidget {
             children: [
               _TabChip(
                 label: 'Generation',
-                icon: Icons.science_outlined,
+                icon: Icons.auto_awesome,
                 selected: state.selectedTab == HistoryTab.generation,
                 onTap: () => context.read<HistoryTabCubit>().selectTab(HistoryTab.generation),
               ),
               SizedBox(width: 8.w),
               _TabChip(
                 label: 'Docking',
-                icon: Icons.dock_outlined,
+                icon: Icons.hub_outlined,
                 selected: state.selectedTab == HistoryTab.docking,
                 onTap: () => context.read<HistoryTabCubit>().selectTab(HistoryTab.docking),
               ),
@@ -39,7 +39,7 @@ class HistoryTabSelector extends StatelessWidget {
               SizedBox(width: 8.w),
               _TabChip(
                 label: 'Drug Repurposing',
-                icon: Icons.medication_outlined,
+                icon: Icons.biotech_outlined,
                 selected: state.selectedTab == HistoryTab.drugRepurposing,
                 onTap: () => context.read<HistoryTabCubit>().selectTab(HistoryTab.drugRepurposing),
               ),

@@ -103,7 +103,7 @@ class _DrugRepurposingSeeAllViewState extends State<DrugRepurposingSeeAllView> {
               return SizedBox.expand(
                 child: Center(
                   child: CustomEmptyBody(
-                    icon: Icons.medication_outlined,
+                    icon: Icons.biotech_outlined,
                     title: 'No History Found',
                     subTitle: 'No drug repurposing jobs yet.',
                     actionLabel: 'Refresh',
@@ -144,7 +144,7 @@ class _DrugRepurposingSeeAllViewState extends State<DrugRepurposingSeeAllView> {
               return SizedBox.expand(
                 child: Center(
                   child: CustomEmptyBody(
-                    icon: Icons.medication_outlined,
+                    icon: Icons.biotech_outlined,
                     title: 'No History Found',
                     subTitle: 'No drug repurposing jobs yet.',
                     actionLabel: 'Refresh',
