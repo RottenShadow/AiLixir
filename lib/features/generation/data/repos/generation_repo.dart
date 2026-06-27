@@ -74,9 +74,7 @@ class GenerationRepo {
     });
   }
 
-  Future<Either<Failure, Map<String, dynamic>>> cancelJob(
-    String jobId,
-  ) async {
+  Future<Either<Failure, Map<String, dynamic>>> cancelJob(String jobId) async {
     if (AppFeatureFlag.useFakeGeneration) {
       return _fakeCancelJob(jobId);
     }
@@ -89,6 +87,42 @@ class GenerationRepo {
         (d) => d as Map<String, dynamic>,
       );
       return base.data ?? {};
+    });
+  }
+
+  Future<Either<Failure, Map<String, dynamic>>> exportLigand({
+    required String smiles,
+    required String format,
+  }) async {
+    if (AppFeatureFlag.useFakeGeneration) {
+      return _fakeExportLigand(smiles, format);
+    }
+    return safeApiCall(() async {
+      final response = await dioService.post(
+        endpoint: AppEndpoints.ligandsExport,
+        data: {'smiles': smiles, 'format': format},
+      );
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+        response as Map<String, dynamic>,
+        (d) => d as Map<String, dynamic>,
+      );
+      return base.data ?? {};
+    });
+  }
+
+  Future<Either<Failure, Map<String, dynamic>>> _fakeExportLigand(
+    String smiles,
+    String format,
+  ) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return Right({
+      'job_id': 'lig_fake_${DateTime.now().millisecondsSinceEpoch}',
+      'status': 'completed',
+      'format': format,
+      'filename': 'ligand_3d.$format',
+      'smiles': smiles,
+      'download_url':
+          'https://shdwrow-ailixir-generation.hf.space/files/jobs/lig_fake/ligand_3d.$format',
     });
   }
 
@@ -122,10 +156,7 @@ class GenerationRepo {
     String jobId,
   ) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return Right({
-      'job_id': jobId,
-      'status': 'cancelled',
-    });
+    return Right({'job_id': jobId, 'status': 'cancelled'});
   }
 
   Future<Either<Failure, GenerationResultEntity>> _fakeGetJobResults(
