@@ -1,3 +1,4 @@
+import 'package:ailixir/core/entities/generation_job_history_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/features/generation/data/models/ligand_model.dart';
 
@@ -10,6 +11,9 @@ class GenerationHistoryEntryModel {
   final int returnTopK;
   final String dockingMode;
   final int dockTopK;
+  final String? stage;
+  final String? summary;
+  final String? files;
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<LigandModel> ligands;
@@ -23,9 +27,12 @@ class GenerationHistoryEntryModel {
     required this.returnTopK,
     required this.dockingMode,
     required this.dockTopK,
+    this.stage,
+    this.summary,
+    this.files,
     required this.createdAt,
     required this.updatedAt,
-    required this.ligands,
+    this.ligands = const [],
   });
 
   static DateTime? _parseDate(String? raw) {
@@ -44,6 +51,9 @@ class GenerationHistoryEntryModel {
       returnTopK: (json['return_top_k'] as num?)?.toInt() ?? 0,
       dockingMode: json['docking_mode'] as String? ?? 'off',
       dockTopK: (json['dock_top_k'] as num?)?.toInt() ?? 0,
+      stage: json['stage'] as String?,
+      summary: json['summary'] as String?,
+      files: json['files'] as String?,
       createdAt: _parseDate(json['created_at'] as String?) ?? DateTime.now(),
       updatedAt: _parseDate(json['updated_at'] as String?) ?? DateTime.now(),
       ligands: ligandsRaw != null
@@ -54,9 +64,8 @@ class GenerationHistoryEntryModel {
     );
   }
 
-  List<LigandEntity> toEntities() {
-    if (ligands.isEmpty) return [];
-    return ligands.map((l) {
+  GenerationJobHistoryEntity toEntity() {
+    final entityLigands = ligands.map((l) {
       final base = l.toEntity(generatedAt: createdAt);
       return LigandEntity(
         id: '${id}_${base.id}',
@@ -81,5 +90,22 @@ class GenerationHistoryEntryModel {
         dockingStatus: base.dockingStatus,
       );
     }).toList();
+
+    return GenerationJobHistoryEntity(
+      id: id,
+      jobId: jobId,
+      status: status,
+      preset: preset,
+      numMolecules: numMolecules,
+      returnTopK: returnTopK,
+      dockingMode: dockingMode,
+      dockTopK: dockTopK,
+      stage: stage,
+      summary: summary,
+      files: files,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      ligands: entityLigands,
+    );
   }
 }

@@ -8,13 +8,13 @@ final class GenerationHistoryInitial extends GenerationHistoryState {}
 final class GenerationHistoryLoading extends GenerationHistoryState {}
 
 final class GenerationHistoryLoaded extends GenerationHistoryState {
-  final List<LigandEntity> ligands;
-  GenerationHistoryLoaded({required this.ligands});
+  final List<GenerationJobHistoryEntity> jobs;
+  GenerationHistoryLoaded({required this.jobs});
 }
 
 final class GenerationHistoryLoadingMore extends GenerationHistoryState {
-  final List<LigandEntity> ligands;
-  GenerationHistoryLoadingMore({required this.ligands});
+  final List<GenerationJobHistoryEntity> jobs;
+  GenerationHistoryLoadingMore({required this.jobs});
 }
 
 final class GenerationHistoryError extends GenerationHistoryState {

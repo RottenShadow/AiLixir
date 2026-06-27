@@ -1,5 +1,5 @@
 import 'package:ailixir/core/entities/docking_entity.dart';
-import 'package:ailixir/core/entities/ligand_entity.dart';
+import 'package:ailixir/core/entities/generation_job_history_entity.dart';
 import 'package:ailixir/core/entities/md_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
@@ -77,11 +77,11 @@ class HistoryViewBody extends StatelessWidget {
             return switch (state) {
               GenerationHistoryLoading() || GenerationHistoryInitial() => Skeletonizer(
                   enabled: true,
-                  child: LigandHistorySection(ligands: LigandEntity.createFakeData()),
+                  child: LigandHistorySection(jobs: _fakeSkeletonJobs),
                 ),
-              GenerationHistoryLoaded(:final ligands) => LigandHistorySection(ligands: ligands),
-              GenerationHistoryLoadingMore(:final ligands) =>
-                  LigandHistorySection(ligands: ligands),
+              GenerationHistoryLoaded(:final jobs) => LigandHistorySection(jobs: jobs),
+              GenerationHistoryLoadingMore(:final jobs) =>
+                  LigandHistorySection(jobs: jobs),
               GenerationHistoryError(:final message) => _ErrorSection(message: message),
             };
           },
@@ -218,6 +218,23 @@ class _NoticeBanner extends StatelessWidget {
     );
   }
 }
+
+final List<GenerationJobHistoryEntity> _fakeSkeletonJobs = List.generate(
+  5,
+  (i) => GenerationJobHistoryEntity(
+    id: '$i',
+    jobId: 'skel_$i',
+    status: 'completed',
+    preset: 'generator_preset',
+    numMolecules: 100,
+    returnTopK: 10,
+    dockingMode: 'off',
+    dockTopK: 0,
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now(),
+    ligands: [],
+  ),
+);
 
 class _ErrorSection extends StatelessWidget {
   final String message;

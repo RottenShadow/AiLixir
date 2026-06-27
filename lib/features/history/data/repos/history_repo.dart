@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/entities/docking_score_entity.dart';
+import 'package:ailixir/core/entities/generation_job_history_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/entities/ligand_details_entity.dart';
 import 'package:ailixir/core/entities/md_entity.dart';
@@ -91,7 +92,7 @@ class HistoryRepo {
     );
   });
 
-  Future<Either<Failure, PaginatedData<LigandEntity>>> getGenerationHistory({
+  Future<Either<Failure, PaginatedData<GenerationJobHistoryEntity>>> getGenerationHistory({
     int page = 1,
     int perPage = 20,
   }) async {
@@ -120,13 +121,13 @@ class HistoryRepo {
               .toList() ??
           [];
 
-      final dataList = jobs.expand((job) => job.toEntities()).toList();
+      final dataList = jobs.map((job) => job.toEntity()).toList();
 
       final pagination = PaginationModel.fromJson(
         innerData['pagination'] ?? {},
       );
 
-      return PaginatedDataWithExtra<LigandEntity, dynamic>(
+      return PaginatedDataWithExtra<GenerationJobHistoryEntity, dynamic>(
         results: dataList,
         pagination: pagination,
       );
@@ -253,21 +254,75 @@ class HistoryRepo {
     });
   }
 
-  Future<Either<Failure, PaginatedData<LigandEntity>>> _fakeGenerationHistory(
+  static final List<GenerationJobHistoryEntity> _fakeJobPool = () {
+    final now = DateTime.now();
+    return [
+      // Running job
+      GenerationJobHistoryEntity(
+        id: '1',
+        jobId: 'gen_20260627_193816_c496f7',
+        status: 'running',
+        preset: 'egfr_generator',
+        numMolecules: 100,
+        returnTopK: 10,
+        dockingMode: 'top_k',
+        dockTopK: 10,
+        stage: 'sampling',
+        createdAt: now.subtract(const Duration(minutes: 5)),
+        updatedAt: now.subtract(const Duration(minutes: 5)),
+      ),
+      // Failed job
+      GenerationJobHistoryEntity(
+        id: '2',
+        jobId: 'gen_20260627_183000_a123b4',
+        status: 'failed',
+        preset: 'drd2_generator',
+        numMolecules: 50,
+        returnTopK: 5,
+        dockingMode: 'off',
+        dockTopK: 0,
+        summary: 'Generation failed: sampling error at step 42',
+        createdAt: now.subtract(const Duration(hours: 2)),
+        updatedAt: now.subtract(const Duration(hours: 1, minutes: 50)),
+      ),
+      // Completed jobs with ligands
+      ...List.generate(10, (i) {
+        final ligands = _fakeLigandPool
+            .skip((i * 5) % _fakeLigandPool.length)
+            .take(5)
+            .toList();
+        return GenerationJobHistoryEntity(
+          id: '${i + 3}',
+          jobId: 'gen_2026062${7 - i}_120000_abc$i',
+          status: 'completed',
+          preset: ['egfr_generator', 'drd2_generator', 'jak2_generator'][i % 3],
+          numMolecules: 100,
+          returnTopK: 10,
+          dockingMode: i % 2 == 0 ? 'top_k' : 'off',
+          dockTopK: i % 2 == 0 ? 10 : 0,
+          createdAt: now.subtract(Duration(days: i + 1)),
+          updatedAt: now.subtract(Duration(days: i + 1)),
+          ligands: ligands,
+        );
+      }),
+    ];
+  }();
+
+  Future<Either<Failure, PaginatedData<GenerationJobHistoryEntity>>> _fakeGenerationHistory(
     int page,
     int perPage,
   ) async {
     await Future.delayed(const Duration(milliseconds: 800));
     final start = (page - 1) * perPage;
-    final items = _fakeLigandPool.skip(start).take(perPage).toList();
-    final totalPages = (_fakeLigandPool.length / perPage).ceil();
+    final items = _fakeJobPool.skip(start).take(perPage).toList();
+    final totalPages = (_fakeJobPool.length / perPage).ceil();
     return Right(
-      PaginatedDataWithExtra<LigandEntity, dynamic>(
+      PaginatedDataWithExtra<GenerationJobHistoryEntity, dynamic>(
         results: items,
         pagination: PaginationModel(
           currentPage: page,
           totalPages: totalPages,
-          totalResults: _fakeLigandPool.length,
+          totalResults: _fakeJobPool.length,
           hasNextPage: page < totalPages,
           hasPrevPage: page > 1,
         ),

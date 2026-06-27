@@ -1,8 +1,8 @@
-import 'package:ailixir/core/entities/ligand_entity.dart';
+import 'package:ailixir/core/entities/generation_job_history_entity.dart';
 import 'package:ailixir/features/history/data/repos/history_repo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:meta/meta.dart';
 
 part 'generation_history_state.dart';
 
@@ -22,7 +22,7 @@ class GenerationHistoryCubit extends Cubit<GenerationHistoryState> {
     final result = await repo.getGenerationHistory(page: 1, perPage: _pageSize);
     result.fold(
       (failure) => emit(GenerationHistoryError(message: failure.message)),
-      (data) => emit(GenerationHistoryLoaded(ligands: data.results)),
+      (data) => emit(GenerationHistoryLoaded(jobs: data.results)),
     );
   }
 
@@ -36,25 +36,25 @@ class GenerationHistoryCubit extends Cubit<GenerationHistoryState> {
       (data) {
         _currentPage = 1;
         _hasMore = data.pagination.hasNextPage;
-        emit(GenerationHistoryLoaded(ligands: data.results));
+        emit(GenerationHistoryLoaded(jobs: data.results));
       },
     );
   }
 
   Future<void> loadMore() async {
     if (!_hasMore || state is GenerationHistoryLoadingMore) return;
-    final current = (state as GenerationHistoryLoaded).ligands;
-    emit(GenerationHistoryLoadingMore(ligands: current));
+    final current = (state as GenerationHistoryLoaded).jobs;
+    emit(GenerationHistoryLoadingMore(jobs: current));
     final result = await repo.getGenerationHistory(
       page: _currentPage + 1,
       perPage: _pageSize,
     );
-    result.fold((failure) => emit(GenerationHistoryLoaded(ligands: current)), (
+    result.fold((failure) => emit(GenerationHistoryLoaded(jobs: current)), (
       data,
     ) {
       _currentPage++;
       _hasMore = data.pagination.hasNextPage;
-      emit(GenerationHistoryLoaded(ligands: [...current, ...data.results]));
+      emit(GenerationHistoryLoaded(jobs: [...current, ...data.results]));
     });
   }
 }
