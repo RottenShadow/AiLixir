@@ -1,5 +1,6 @@
 import 'package:ailixir/core/constants/app_images.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
+import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:ailixir/features/chatbot/presentation/cubits/chat_session_cubit.dart';
 import 'package:ailixir/features/chatbot/presentation/widgets/chat_search_dialog.dart';
 import 'package:flutter/material.dart';
@@ -47,8 +48,9 @@ class ChatbotSidebar extends StatelessWidget {
                 if (selectedResult != null) {
                   await Clipboard.setData(ClipboardData(text: selectedResult));
                   if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Copied to clipboard')),
+                    AppToast.showSuccessToast(
+                      context: context,
+                      message: 'Copied to clipboard',
                     );
                   }
                 }

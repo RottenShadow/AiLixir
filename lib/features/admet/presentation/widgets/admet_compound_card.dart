@@ -1,5 +1,6 @@
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:ailixir/features/admet/domain/entities/admet_prediction_entity.dart';
 import 'package:ailixir/features/admet/presentation/widgets/admet_metric_row.dart';
 import 'package:flutter/material.dart';
@@ -29,14 +30,9 @@ Excretion: ${prediction.excretion.toStringAsFixed(3)}
 Toxicity: ${prediction.toxicity.toStringAsFixed(3)}
 ''';
     Clipboard.setData(ClipboardData(text: text));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Result copied to clipboard'),
-        duration: const Duration(seconds: 2),
-        backgroundColor: AppColors.slate800,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
+    AppToast.showSuccessToast(
+      context: context,
+      message: 'Result copied to clipboard',
     );
   }
 
