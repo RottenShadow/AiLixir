@@ -75,14 +75,21 @@ class HistoryViewBody extends StatelessWidget {
         return BlocBuilder<GenerationHistoryCubit, GenerationHistoryState>(
           builder: (context, state) {
             return switch (state) {
-              GenerationHistoryLoading() || GenerationHistoryInitial() => Skeletonizer(
-                  enabled: true,
-                  child: LigandHistorySection(jobs: _fakeSkeletonJobs),
-                ),
-              GenerationHistoryLoaded(:final jobs) => LigandHistorySection(jobs: jobs),
-              GenerationHistoryLoadingMore(:final jobs) =>
-                  LigandHistorySection(jobs: jobs),
-              GenerationHistoryError(:final message) => _ErrorSection(message: message),
+              GenerationHistoryLoading() ||
+              GenerationHistoryInitial() => Skeletonizer(
+                enabled: true,
+                child: LigandHistorySection(jobs: _fakeSkeletonJobs),
+              ),
+              GenerationHistoryLoaded(:final jobs) => LigandHistorySection(
+                jobs: jobs,
+              ),
+              GenerationHistoryLoadingMore(:final jobs) => LigandHistorySection(
+                jobs: jobs,
+              ),
+              GenerationHistoryError(:final message) => _ErrorSection(
+                message: message,
+                selectedTab: selectedTab,
+              ),
             };
           },
         );
@@ -91,14 +98,22 @@ class HistoryViewBody extends StatelessWidget {
         return BlocBuilder<DockingHistoryCubit, DockingHistoryState>(
           builder: (context, state) {
             return switch (state) {
-              DockingHistoryLoading() || DockingHistoryInitial() => Skeletonizer(
-                  enabled: true,
-                  child: DockingHistorySection(dockings: DockingEntity.createFakeData()),
+              DockingHistoryLoading() ||
+              DockingHistoryInitial() => Skeletonizer(
+                enabled: true,
+                child: DockingHistorySection(
+                  dockings: DockingEntity.createFakeData(),
                 ),
-              DockingHistoryLoaded(:final dockings) => DockingHistorySection(dockings: dockings),
+              ),
+              DockingHistoryLoaded(:final dockings) => DockingHistorySection(
+                dockings: dockings,
+              ),
               DockingHistoryLoadingMore(:final dockings) =>
-                  DockingHistorySection(dockings: dockings),
-              DockingHistoryError(:final message) => _ErrorSection(message: message),
+                DockingHistorySection(dockings: dockings),
+              DockingHistoryError(:final message) => _ErrorSection(
+                message: message,
+                selectedTab: selectedTab,
+              ),
             };
           },
         );
@@ -108,33 +123,27 @@ class HistoryViewBody extends StatelessWidget {
           builder: (context, state) {
             return switch (state) {
               MdHistoryLoading() || MdHistoryInitial() => Skeletonizer(
-                  enabled: true,
-                  child: MdHistorySection(mdSimulations: MdEntity.createFakeData()),
+                enabled: true,
+                child: MdHistorySection(
+                  mdSimulations: MdEntity.createFakeData(),
                 ),
-              MdHistoryLoaded(:final mdSimulations) =>
-                  MdHistorySection(mdSimulations: mdSimulations),
-              MdHistoryLoadingMore(:final mdSimulations) =>
-                  MdHistorySection(mdSimulations: mdSimulations),
-              MdHistoryError(:final message) => _ErrorSection(message: message),
+              ),
+              MdHistoryLoaded(:final mdSimulations) => MdHistorySection(
+                mdSimulations: mdSimulations,
+              ),
+              MdHistoryLoadingMore(:final mdSimulations) => MdHistorySection(
+                mdSimulations: mdSimulations,
+              ),
+              MdHistoryError(:final message) => _ErrorSection(
+                message: message,
+                selectedTab: selectedTab,
+              ),
             };
           },
         );
 
       case HistoryTab.drugRepurposing:
         return const DrugRepurposingHistorySection();
-    }
-  }
-
-  Future<void> _refreshCurrentTab(BuildContext context, HistoryTab tab) async {
-    switch (tab) {
-      case HistoryTab.generation:
-        return context.read<GenerationHistoryCubit>().load();
-      case HistoryTab.docking:
-        return context.read<DockingHistoryCubit>().load();
-      case HistoryTab.md:
-        return context.read<MdHistoryCubit>().load();
-      case HistoryTab.drugRepurposing:
-        return context.read<DrugRepurposingCubit>().load();
     }
   }
 }
@@ -166,8 +175,13 @@ class _Header extends StatelessWidget {
                     height: 32.w,
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: Icon(Icons.refresh, color: AppColors.cyan400, size: 20.sp),
-                      onPressed: () => _refreshCurrentTab(context, state.selectedTab),
+                      icon: Icon(
+                        Icons.refresh,
+                        color: AppColors.cyan400,
+                        size: 20.sp,
+                      ),
+                      onPressed: () =>
+                          _refreshCurrentTab(context, state.selectedTab),
                     ),
                   ),
                 ),
@@ -177,19 +191,6 @@ class _Header extends StatelessWidget {
         );
       },
     );
-  }
-
-  Future<void> _refreshCurrentTab(BuildContext context, HistoryTab tab) async {
-    switch (tab) {
-      case HistoryTab.generation:
-        return context.read<GenerationHistoryCubit>().load();
-      case HistoryTab.docking:
-        return context.read<DockingHistoryCubit>().load();
-      case HistoryTab.md:
-        return context.read<MdHistoryCubit>().load();
-      case HistoryTab.drugRepurposing:
-        return context.read<DrugRepurposingCubit>().load();
-    }
   }
 }
 
@@ -238,7 +239,8 @@ final List<GenerationJobHistoryEntity> _fakeSkeletonJobs = List.generate(
 
 class _ErrorSection extends StatelessWidget {
   final String message;
-  const _ErrorSection({required this.message});
+  final HistoryTab selectedTab;
+  const _ErrorSection({required this.message, required this.selectedTab});
 
   @override
   Widget build(BuildContext context) {
@@ -247,8 +249,21 @@ class _ErrorSection extends StatelessWidget {
         icon: Icons.error_outline,
         msg: message,
         actionLabel: 'Try Again',
-        onAction: () {},
+        onAction: () => _refreshCurrentTab(context, selectedTab),
       ),
     );
+  }
+}
+
+Future<void> _refreshCurrentTab(BuildContext context, HistoryTab tab) async {
+  switch (tab) {
+    case HistoryTab.generation:
+      return context.read<GenerationHistoryCubit>().load();
+    case HistoryTab.docking:
+      return context.read<DockingHistoryCubit>().load();
+    case HistoryTab.md:
+      return context.read<MdHistoryCubit>().load();
+    case HistoryTab.drugRepurposing:
+      return context.read<DrugRepurposingCubit>().load();
   }
 }
