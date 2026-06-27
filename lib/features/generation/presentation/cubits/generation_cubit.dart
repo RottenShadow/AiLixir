@@ -79,7 +79,7 @@ class GenerationCubit extends Cubit<GenerationState> {
           status: GenerationStatus.idle,
           logs: [
             ...state.logs,
-            '[${_timestamp()}] Max polling attempts reached ($_maxPollAttempts). Returning to idle.',
+            '[${_timestamp()}] Max polling attempts reached ($_maxPollAttempts). Returning to idle. You can check progress in history.',
           ],
         ),
       );
@@ -116,10 +116,7 @@ class GenerationCubit extends Cubit<GenerationState> {
           emit(
             state.copyWith(
               status: GenerationStatus.idle,
-              logs: [
-                ...state.logs,
-                '[${_timestamp()}] Job failed.',
-              ],
+              logs: [...state.logs, '[${_timestamp()}] Job failed.'],
             ),
           );
         } else {
@@ -141,10 +138,7 @@ class GenerationCubit extends Cubit<GenerationState> {
 
     emit(
       state.copyWith(
-        logs: [
-          ...state.logs,
-          '[${_timestamp()}] Fetching results...',
-        ],
+        logs: [...state.logs, '[${_timestamp()}] Fetching results...'],
       ),
     );
 
