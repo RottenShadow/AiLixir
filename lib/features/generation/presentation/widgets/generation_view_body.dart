@@ -55,6 +55,42 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
     context.read<GenerationCubit>().startGeneration(request);
   }
 
+  Future<void> _cancelGeneration(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.slate800,
+        title: Text(
+          'Cancel Job',
+          style: AppTextStyles.h5.copyWith(color: AppColors.white),
+        ),
+        content: Text(
+          'Are you sure you want to cancel this generation job?',
+          style: AppTextStyles.bodysmall.copyWith(color: AppColors.slate300),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'No',
+              style: AppTextStyles.labelsmall.copyWith(color: AppColors.slate400),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              'Yes, Cancel',
+              style: AppTextStyles.labelsmall.copyWith(color: AppColors.red400),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      context.read<GenerationCubit>().cancelJob();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GenerationCubit, GenerationState>(
@@ -135,12 +171,15 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
                     ),
                     SizedBox(height: 20.h),
 
-                    // Start Button
+                    // Start / Cancel Buttons
                     _StartButton(
                       isRunning: isRunning,
                       onPressed: isRunning ? null : _submit,
                       onReset: state.status == GenerationStatus.completed
                           ? () => context.read<GenerationCubit>().reset()
+                          : null,
+                      onCancel: isRunning
+                          ? () => _cancelGeneration(context)
                           : null,
                     ),
                   ],
@@ -568,11 +607,13 @@ class _StartButton extends StatelessWidget {
   final bool isRunning;
   final VoidCallback? onPressed;
   final VoidCallback? onReset;
+  final VoidCallback? onCancel;
 
   const _StartButton({
     required this.isRunning,
     required this.onPressed,
     required this.onReset,
+    this.onCancel,
   });
 
   @override
@@ -592,12 +633,34 @@ class _StartButton extends StatelessWidget {
       );
     }
 
+    if (isRunning && onCancel != null) {
+      return Row(
+        children: [
+          Expanded(
+            child: _buildBtn(
+              label: 'Running...',
+              color: AppColors.slate600,
+              isLoading: true,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: _buildBtn(
+              label: 'Cancel',
+              icon: Icons.close,
+              color: AppColors.red800,
+              onPressed: onCancel,
+            ),
+          ),
+        ],
+      );
+    }
+
     return _buildBtn(
-      label: isRunning ? 'Running...' : 'Start Generation Job',
-      icon: isRunning ? null : Icons.rocket_launch_outlined,
-      color: isRunning ? AppColors.slate600 : AppColors.brandBlue,
+      label: 'Start Generation Job',
+      icon: Icons.rocket_launch_outlined,
+      color: AppColors.brandBlue,
       onPressed: onPressed,
-      isLoading: isRunning,
     );
   }
 
