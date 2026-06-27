@@ -229,7 +229,15 @@ class _DockingViewBodyState extends State<DockingViewBody> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DockingCubit, DockingState>(
+    return BlocConsumer<DockingCubit, DockingState>(
+      listenWhen: (previous, current) =>
+          previous.status == DockingStatus.polling &&
+          current.status == DockingStatus.idle &&
+          current.request == null,
+      listener: (context, state) {
+        _clearProtein();
+        _clearLigand();
+      },
       builder: (context, state) {
         final isRunning = state.status == DockingStatus.polling;
         final isDone = state.status == DockingStatus.completed;

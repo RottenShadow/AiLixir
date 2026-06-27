@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/entities/docking_request_entity.dart';
 import 'package:ailixir/features/docking/data/repos/docking_repo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:meta/meta.dart';
 
 part 'docking_state.dart';
 
@@ -17,6 +17,7 @@ class DockingCubit extends Cubit<DockingState> {
   int _pollCount = 0;
 
   static const _pollInterval = Duration(seconds: 15);
+  static const _maxPollAttempts = 3;
 
   int? _currentJobId;
 
@@ -70,6 +71,18 @@ class DockingCubit extends Cubit<DockingState> {
   Future<void> _pollReal() async {
     if (isClosed || _currentJobId == null) return;
     _pollCount++;
+
+    if (_pollCount > _maxPollAttempts) {
+      _cancelTimer();
+      emit(DockingState(
+        status: DockingStatus.idle,
+        logs: [
+          ...state.logs,
+          '[${_ts()}] Max polling attempts reached ($_maxPollAttempts). Returning to idle. You can check progress in history.',
+        ],
+      ));
+      return;
+    }
 
     emit(
       state.copyWith(
