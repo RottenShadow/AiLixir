@@ -7,16 +7,17 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 
-class DockingDownloadView extends StatefulWidget {
+class FileDownloadView extends StatefulWidget {
   final String url;
+  final String? title;
 
-  const DockingDownloadView({super.key, required this.url});
+  const FileDownloadView({super.key, required this.url, this.title});
 
   @override
-  State<DockingDownloadView> createState() => _DockingDownloadViewState();
+  State<FileDownloadView> createState() => _FileDownloadViewState();
 }
 
-class _DockingDownloadViewState extends State<DockingDownloadView> {
+class _FileDownloadViewState extends State<FileDownloadView> {
   final Future<String?> _tokenFuture = GetIt.I
       .get<SecureStorageService>()
       .readValue(key: AppConstants.accessTokenKey);
@@ -34,7 +35,7 @@ class _DockingDownloadViewState extends State<DockingDownloadView> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Download Results',
+          widget.title ?? 'Download Results',
           style: AppTextStyles.h5.copyWith(color: AppColors.white),
         ),
         bottom: _loading
