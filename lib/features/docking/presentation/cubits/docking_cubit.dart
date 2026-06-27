@@ -95,15 +95,15 @@ class DockingCubit extends Cubit<DockingState> {
       (job) {
         if (job.status == 'completed') {
           _cancelTimer();
-          final scores = job.results?.scores ?? [];
+          final scores = job.scores;
           final bestScore = scores.isNotEmpty
               ? scores.map((s) => s.affinity).reduce((a, b) => a < b ? a : b)
               : 0.0;
           final results = [
             DockingEntity(
               id: job.jobId.toString(),
-              targetId: job.inputs?.protein ?? 'Unknown',
-              targetName: job.inputs?.protein ?? 'Unknown',
+              targetId: job.protein ?? 'Unknown',
+              targetName: job.protein ?? 'Unknown',
               jobId: 'JOB-${job.jobId}',
               createdAt: job.createdAt ?? DateTime.now(),
               vinaScore: bestScore,

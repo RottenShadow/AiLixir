@@ -1,24 +1,6 @@
 import 'package:ailixir/core/entities/docking_score_entity.dart';
 import 'package:ailixir/features/docking/domain/entities/docking_job_entity.dart';
 
-class DockingJobInputsModel {
-  final String protein;
-  final String? ligand;
-
-  const DockingJobInputsModel({required this.protein, this.ligand});
-
-  factory DockingJobInputsModel.fromJson(Map<String, dynamic> json) {
-    return DockingJobInputsModel(
-      protein: json['protein'] as String? ?? '',
-      ligand: json['ligand'] as String?,
-    );
-  }
-
-  DockingJobInputsEntity toEntity() {
-    return DockingJobInputsEntity(protein: protein, ligand: ligand);
-  }
-}
-
 class DockingScoreModel {
   final double affinity;
   final double inter;
@@ -55,45 +37,22 @@ class DockingScoreModel {
   }
 }
 
-class DockingJobResultsModel {
-  final List<DockingScoreModel> scores;
-  final String? downloadUrl;
-
-  const DockingJobResultsModel({
-    required this.scores,
-    this.downloadUrl,
-  });
-
-  factory DockingJobResultsModel.fromJson(Map<String, dynamic> json) {
-    return DockingJobResultsModel(
-      scores: (json['scores'] as List<dynamic>?)
-              ?.map((e) => DockingScoreModel.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      downloadUrl: json['download_url'] as String?,
-    );
-  }
-
-  DockingJobResultsEntity toEntity() {
-    return DockingJobResultsEntity(
-      scores: scores.map((e) => e.toEntity()).toList(),
-      downloadUrl: downloadUrl,
-    );
-  }
-}
-
 class DockingJobModel {
   final int jobId;
   final String status;
-  final DockingJobInputsModel? inputs;
-  final DockingJobResultsModel? results;
+  final String? protein;
+  final String? ligand;
+  final List<DockingScoreModel> scores;
+  final String? downloadUrl;
   final DateTime? createdAt;
 
   const DockingJobModel({
     required this.jobId,
     required this.status,
-    this.inputs,
-    this.results,
+    this.protein,
+    this.ligand,
+    this.scores = const [],
+    this.downloadUrl,
     this.createdAt,
   });
 
@@ -104,16 +63,18 @@ class DockingJobModel {
     }
 
     return DockingJobModel(
-      jobId: (json['job_id'] as num?)?.toInt() ?? 0,
+      jobId: json['job_id'] ?? json['id'] ?? 0,
       status: json['status'] as String? ?? 'unknown',
-      inputs: json['inputs'] != null
-          ? DockingJobInputsModel.fromJson(
-              json['inputs'] as Map<String, dynamic>)
-          : null,
-      results: json['results'] != null
-          ? DockingJobResultsModel.fromJson(
-              json['results'] as Map<String, dynamic>)
-          : null,
+      protein: json['protein'] as String?,
+      ligand: json['ligand'] as String?,
+      scores:
+          (json['scores'] as List<dynamic>?)
+              ?.map(
+                (e) => DockingScoreModel.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          [],
+      downloadUrl: json['download_url'] as String?,
       createdAt: parseDate(json['created_at'] as String?),
     );
   }
@@ -122,8 +83,10 @@ class DockingJobModel {
     return DockingJobEntity(
       jobId: jobId,
       status: status,
-      inputs: inputs?.toEntity(),
-      results: results?.toEntity(),
+      protein: protein,
+      ligand: ligand,
+      scores: scores.map((e) => e.toEntity()).toList(),
+      downloadUrl: downloadUrl,
       createdAt: createdAt,
     );
   }
