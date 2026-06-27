@@ -38,6 +38,8 @@ abstract class AppEndpoints {
   static String generationResults(String jobId) =>
       'ai/generation/jobs/$jobId/results';
   static const String aiGenerationHistory = 'ai/generation/history';
+  static String generationCancel(String jobId) =>
+      'ai/generation/jobs/$jobId/cancel';
   static const String ligandsExport = 'ai/ligands/export';
   static String aiFiles(String jobId, String filename) =>
       'ai/files/$jobId/$filename';

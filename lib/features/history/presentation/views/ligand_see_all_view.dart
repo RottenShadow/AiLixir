@@ -2,12 +2,15 @@ import 'package:ailixir/core/entities/generation_job_history_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
+import 'package:ailixir/features/generation/data/repos/generation_repo.dart';
 import 'package:ailixir/features/history/presentation/cubits/generation_history_cubit/generation_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -105,7 +108,8 @@ class _LigandSeeAllViewState extends State<LigandSeeAllView> {
                 child: CustomEmptyBody(
                   icon: Icons.science_outlined,
                   title: 'No Jobs Found',
-                  subTitle: 'No generation jobs yet.\nStart a generation job to see results here.',
+                  subTitle:
+                      'No generation jobs yet.\nStart a generation job to see results here.',
                   actionLabel: 'Refresh',
                   onAction: () => cubit.loadAll(),
                 ),
@@ -224,7 +228,11 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
     return AppColors.brandBorder;
   }
 
-  Widget _buildHeader(BuildContext context, GenerationJobHistoryEntity job, String dateStr) {
+  Widget _buildHeader(
+    BuildContext context,
+    GenerationJobHistoryEntity job,
+    String dateStr,
+  ) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       child: Row(
@@ -240,6 +248,8 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
             )
           else if (job.isFailed)
             Icon(Icons.error, color: AppColors.red400, size: 20.sp)
+          else if (job.isCancelled)
+            Icon(Icons.cancel_outlined, color: AppColors.gray400, size: 20.sp)
           else
             Icon(Icons.check_circle, color: AppColors.green400, size: 20.sp),
           SizedBox(width: 12.w),
@@ -251,8 +261,10 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
                   children: [
                     Flexible(
                       child: Text(
-                        job.preset,
-                        style: AppTextStyles.h6.copyWith(color: AppColors.white),
+                        job.jobId,
+                        style: AppTextStyles.h6.copyWith(
+                          color: AppColors.white,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -265,20 +277,26 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
                   children: [
                     Text(
                       dateStr,
-                      style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+                      style: AppTextStyles.bodyxs.copyWith(
+                        color: AppColors.slate400,
+                      ),
                     ),
                     if (job.isRunning && job.stage != null) ...[
                       SizedBox(width: 12.w),
                       Text(
                         'Stage: ${job.stage}',
-                        style: AppTextStyles.bodyxs.copyWith(color: AppColors.blue300),
+                        style: AppTextStyles.bodyxs.copyWith(
+                          color: AppColors.blue300,
+                        ),
                       ),
                     ],
                     if (!job.isRunning) ...[
                       SizedBox(width: 12.w),
                       Text(
                         '${job.ligands.length} ligands',
-                        style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+                        style: AppTextStyles.bodyxs.copyWith(
+                          color: AppColors.slate400,
+                        ),
                       ),
                     ],
                   ],
@@ -288,7 +306,9 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
                     padding: EdgeInsets.only(top: 4.h),
                     child: Text(
                       job.summary!,
-                      style: AppTextStyles.bodyxs.copyWith(color: AppColors.red300),
+                      style: AppTextStyles.bodyxs.copyWith(
+                        color: AppColors.red300,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -296,6 +316,24 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
               ],
             ),
           ),
+          if (job.isRunning)
+            GestureDetector(
+              onTap: () => _cancelJob(context, job),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                decoration: BoxDecoration(
+                  color: AppColors.red900.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(4.r),
+                  border: Border.all(color: AppColors.red700),
+                ),
+                child: Text(
+                  'Cancel',
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.red300,
+                  ),
+                ),
+              ),
+            ),
           if (job.isCompleted)
             GestureDetector(
               onTap: () => setState(() => _expanded = !_expanded),
@@ -310,7 +348,10 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
     );
   }
 
-  Widget _buildLigandList(BuildContext context, GenerationJobHistoryEntity job) {
+  Widget _buildLigandList(
+    BuildContext context,
+    GenerationJobHistoryEntity job,
+  ) {
     if (job.ligands.isEmpty) {
       return Padding(
         padding: EdgeInsets.all(16.w),
@@ -326,6 +367,66 @@ class _JobSeeAllCardState extends State<_JobSeeAllCard> {
       children: job.ligands.map((l) => _LigandSeeAllRow(ligand: l)).toList(),
     );
   }
+
+  Future<void> _cancelJob(
+    BuildContext context,
+    GenerationJobHistoryEntity job,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.slate800,
+        title: Text(
+          'Cancel Job',
+          style: AppTextStyles.h5.copyWith(color: AppColors.white),
+        ),
+        content: Text(
+          'Are you sure you want to cancel this generation job?',
+          style: AppTextStyles.bodysmall.copyWith(color: AppColors.slate300),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'No',
+              style: AppTextStyles.labelsmall.copyWith(
+                color: AppColors.slate400,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              'Yes, Cancel',
+              style: AppTextStyles.labelsmall.copyWith(color: AppColors.red400),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    final repo = GetIt.I.get<GenerationRepo>();
+    final result = await repo.cancelJob(job.jobId);
+    result.fold(
+      (failure) {
+        if (context.mounted) {
+          AppToast.showErrorToast(
+            context: context,
+            message: 'Failed to cancel job: ${failure.message}',
+          );
+        }
+      },
+      (_) {
+        if (context.mounted) {
+          AppToast.showSuccessToast(
+            context: context,
+            message: 'Job cancelled successfully',
+          );
+          context.read<GenerationHistoryCubit>().load();
+        }
+      },
+    );
+  }
 }
 
 class _StatusChip extends StatelessWidget {
@@ -335,9 +436,10 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (Color bg, Color fg, String label) = switch (status) {
-      'running' => (AppColors.blue900, AppColors.blue300, 'Running'),
-      'failed' => (AppColors.red900, AppColors.red300, 'Failed'),
-      _ => (AppColors.green900, AppColors.green300, 'Completed'),
+      'running' => (AppColors.blue900, AppColors.blue400, 'Running'),
+      'failed' => (AppColors.red900, AppColors.red400, 'Failed'),
+      'cancelled' => (AppColors.gray900, AppColors.gray400, 'Cancelled'),
+      _ => (AppColors.green900, AppColors.green400, 'Completed'),
     };
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
@@ -345,10 +447,7 @@ class _StatusChip extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(4.r),
       ),
-      child: Text(
-        label,
-        style: AppTextStyles.caption.copyWith(color: fg),
-      ),
+      child: Text(label, style: AppTextStyles.caption.copyWith(color: fg)),
     );
   }
 }
@@ -364,7 +463,9 @@ class _LigandSeeAllRow extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: AppColors.slate700, width: 0.5)),
+          border: Border(
+            top: BorderSide(color: AppColors.slate700, width: 0.5),
+          ),
         ),
         child: Row(
           children: [
@@ -378,7 +479,9 @@ class _LigandSeeAllRow extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 '#${ligand.rank ?? ''}',
-                style: AppTextStyles.caption.copyWith(color: AppColors.slate300),
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.slate300,
+                ),
               ),
             ),
             SizedBox(width: 12.w),
@@ -388,12 +491,16 @@ class _LigandSeeAllRow extends StatelessWidget {
                 children: [
                   Text(
                     ligand.candidateName,
-                    style: AppTextStyles.labelsmall.copyWith(color: AppColors.white),
+                    style: AppTextStyles.labelsmall.copyWith(
+                      color: AppColors.white,
+                    ),
                   ),
                   SizedBox(height: 2.h),
                   Text(
                     ligand.smiles,
-                    style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
+                    style: AppTextStyles.bodyxs.copyWith(
+                      color: AppColors.slate400,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -403,7 +510,9 @@ class _LigandSeeAllRow extends StatelessWidget {
             SizedBox(width: 8.w),
             Text(
               'Analyze',
-              style: AppTextStyles.labelsmall.copyWith(color: AppColors.cyan400),
+              style: AppTextStyles.labelsmall.copyWith(
+                color: AppColors.cyan400,
+              ),
             ),
           ],
         ),

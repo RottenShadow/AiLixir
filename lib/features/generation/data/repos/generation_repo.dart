@@ -74,6 +74,24 @@ class GenerationRepo {
     });
   }
 
+  Future<Either<Failure, Map<String, dynamic>>> cancelJob(
+    String jobId,
+  ) async {
+    if (AppFeatureFlag.useFakeGeneration) {
+      return _fakeCancelJob(jobId);
+    }
+    return safeApiCall(() async {
+      final response = await dioService.post(
+        endpoint: AppEndpoints.generationCancel(jobId),
+      );
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+        response as Map<String, dynamic>,
+        (d) => d as Map<String, dynamic>,
+      );
+      return base.data ?? {};
+    });
+  }
+
   Future<Either<Failure, GenerationJobEntity>> _fakeSubmitJob() async {
     await Future.delayed(const Duration(milliseconds: 500));
     return Right(
@@ -98,6 +116,16 @@ class GenerationRepo {
         createdAt: DateTime.now(),
       ),
     );
+  }
+
+  Future<Either<Failure, Map<String, dynamic>>> _fakeCancelJob(
+    String jobId,
+  ) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return Right({
+      'job_id': jobId,
+      'status': 'cancelled',
+    });
   }
 
   Future<Either<Failure, GenerationResultEntity>> _fakeGetJobResults(

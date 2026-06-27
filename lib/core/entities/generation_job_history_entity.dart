@@ -36,4 +36,5 @@ class GenerationJobHistoryEntity {
   bool get isRunning => status == 'running';
   bool get isFailed => status == 'failed';
   bool get isCompleted => status == 'completed';
+  bool get isCancelled => status == 'cancelled';
 }
