@@ -1,18 +1,16 @@
 import 'package:ailixir/core/entities/generation_job_history_entity.dart';
-import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
 import 'package:ailixir/features/generation/data/repos/generation_repo.dart';
 import 'package:ailixir/features/history/presentation/cubits/generation_history_cubit/generation_history_cubit.dart';
-import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
+import 'package:ailixir/features/history/presentation/views/ligand_job_details_view.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_see_all_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class LigandHistorySection extends StatelessWidget {
@@ -140,20 +138,12 @@ class LigandHistorySection extends StatelessWidget {
   }
 }
 
-class _JobCard extends StatefulWidget {
+class _JobCard extends StatelessWidget {
   final GenerationJobHistoryEntity job;
   const _JobCard({required this.job});
 
   @override
-  State<_JobCard> createState() => _JobCardState();
-}
-
-class _JobCardState extends State<_JobCard> {
-  bool _expanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final job = widget.job;
     final dateStr = DateFormat('MMM dd, yyyy HH:mm').format(job.createdAt);
 
     return Container(
@@ -163,21 +153,13 @@ class _JobCardState extends State<_JobCard> {
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(color: _borderColor),
       ),
-      child: Column(
-        children: [
-          _buildHeader(context, job, dateStr),
-          if (job.isCompleted && _expanded) ...[
-            Divider(height: 1, color: AppColors.slate700),
-            _buildLigandList(context, job),
-          ],
-        ],
-      ),
+      child: _buildHeader(context, job, dateStr),
     );
   }
 
   Color get _borderColor {
-    if (widget.job.isRunning) return AppColors.blue700;
-    if (widget.job.isFailed) return AppColors.red700;
+    if (job.isRunning) return AppColors.blue700;
+    if (job.isFailed) return AppColors.red700;
     return AppColors.brandBorder;
   }
 
@@ -265,12 +247,27 @@ class _JobCardState extends State<_JobCard> {
               ),
             ),
           if (job.isCompleted)
-            GestureDetector(
-              onTap: () => setState(() => _expanded = !_expanded),
-              child: Icon(
-                _expanded ? Icons.expand_less : Icons.expand_more,
-                color: AppColors.slate400,
-                size: 20.sp,
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => LigandJobDetailsView(job: job),
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: AppColors.cyan600),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6.r),
+                ),
+              ),
+              icon: Icon(
+                Icons.arrow_forward,
+                color: AppColors.cyan400,
+                size: 12.sp,
+              ),
+              label: Text(
+                'See Details',
+                style: AppTextStyles.caption.copyWith(color: AppColors.cyan400),
               ),
             ),
         ],
@@ -338,25 +335,6 @@ class _JobCardState extends State<_JobCard> {
     );
   }
 
-  Widget _buildLigandList(
-    BuildContext context,
-    GenerationJobHistoryEntity job,
-  ) {
-    if (job.ligands.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Center(
-          child: Text(
-            'No ligands found for this job.',
-            style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
-          ),
-        ),
-      );
-    }
-    return Column(
-      children: job.ligands.map((l) => _LigandRow(ligand: l)).toList(),
-    );
-  }
 }
 
 class _StatusIcon extends StatelessWidget {
@@ -408,66 +386,4 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-class _LigandRow extends StatelessWidget {
-  final LigandEntity ligand;
-  const _LigandRow({required this.ligand});
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.push(LigandDetailsView.routeName, extra: ligand),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: AppColors.slate700, width: 0.5),
-          ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 32.w,
-              height: 32.w,
-              decoration: BoxDecoration(
-                color: AppColors.slate700,
-                borderRadius: BorderRadius.circular(6.r),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                'SM',
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.slate300,
-                ),
-              ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    ligand.candidateName,
-                    style: AppTextStyles.labelsmall.copyWith(
-                      color: AppColors.white,
-                    ),
-                  ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    ligand.smiles,
-                    style: AppTextStyles.bodyxs.copyWith(
-                      color: AppColors.slate400,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 8.w),
-            Icon(Icons.chevron_right, color: AppColors.slate500, size: 16.sp),
-          ],
-        ),
-      ),
-    );
-  }
-}
