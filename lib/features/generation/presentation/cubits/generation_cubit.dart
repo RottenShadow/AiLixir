@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ailixir/core/entities/generation_files_entity.dart';
 import 'package:ailixir/core/entities/generation_request_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/features/generation/data/repos/generation_repo.dart';
@@ -164,6 +165,7 @@ class GenerationCubit extends Cubit<GenerationState> {
               '[${_timestamp()}] Results received. ${generationResult.ligands.length} ligands.',
             ],
             results: generationResult.ligands,
+            files: generationResult.files,
           ),
         );
       },

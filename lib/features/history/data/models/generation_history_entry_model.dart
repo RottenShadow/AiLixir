@@ -1,5 +1,6 @@
 import 'package:ailixir/core/entities/generation_job_history_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
+import 'package:ailixir/features/generation/data/models/generation_files_model.dart';
 import 'package:ailixir/features/generation/data/models/ligand_model.dart';
 
 class GenerationHistoryEntryModel {
@@ -12,8 +13,7 @@ class GenerationHistoryEntryModel {
   final String dockingMode;
   final int dockTopK;
   final String? stage;
-  final String? summary;
-  final String? files;
+  final GenerationFilesModel? files;
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<LigandModel> ligands;
@@ -28,7 +28,6 @@ class GenerationHistoryEntryModel {
     required this.dockingMode,
     required this.dockTopK,
     this.stage,
-    this.summary,
     this.files,
     required this.createdAt,
     required this.updatedAt,
@@ -52,14 +51,15 @@ class GenerationHistoryEntryModel {
       dockingMode: json['docking_mode'] as String? ?? 'off',
       dockTopK: (json['dock_top_k'] as num?)?.toInt() ?? 0,
       stage: json['stage'] as String?,
-      summary: json['summary'] as String?,
-      files: json['files'] as String?,
+      files: json['files'] != null
+          ? GenerationFilesModel.fromJson(json['files'] as Map<String, dynamic>)
+          : null,
       createdAt: _parseDate(json['created_at'] as String?) ?? DateTime.now(),
       updatedAt: _parseDate(json['updated_at'] as String?) ?? DateTime.now(),
       ligands: ligandsRaw != null
           ? ligandsRaw
-              .map((e) => LigandModel.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .map((e) => LigandModel.fromJson(e as Map<String, dynamic>))
+                .toList()
           : [],
     );
   }
@@ -101,8 +101,7 @@ class GenerationHistoryEntryModel {
       dockingMode: dockingMode,
       dockTopK: dockTopK,
       stage: stage,
-      summary: summary,
-      files: files,
+      files: files?.toEntity(),
       createdAt: createdAt,
       updatedAt: updatedAt,
       ligands: entityLigands,
