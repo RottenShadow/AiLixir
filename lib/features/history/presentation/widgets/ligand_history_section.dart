@@ -24,112 +24,119 @@ class LigandHistorySection extends StatelessWidget {
     final hasCompleted = jobs.any((j) => j.isCompleted);
     final hasCanceled = jobs.any((j) => j.isCancelled);
 
-    return Column(
-      mainAxisSize: jobs.isEmpty ? MainAxisSize.max : MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.auto_awesome, color: AppColors.cyan400, size: 20.sp),
-                SizedBox(width: 8.w),
-                Text(
-                  'Ligand Generation History',
-                  style: AppTextStyles.h3.copyWith(color: AppColors.white),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => BlocProvider(
-                          create: (_) => GenerationHistoryCubit()..loadAll(),
-                          child: const LigandSeeAllView(),
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Column(
+        mainAxisSize: jobs.isEmpty ? MainAxisSize.max : MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.auto_awesome,
+                    color: AppColors.cyan400,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 8.w),
+                  Text(
+                    'Ligand Generation History',
+                    style: AppTextStyles.h3.copyWith(color: AppColors.white),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider(
+                            create: (_) => GenerationHistoryCubit()..loadAll(),
+                            child: const LigandSeeAllView(),
+                          ),
                         ),
+                      );
+                    },
+                    child: Text(
+                      'See All',
+                      style: AppTextStyles.labelsmall.copyWith(
+                        color: AppColors.cyan400,
                       ),
-                    );
-                  },
-                  child: Text(
-                    'See All',
-                    style: AppTextStyles.labelsmall.copyWith(
-                      color: AppColors.cyan400,
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(height: 12.h),
-        if (jobs.isEmpty)
-          Expanded(
-            child: Center(
-              child: CustomEmptyBody(
-                icon: Icons.auto_awesome,
-                title: 'No Ligands Yet',
-                subTitle: 'Generated ligands will appear here.',
+                ],
               ),
-            ),
-          )
-        else ...[
-          if (hasRunning) ...[
-            Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: Text(
-                'Active',
-                style: AppTextStyles.labelsmall.copyWith(
-                  color: AppColors.blue400,
+            ],
+          ),
+          SizedBox(height: 12.h),
+          if (jobs.isEmpty)
+            Expanded(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.auto_awesome,
+                  title: 'No Ligands Yet',
+                  subTitle: 'Generated ligands will appear here.',
                 ),
               ),
-            ),
-            ...jobs.where((j) => j.isRunning).map((j) => _JobCard(job: j)),
-            SizedBox(height: 12.h),
-          ],
-          if (hasFailed) ...[
-            Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: Text(
-                'Failed',
-                style: AppTextStyles.labelsmall.copyWith(
-                  color: AppColors.red400,
+            )
+          else ...[
+            if (hasRunning) ...[
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: Text(
+                  'Active',
+                  style: AppTextStyles.labelsmall.copyWith(
+                    color: AppColors.blue400,
+                  ),
                 ),
               ),
-            ),
-            ...jobs.where((j) => j.isFailed).map((j) => _JobCard(job: j)),
-            SizedBox(height: 12.h),
-          ],
-          if (hasCanceled) ...[
-            Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: Text(
-                'Cancelled',
-                style: AppTextStyles.labelsmall.copyWith(
-                  color: AppColors.gray400,
+              ...jobs.where((j) => j.isRunning).map((j) => _JobCard(job: j)),
+              SizedBox(height: 12.h),
+            ],
+            if (hasCompleted) ...[
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: Text(
+                  'Completed',
+                  style: AppTextStyles.labelsmall.copyWith(
+                    color: AppColors.green400,
+                  ),
                 ),
               ),
-            ),
-            ...jobs.where((j) => j.isCancelled).map((j) => _JobCard(job: j)),
-            SizedBox(height: 12.h),
-          ],
-          if (hasCompleted) ...[
-            Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: Text(
-                'Completed',
-                style: AppTextStyles.labelsmall.copyWith(
-                  color: AppColors.green400,
+              ...jobs.where((j) => j.isCompleted).map((j) => _JobCard(job: j)),
+            ],
+            if (hasFailed) ...[
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: Text(
+                  'Failed',
+                  style: AppTextStyles.labelsmall.copyWith(
+                    color: AppColors.red400,
+                  ),
                 ),
               ),
-            ),
-            ...jobs.where((j) => j.isCompleted).map((j) => _JobCard(job: j)),
+              ...jobs.where((j) => j.isFailed).map((j) => _JobCard(job: j)),
+              SizedBox(height: 12.h),
+            ],
+            if (hasCanceled) ...[
+              Padding(
+                padding: EdgeInsets.only(bottom: 8.h),
+                child: Text(
+                  'Cancelled',
+                  style: AppTextStyles.labelsmall.copyWith(
+                    color: AppColors.gray400,
+                  ),
+                ),
+              ),
+              ...jobs.where((j) => j.isCancelled).map((j) => _JobCard(job: j)),
+              SizedBox(height: 12.h),
+            ],
           ],
         ],
-      ],
+      ),
     );
   }
 }
