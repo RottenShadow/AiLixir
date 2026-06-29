@@ -30,7 +30,7 @@ class MdSectionSystemSetup extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const MdFieldLabel('Protein PDB File'),
+                    const MdFieldLabel('Protein PDB File', required: true),
                     _PdbFilePicker(
                       hint: 'Select protein.pdb file...',
                       fileName: config.proteinPdbName,
@@ -38,7 +38,7 @@ class MdSectionSystemSetup extends StatelessWidget {
                       onClear: cubit.clearProteinFile,
                     ),
                     SizedBox(height: 12.h),
-                    const MdFieldLabel('Ligand PDB File'),
+                    const MdFieldLabel('Ligand PDB File', required: true),
                     _PdbFilePicker(
                       hint: 'Select ligand.pdb file...',
                       fileName: config.ligandPdbName,

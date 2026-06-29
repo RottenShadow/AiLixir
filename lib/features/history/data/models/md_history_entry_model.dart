@@ -8,6 +8,8 @@ class MdHistoryEntryModel {
   final Map<String, dynamic>? inputParams;
   final Map<String, dynamic>? resultMeta;
   final Map<String, dynamic>? analysisMeta;
+  final String? remoteStatus;
+  final String? errorMessage;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -19,13 +21,15 @@ class MdHistoryEntryModel {
     this.inputParams,
     this.resultMeta,
     this.analysisMeta,
+    this.remoteStatus,
+    this.errorMessage,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  static DateTime? _parseDate(String? raw) {
-    if (raw == null || raw.isEmpty) return null;
-    return DateTime.tryParse(raw);
+  static DateTime _parseDate(String? raw) {
+    if (raw == null || raw.isEmpty) return DateTime.now();
+    return DateTime.tryParse(raw) ?? DateTime.now();
   }
 
   factory MdHistoryEntryModel.fromJson(Map<String, dynamic> json) {
@@ -37,8 +41,10 @@ class MdHistoryEntryModel {
       inputParams: json['input_params'] as Map<String, dynamic>?,
       resultMeta: json['result_meta'] as Map<String, dynamic>?,
       analysisMeta: json['analysis_meta'] as Map<String, dynamic>?,
-      createdAt: _parseDate(json['created_at'] as String?) ?? DateTime.now(),
-      updatedAt: _parseDate(json['updated_at'] as String?) ?? DateTime.now(),
+      remoteStatus: json['remote_status'] as String?,
+      errorMessage: json['error_message'] as String?,
+      createdAt: _parseDate(json['created_at'] as String?),
+      updatedAt: _parseDate(json['updated_at'] as String?),
     );
   }
 
@@ -56,12 +62,32 @@ class MdHistoryEntryModel {
 
   String get _derivedForcefield {
     final ff = inputParams?['force_field'] as String?;
-    return ff ?? 'Unknown';
+    return ff?.isNotEmpty == true ? ff! : '—';
   }
 
   String get _derivedDuration {
-    final simTime = inputParams?['sim_time_ns'] as String?;
+    final simTime = inputParams?['sim_time_ns'];
     return simTime != null ? '$simTime ns' : '—';
+  }
+
+  MdResultMeta? get _derivedResultMeta {
+    if (resultMeta == null) return null;
+    return MdResultMeta(
+      downloadUrl: resultMeta!['download_url'] as String?,
+      downloadAnalysisUrl: resultMeta!['download_analysis_url'] as String?,
+    );
+  }
+
+  MdAnalysisMeta? get _derivedAnalysisMeta {
+    if (analysisMeta == null) return null;
+    final outputs = (analysisMeta!['outputs'] as List<dynamic>?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+    return MdAnalysisMeta(
+      downloadUrl: analysisMeta!['download_url'] as String?,
+      outputs: outputs,
+    );
   }
 
   MdEntity toEntity() {
@@ -76,6 +102,10 @@ class MdHistoryEntryModel {
       status: _derivedStatus,
       proteinName: proteinName,
       ligandName: ligandName,
+      remoteStatus: remoteStatus,
+      errorMessage: errorMessage,
+      resultMeta: _derivedResultMeta,
+      analysisMeta: _derivedAnalysisMeta,
     );
   }
 }

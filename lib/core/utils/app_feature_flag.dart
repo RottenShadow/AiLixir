@@ -4,6 +4,7 @@ abstract class AppFeatureFlag {
 
   static const bool useFakeGeneration = false;
   static const bool useFakeDocking = false;
+  static const bool useFakeMdSimulation = false;
   static const bool useFakeHistory = false;
   static const bool useFakeAdmet = false;
   static const bool useFakeChemicalSearch = false;

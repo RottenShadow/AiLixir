@@ -25,7 +25,6 @@ class LigandHistorySection extends StatelessWidget {
     final hasCanceled = jobs.any((j) => j.isCancelled);
 
     return Column(
-      mainAxisSize: jobs.isEmpty ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -90,6 +89,18 @@ class LigandHistorySection extends StatelessWidget {
             ...jobs.where((j) => j.isRunning).map((j) => _JobCard(job: j)),
             SizedBox(height: 12.h),
           ],
+          if (hasCompleted) ...[
+            Padding(
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: Text(
+                'Completed',
+                style: AppTextStyles.labelsmall.copyWith(
+                  color: AppColors.green400,
+                ),
+              ),
+            ),
+            ...jobs.where((j) => j.isCompleted).map((j) => _JobCard(job: j)),
+          ],
           if (hasFailed) ...[
             Padding(
               padding: EdgeInsets.only(bottom: 8.h),
@@ -115,18 +126,6 @@ class LigandHistorySection extends StatelessWidget {
             ),
             ...jobs.where((j) => j.isCancelled).map((j) => _JobCard(job: j)),
             SizedBox(height: 12.h),
-          ],
-          if (hasCompleted) ...[
-            Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: Text(
-                'Completed',
-                style: AppTextStyles.labelsmall.copyWith(
-                  color: AppColors.green400,
-                ),
-              ),
-            ),
-            ...jobs.where((j) => j.isCompleted).map((j) => _JobCard(job: j)),
           ],
         ],
       ],
