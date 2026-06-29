@@ -51,6 +51,15 @@ abstract class AppEndpoints {
   static String dockingDownload(int id) => 'docking/download/$id';
 
   // ── MD Simulation Endpoints ──────────────────────────
+  static const String mdSimulationProcess = 'md-simulation/process';
+  static String mdSimulationStatus(String jobId) =>
+      'md-simulation/status/$jobId';
+  static String mdSimulationDownload(String jobId) =>
+      'md-simulation/download/$jobId';
+  static String mdSimulationAnalyze(String jobId) =>
+      'md-simulation/analyze/$jobId';
+  static String mdSimulationDownloadAnalysis(String jobId) =>
+      'md-simulation/download-analysis/$jobId';
   static const String mdSimulationHistory = 'md-simulation/history';
 
   // ── Chemical Search Endpoints ─────────────────────────

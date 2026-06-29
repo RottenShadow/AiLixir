@@ -59,7 +59,7 @@ class MdSectionProduction extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const MdFieldLabel('Number of Strides'),
+                    const MdFieldLabel('Number of Strides (max 10)'),
                     _NumberOfStridesField(
                       value: config.numberOfStrides,
                       onChanged: cubit.setNumberOfStrides,
@@ -194,9 +194,15 @@ class _NumberOfStridesField extends StatelessWidget {
       style: AppTextStyles.bodysmall.copyWith(color: AppColors.white),
       onChanged: (v) {
         final i = int.tryParse(v);
-        if (i != null) onChanged(i);
+        if (i != null) onChanged(i.clamp(1, 10));
       },
       decoration: InputDecoration(
+        hintText: '1–10',
+        hintStyle: AppTextStyles.bodysmall.copyWith(color: AppColors.slate500),
+        suffixText: '/ 10',
+        suffixStyle: AppTextStyles.caption.copyWith(
+          color: AppColors.authTextSecondary,
+        ),
         filled: true,
         fillColor: AppColors.slate800,
         contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),

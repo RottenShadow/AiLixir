@@ -1,7 +1,9 @@
 import 'package:ailixir/core/entities/md_entity.dart';
+import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
+import 'package:ailixir/core/widgets/file_download_view.dart';
 import 'package:ailixir/features/history/presentation/cubits/md_history_cubit/md_history_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -102,7 +104,8 @@ class _MdSeeAllViewState extends State<MdSeeAllView> {
                 child: CustomEmptyBody(
                   icon: Icons.blur_on,
                   title: 'No MD Simulations Found',
-                  subTitle: 'No MD simulations yet.\nSubmit a simulation to see results here.',
+                  subTitle:
+                      'No MD simulations yet.\nSubmit a simulation to see results here.',
                 ),
               ),
             );
@@ -119,6 +122,8 @@ class _MdSeeAllViewState extends State<MdSeeAllView> {
     );
   }
 }
+
+// ── Table ────────────────────────────────────────────────────────────────────
 
 class _MdTable extends StatelessWidget {
   final List<MdEntity> items;
@@ -137,7 +142,7 @@ class _MdTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Sticky header
+        // Header
         Container(
           color: AppColors.slate900,
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 10.h),
@@ -147,45 +152,40 @@ class _MdTable extends StatelessWidget {
                 flex: 3,
                 child: Text(
                   'Simulation Task',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.slate500,
-                  ),
+                  style: AppTextStyles.labelsmall
+                      .copyWith(color: AppColors.slate500),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                   'Forcefield',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.slate500,
-                  ),
+                  style: AppTextStyles.labelsmall
+                      .copyWith(color: AppColors.slate500),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                   'Duration',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.slate500,
-                  ),
+                  style: AppTextStyles.labelsmall
+                      .copyWith(color: AppColors.slate500),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Text(
                   'Status',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.slate500,
-                  ),
+                  style: AppTextStyles.labelsmall
+                      .copyWith(color: AppColors.slate500),
                 ),
               ),
               Expanded(
                 flex: 3,
                 child: Text(
-                  'Artifacts',
-                  style: AppTextStyles.labelsmall.copyWith(
-                    color: AppColors.slate500,
-                  ),
+                  'Downloads',
+                  style: AppTextStyles.labelsmall
+                      .copyWith(color: AppColors.slate500),
                   textAlign: TextAlign.end,
                 ),
               ),
@@ -223,16 +223,14 @@ class _MdTable extends StatelessWidget {
                     child: Center(
                       child: Text(
                         'No more results',
-                        style: AppTextStyles.bodyxs.copyWith(
-                          color: AppColors.slate500,
-                        ),
+                        style: AppTextStyles.bodyxs
+                            .copyWith(color: AppColors.slate500),
                       ),
                     ),
                   );
                 }
                 return const SizedBox.shrink();
               }
-
               return _MdRow(md: items[index]);
             },
           ),
@@ -242,13 +240,39 @@ class _MdTable extends StatelessWidget {
   }
 }
 
+// ── Row ───────────────────────────────────────────────────────────────────────
+
 class _MdRow extends StatelessWidget {
   final MdEntity md;
   const _MdRow({required this.md});
 
+  String _resolveUrl(String? fromMeta, String fallbackPath) {
+    final raw =
+        (fromMeta != null && fromMeta.isNotEmpty) ? fromMeta : fallbackPath;
+    if (raw.startsWith('http')) return raw;
+    // Strip trailing /api/ from base and prepend
+    final base = AppEndpoints.baseUrl.replaceAll(RegExp(r'/api/?$'), '');
+    return '$base$raw';
+  }
+
   @override
   Widget build(BuildContext context) {
     final dateStr = DateFormat('MMM dd, yyyy · hh:mm a').format(md.createdAt);
+    final isCompleted = md.status == MdStatus.completed;
+
+    final resultsUrl = _resolveUrl(
+      md.resultMeta?.downloadUrl,
+      AppEndpoints.mdSimulationDownload(md.id),
+    );
+    final analysisUrl = _resolveUrl(
+      md.analysisMeta?.downloadUrl ?? md.resultMeta?.downloadAnalysisUrl,
+      AppEndpoints.mdSimulationDownloadAnalysis(md.id),
+    );
+    final hasResults = isCompleted && md.resultMeta?.downloadUrl != null;
+    final hasAnalysis = isCompleted &&
+        (md.analysisMeta?.downloadUrl != null ||
+            md.resultMeta?.downloadAnalysisUrl != null);
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
       child: Row(
@@ -260,9 +284,9 @@ class _MdRow extends StatelessWidget {
               children: [
                 Text(
                   md.simulationTask,
-                  style: AppTextStyles.bodysmall.copyWith(
-                    color: AppColors.white,
-                  ),
+                  style: AppTextStyles.bodysmall
+                      .copyWith(color: AppColors.white),
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: 2.h),
                 Text(
@@ -298,11 +322,23 @@ class _MdRow extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                _ArtifactBtn(label: '.PDB'),
+                _DownloadBtn(
+                  label: 'Results',
+                  icon: Icons.download_rounded,
+                  url: resultsUrl,
+                  title: 'MD Results — ${md.simulationTask}',
+                  enabled: hasResults,
+                  color: AppColors.violet400,
+                ),
                 SizedBox(width: 8.w),
-                _ArtifactBtn(label: '.DCD'),
-                SizedBox(width: 8.w),
-                _ArtifactBtn(label: '.LOG'),
+                _DownloadBtn(
+                  label: 'Analysis',
+                  icon: Icons.analytics_outlined,
+                  url: analysisUrl,
+                  title: 'MD Analysis — ${md.simulationTask}',
+                  enabled: hasAnalysis,
+                  color: AppColors.cyan400,
+                ),
               ],
             ),
           ),
@@ -311,6 +347,73 @@ class _MdRow extends StatelessWidget {
     );
   }
 }
+
+// ── Download button ───────────────────────────────────────────────────────────
+
+class _DownloadBtn extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final String url;
+  final String title;
+  final bool enabled;
+  final Color color;
+
+  const _DownloadBtn({
+    required this.label,
+    required this.icon,
+    required this.url,
+    required this.title,
+    required this.enabled,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled
+          ? () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => FileDownloadView(url: url, title: title),
+                ),
+              )
+          : null,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        decoration: BoxDecoration(
+          color: enabled
+              ? color.withValues(alpha: 0.12)
+              : AppColors.slate700.withValues(alpha: 0.4),
+          borderRadius: BorderRadius.circular(6.r),
+          border: Border.all(
+            color: enabled
+                ? color.withValues(alpha: 0.4)
+                : AppColors.brandBorder,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: enabled ? color : AppColors.slate500,
+              size: 12.sp,
+            ),
+            SizedBox(width: 4.w),
+            Text(
+              label,
+              style: AppTextStyles.caption.copyWith(
+                color: enabled ? color : AppColors.slate500,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Status badge ──────────────────────────────────────────────────────────────
 
 class _StatusBadge extends StatelessWidget {
   final MdStatus status;
@@ -342,22 +445,9 @@ class _StatusBadge extends StatelessWidget {
         color: bg,
         borderRadius: BorderRadius.circular(4.r),
       ),
-      child: Text(label, style: AppTextStyles.labelsmall.copyWith(color: fg)),
-    );
-  }
-}
-
-class _ArtifactBtn extends StatelessWidget {
-  final String label;
-  const _ArtifactBtn({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {},
       child: Text(
         label,
-        style: AppTextStyles.labelsmall.copyWith(color: AppColors.slate400),
+        style: AppTextStyles.labelsmall.copyWith(color: fg),
       ),
     );
   }

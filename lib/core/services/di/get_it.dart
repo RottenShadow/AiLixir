@@ -9,6 +9,7 @@ import 'package:ailixir/features/docking/data/repos/docking_repo.dart';
 import 'package:ailixir/features/history/data/repos/history_repo.dart';
 import 'package:ailixir/features/admet/data/repos/admet_repo.dart';
 import 'package:ailixir/features/chemical_search/data/repos/chemical_search_repo.dart';
+import 'package:ailixir/features/molecular_dynamics/data/repos/md_simulation_repo.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
@@ -92,6 +93,10 @@ void getItRegisterSingleton() {
 
   GetIt.I.registerLazySingleton<ChemicalSearchRepo>(
     () => ChemicalSearchRepo(dioService: GetIt.I.get()),
+  );
+
+  GetIt.I.registerLazySingleton<MdSimulationRepo>(
+    () => MdSimulationRepo(dioService: GetIt.I.get()),
   );
 
   // My Cubits
