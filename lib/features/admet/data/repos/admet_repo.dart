@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/errors/failure.dart';
@@ -22,10 +23,12 @@ class AdmetRepo {
       return _fakePredict(smiles);
     }
     return safeApiCall(() async {
-      final response = await dioService.post(
-        endpoint: AppEndpoints.admetPredict,
-        data: {'smiles': smiles.join(', ')},
-      ) as Map<String, dynamic>;
+      final response =
+          await dioService.post(
+                endpoint: AppEndpoints.admetPredict,
+                data: {'smiles': smiles.join(', ')},
+              )
+              as Map<String, dynamic>;
       final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response,
         (d) => d as Map<String, dynamic>,
@@ -41,13 +44,14 @@ class AdmetRepo {
       return _fakePredictFromFile(filePath);
     }
     return safeApiCall(() async {
-      final formData = await DioService.buildFormData({
-        'file': filePath,
-      });
-      final response = await dioService.post(
-        endpoint: AppEndpoints.admetPredict,
-        data: formData,
-      ) as Map<String, dynamic>;
+      File file = File(filePath);
+      final formData = await DioService.buildFormData({'file': file});
+      final response =
+          await dioService.post(
+                endpoint: AppEndpoints.admetPredict,
+                data: formData,
+              )
+              as Map<String, dynamic>;
       final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response,
         (d) => d as Map<String, dynamic>,
@@ -73,11 +77,7 @@ class AdmetRepo {
           ),
         )
         .toList();
-    return Right(
-      AdmetPredictResponseEntity(
-        results: predictions,
-      ),
-    );
+    return Right(AdmetPredictResponseEntity(results: predictions));
   }
 
   Future<Either<Failure, AdmetPredictResponseEntity>> _fakePredictFromFile(
@@ -109,10 +109,6 @@ class AdmetRepo {
           ),
         )
         .toList();
-    return Right(
-      AdmetPredictResponseEntity(
-        results: predictions,
-      ),
-    );
+    return Right(AdmetPredictResponseEntity(results: predictions));
   }
 }
