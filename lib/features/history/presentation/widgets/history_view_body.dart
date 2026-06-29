@@ -54,9 +54,13 @@ class HistoryViewBody extends StatelessWidget {
                     ),
                   ),
                   SliverFillRemaining(
-                    hasScrollBody: true,
+                    hasScrollBody: false,
                     child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      padding: EdgeInsets.only(
+                        left: 24.w,
+                        right: 24.w,
+                        bottom: 24.h,
+                      ),
                       child: _buildContent(context, selectedTab),
                     ),
                   ),
