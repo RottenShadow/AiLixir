@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/errors/failure.dart';
-import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
+// import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/app_feature_flag.dart';
@@ -25,16 +25,18 @@ class ChemicalSearchRepo {
       final endpoint = fullRag
           ? AppEndpoints.chemicalSearchFullRag
           : AppEndpoints.chemicalSearch;
-      final response = await dioService.post(
-        endpoint: endpoint,
-        data: {'smiles': smiles, 'top_k': topK},
-      ) as Map<String, dynamic>;
+      final res =
+          await dioService.post(
+                endpoint: endpoint,
+                data: {'smiles': smiles, 'top_k': topK},
+              )
+              as Map<String, dynamic>;
 
-      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
-        response,
-        (d) => d is Map<String, dynamic> ? d : response,
-      );
-      return ChemicalSearchResponseModel.fromJson(base.data!).toEntity();
+      // final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+      //   response,
+      //   (d) => d is Map<String, dynamic> ? d : response,
+      // );
+      return ChemicalSearchResponseModel.fromJson(res).toEntity();
     });
   }
 
@@ -51,8 +53,8 @@ class ChemicalSearchRepo {
         rank: 1,
         explanation: fullRag
             ? 'Query and Match: Identical compound.\n'
-                'Similarity Score: 1.000\n\n'
-                'Explanation: The structure is an exact match.'
+                  'Similarity Score: 1.000\n\n'
+                  'Explanation: The structure is an exact match.'
             : null,
       ),
       ChemicalSearchResultEntity(
@@ -62,10 +64,10 @@ class ChemicalSearchRepo {
         rank: 2,
         explanation: fullRag
             ? 'Query: Contains C=O ketone group | Match: C-OH alcohol group\n'
-                'Similarity Score: 0.995\n\n'
-                'Explanation: This match represents a reduction of the ketone '
-                'group (C=O) in the query to a secondary alcohol group (C-OH). '
-                'The rest of the molecular framework remains identical.'
+                  'Similarity Score: 0.995\n\n'
+                  'Explanation: This match represents a reduction of the ketone '
+                  'group (C=O) in the query to a secondary alcohol group (C-OH). '
+                  'The rest of the molecular framework remains identical.'
             : null,
       ),
       ChemicalSearchResultEntity(
@@ -75,23 +77,22 @@ class ChemicalSearchRepo {
         rank: 3,
         explanation: fullRag
             ? 'Query: C1=CC...C(=O)... | Match: C1=CC...C(=O)...\n'
-                'Similarity Score: 0.982\n\n'
-                'Explanation: This match preserves the ketone bridge and both '
-                'fluorinated side chains with slight conformational differences '
-                'in the aromatic ring substitution pattern.'
+                  'Similarity Score: 0.982\n\n'
+                  'Explanation: This match preserves the ketone bridge and both '
+                  'fluorinated side chains with slight conformational differences '
+                  'in the aromatic ring substitution pattern.'
             : null,
       ),
       ChemicalSearchResultEntity(
-        smiles:
-            'C1=CC(=CC=C1C(CC(C(F)(F)F)(C(F)(F)F)O)O)C(=O)CC(C(F)(F)F)O',
+        smiles: 'C1=CC(=CC=C1C(CC(C(F)(F)F)(C(F)(F)F)O)O)C(=O)CC(C(F)(F)F)O',
         similarityScore: 0.8947,
         rank: 4,
         explanation: fullRag
             ? 'Query: Two HFIP groups | Match: One HFIP group\n'
-                'Similarity Score: 0.895\n\n'
-                'Explanation: This compound retains the core aromatic structure '
-                'and one hexafluoroisopropanol (HFIP) group but is missing the '
-                'second HFIP group, resulting in moderate similarity.'
+                  'Similarity Score: 0.895\n\n'
+                  'Explanation: This compound retains the core aromatic structure '
+                  'and one hexafluoroisopropanol (HFIP) group but is missing the '
+                  'second HFIP group, resulting in moderate similarity.'
             : null,
       ),
       ChemicalSearchResultEntity(
@@ -100,9 +101,9 @@ class ChemicalSearchRepo {
         rank: 5,
         explanation: fullRag
             ? 'Query: Complex fluorinated compound | Match: Benzene\n'
-                'Similarity Score: 0.321\n\n'
-                'Explanation: Only the aromatic core is shared. All functional '
-                'group extensions are absent in the match.'
+                  'Similarity Score: 0.321\n\n'
+                  'Explanation: Only the aromatic core is shared. All functional '
+                  'group extensions are absent in the match.'
             : null,
       ),
     ];
