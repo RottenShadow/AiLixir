@@ -315,7 +315,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
           return Padding(
             padding: EdgeInsetsGeometry.symmetric(
               vertical: 0.43.sh,
-              horizontal: 0.35.sw,
+              horizontal: 0.3.sw,
             ),
             child: Card(
               shape: RoundedRectangleBorder(
@@ -369,7 +369,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
                             child: SafeArea(
                               child: Padding(
                                 padding: EdgeInsetsGeometry.symmetric(
-                                  horizontal: 200,
+                                  horizontal: 75,
                                 ),
                                 child: Column(children: _messages),
                               ),

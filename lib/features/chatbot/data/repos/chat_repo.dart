@@ -20,7 +20,7 @@ class ChatRepo {
         json = ((await dioService.post(
           endpoint: "${AppEndpoints.baseUrl}chemistry/thread",
         )))["data"];
-        if (!json["success"]) {
+        if ((json["success"]) == false) {
           throw Exception("Server Error");
         }
       } else {
