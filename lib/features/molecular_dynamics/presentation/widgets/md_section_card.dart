@@ -58,18 +58,34 @@ class MdSectionCard extends StatelessWidget {
 /// Small label above an input field
 class MdFieldLabel extends StatelessWidget {
   final String text;
-  const MdFieldLabel(this.text, {super.key});
+  final bool required;
+  const MdFieldLabel(this.text, {super.key, this.required = false});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 6.h),
-      child: Text(
-        text.toUpperCase(),
-        style: AppTextStyles.caption.copyWith(
-          color: AppColors.authTextSecondary,
-          letterSpacing: 0.8,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            text.toUpperCase(),
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.authTextSecondary,
+              letterSpacing: 0.8,
+            ),
+          ),
+          if (required) ...[
+            SizedBox(width: 4.w),
+            Text(
+              '*',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.red400,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

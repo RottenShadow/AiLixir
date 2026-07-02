@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:math';
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/errors/failure.dart';
+import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/app_feature_flag.dart';
@@ -21,13 +23,17 @@ class AdmetRepo {
       return _fakePredict(smiles);
     }
     return safeApiCall(() async {
-      final response = await dioService.post(
-        endpoint: AppEndpoints.admetPredict,
-        data: {'smiles': smiles.join(', ')},
+      final response =
+          await dioService.post(
+                endpoint: AppEndpoints.admetPredict,
+                data: {'smiles': smiles.join(', ')},
+              )
+              as Map<String, dynamic>;
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+        response,
+        (d) => d as Map<String, dynamic>,
       );
-      return AdmetPredictResponseModel.fromJson(
-        response as Map<String, dynamic>,
-      ).toEntity();
+      return AdmetPredictResponseModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -38,16 +44,19 @@ class AdmetRepo {
       return _fakePredictFromFile(filePath);
     }
     return safeApiCall(() async {
-      final formData = await DioService.buildFormData({
-        'file': filePath,
-      });
-      final response = await dioService.post(
-        endpoint: AppEndpoints.admetPredict,
-        data: formData,
+      File file = File(filePath);
+      final formData = await DioService.buildFormData({'file': file});
+      final response =
+          await dioService.post(
+                endpoint: AppEndpoints.admetPredict,
+                data: formData,
+              )
+              as Map<String, dynamic>;
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
+        response,
+        (d) => d as Map<String, dynamic>,
       );
-      return AdmetPredictResponseModel.fromJson(
-        response as Map<String, dynamic>,
-      ).toEntity();
+      return AdmetPredictResponseModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -68,11 +77,7 @@ class AdmetRepo {
           ),
         )
         .toList();
-    return Right(
-      AdmetPredictResponseEntity(
-        results: predictions,
-      ),
-    );
+    return Right(AdmetPredictResponseEntity(results: predictions));
   }
 
   Future<Either<Failure, AdmetPredictResponseEntity>> _fakePredictFromFile(
@@ -104,10 +109,6 @@ class AdmetRepo {
           ),
         )
         .toList();
-    return Right(
-      AdmetPredictResponseEntity(
-        results: predictions,
-      ),
-    );
+    return Right(AdmetPredictResponseEntity(results: predictions));
   }
 }

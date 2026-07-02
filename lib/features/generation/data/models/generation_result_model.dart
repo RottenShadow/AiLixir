@@ -1,5 +1,6 @@
-import 'package:ailixir/features/generation/domain/entities/generation_result_entity.dart';
+import 'package:ailixir/features/generation/data/models/generation_files_model.dart';
 import 'package:ailixir/features/generation/data/models/ligand_model.dart';
+import 'package:ailixir/features/generation/domain/entities/generation_result_entity.dart';
 
 class GenerationSummaryModel {
   final int numRequested;
@@ -42,6 +43,7 @@ class GenerationResultModel {
   final String status;
   final GenerationSummaryModel? summary;
   final List<LigandModel> ligands;
+  final GenerationFilesModel? files;
   final DateTime? createdAt;
 
   const GenerationResultModel({
@@ -49,6 +51,7 @@ class GenerationResultModel {
     required this.status,
     this.summary,
     required this.ligands,
+    this.files,
     this.createdAt,
   });
 
@@ -65,6 +68,9 @@ class GenerationResultModel {
           ? GenerationSummaryModel.fromJson(
               json['summary'] as Map<String, dynamic>)
           : null,
+      files: json['files'] != null
+          ? GenerationFilesModel.fromJson(json['files'] as Map<String, dynamic>)
+          : null,
       ligands: (json['ligands'] as List<dynamic>?)
               ?.map((e) =>
                   LigandModel.fromJson(e as Map<String, dynamic>))
@@ -79,6 +85,7 @@ class GenerationResultModel {
       jobId: jobId,
       status: status,
       summary: summary?.toEntity(),
+      files: files?.toEntity(),
       ligands: ligands
           .map((l) => l.toEntity(generatedAt: createdAt))
           .toList(),

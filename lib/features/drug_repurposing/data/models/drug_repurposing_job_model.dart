@@ -10,10 +10,9 @@ class DrugRepurposingJobModel {
   });
 
   factory DrugRepurposingJobModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>? ?? json;
     return DrugRepurposingJobModel(
-      jobId: (data['job_id'] as num?)?.toInt() ?? 0,
-      status: data['status'] as String? ?? 'unknown',
+      jobId: (json['job_id'] as num?)?.toInt() ?? 0,
+      status: json['status'] as String? ?? 'unknown',
     );
   }
 

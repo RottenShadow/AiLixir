@@ -18,31 +18,29 @@ class DrugRepurposingScreenJobModel {
   });
 
   factory DrugRepurposingScreenJobModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>? ?? json;
-
     DateTime? parseDate(String? raw) {
       if (raw == null || raw.isEmpty) return null;
       return DateTime.tryParse(raw);
     }
 
     DrugRepurposingScreenRequestModel? parsedInput;
-    final inputRaw = data['input'];
+    final inputRaw = json['input'];
     if (inputRaw != null && inputRaw is Map<String, dynamic>) {
       parsedInput = DrugRepurposingScreenRequestModel.fromJson(inputRaw);
     }
 
     DrugRepurposingScreenResponseModel? parsedOutput;
-    final outputRaw = data['output'];
+    final outputRaw = json['output'];
     if (outputRaw != null && outputRaw is Map<String, dynamic>) {
       parsedOutput = DrugRepurposingScreenResponseModel.fromJson(outputRaw);
     }
 
     return DrugRepurposingScreenJobModel(
-      jobId: (data['job_id'] as num?)?.toInt() ?? 0,
-      status: data['status'] as String? ?? 'unknown',
+      jobId: (json['job_id'] as num?)?.toInt() ?? 0,
+      status: json['status'] as String? ?? 'unknown',
       input: parsedInput,
       output: parsedOutput,
-      createdAt: parseDate(data['created_at'] as String?),
+      createdAt: parseDate(json['created_at'] as String?),
     );
   }
 

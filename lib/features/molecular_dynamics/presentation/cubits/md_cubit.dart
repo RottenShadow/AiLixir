@@ -1,15 +1,17 @@
-import 'dart:async';
 import 'package:ailixir/core/entities/md_simulation_entity.dart';
+import 'package:ailixir/features/molecular_dynamics/data/repos/md_simulation_repo.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:get_it/get_it.dart';
 
 part 'md_state.dart';
 
 class MdCubit extends Cubit<MdState> {
+  final repo = GetIt.I.get<MdSimulationRepo>();
+
   MdCubit() : super(MdState(config: const MdSimulationEntity()));
 
-  // ── Config mutations ─────────────────────────────────────────────────────
+  // ── File pickers ─────────────────────────────────────────────────────────
 
   Future<void> pickProteinFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -43,11 +45,15 @@ class MdCubit extends Cubit<MdState> {
     );
   }
 
-  void clearProteinFile() =>
-      _update(config: state.config.copyWith(proteinPdbPath: '', proteinPdbName: ''));
+  void clearProteinFile() => _update(
+    config: state.config.copyWith(proteinPdbPath: '', proteinPdbName: ''),
+  );
 
-  void clearLigandFile() =>
-      _update(config: state.config.copyWith(ligandPdbPath: '', ligandPdbName: ''));
+  void clearLigandFile() => _update(
+    config: state.config.copyWith(ligandPdbPath: '', ligandPdbName: ''),
+  );
+
+  // ── Config mutations ─────────────────────────────────────────────────────
 
   void setRemoveWaters(bool v) =>
       _update(config: state.config.copyWith(removeWaters: v));
@@ -110,7 +116,7 @@ class MdCubit extends Cubit<MdState> {
       _update(config: state.config.copyWith(strideDuration: v));
 
   void setNumberOfStrides(int v) =>
-      _update(config: state.config.copyWith(numberOfStrides: v));
+      _update(config: state.config.copyWith(numberOfStrides: v.clamp(1, 10)));
 
   void setCompressTrajectory(bool v) =>
       _update(config: state.config.copyWith(compressTrajectory: v));
@@ -120,29 +126,55 @@ class MdCubit extends Cubit<MdState> {
 
   // ── Simulation lifecycle ─────────────────────────────────────────────────
 
-  void startSimulation() {
+  Future<void> startSimulation() async {
+    final cfg = state.config;
+
     emit(
       state.copyWith(
-        status: MdStatus.running,
-        logs: ['[${_ts()}] Job submitted. Preparing MD environment...'],
+        submitStatus: MdSubmitStatus.submitting,
+        submittedJobId: null,
+        errorMessage: null,
       ),
     );
 
-    Future.delayed(const Duration(seconds: 3), () {
-      if (isClosed) return;
-      final success = DateTime.now().millisecondsSinceEpoch % 2 == 0;
-      emit(
-        state.copyWith(
-          status: success ? MdStatus.completed : MdStatus.failure,
-          logs: [
-            ...state.logs,
-            success
-                ? '[${_ts()}] ✓ Simulation completed. Trajectory saved.'
-                : '[${_ts()}] ✗ Simulation failed.',
-          ],
-        ),
-      );
-    });
+    final result = await repo.submitJob(
+      proteinPath: cfg.proteinPdbPath,
+      proteinName: cfg.proteinPdbName,
+      ligandPath: cfg.ligandPdbPath,
+      ligandName: cfg.ligandPdbName,
+      forceField: cfg.proteinForceField,
+      netCharge: cfg.systemTotalCharge,
+      boxSize: cfg.boxSizePadding,
+      ionType: cfg.saltType,
+      saltConc: cfg.concentration,
+      removeWaters: cfg.removeWaters,
+      addHydrogens: cfg.addLigandHydrogens,
+      equilTimeNs: cfg.equilTimestep,
+      simTimeNs: cfg.strideDuration / 1000,
+      nStrides: cfg.numberOfStrides,
+      temperatureK: cfg.equilTemperature,
+      pressureBar: cfg.equilPressure,
+      dtFs: cfg.equilTimestep.round(),
+    );
+
+    result.fold(
+      (failure) {
+        emit(
+          state.copyWith(
+            submitStatus: MdSubmitStatus.failure,
+            errorMessage: failure.message,
+          ),
+        );
+      },
+      (job) {
+        emit(
+          state.copyWith(
+            submitStatus: MdSubmitStatus.submitted,
+            submittedJobId: job.remoteJobId,
+          ),
+        );
+      },
+    );
   }
 
   void reset() {
@@ -151,12 +183,5 @@ class MdCubit extends Cubit<MdState> {
 
   void _update({required MdSimulationEntity config}) {
     emit(state.copyWith(config: config));
-  }
-
-  String _ts() {
-    final n = DateTime.now();
-    return '${n.hour.toString().padLeft(2, '0')}:'
-        '${n.minute.toString().padLeft(2, '0')}:'
-        '${n.second.toString().padLeft(2, '0')}';
   }
 }

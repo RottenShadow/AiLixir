@@ -63,7 +63,7 @@ class MdSimulationEntity {
     this.equilWriteLog = 1,
     this.productionEnabled = true,
     this.strideDuration = 100,
-    this.numberOfStrides = 50,
+    this.numberOfStrides = 1,
     this.compressTrajectory = true,
     this.calculateRmsdOnTheFly = false,
   });

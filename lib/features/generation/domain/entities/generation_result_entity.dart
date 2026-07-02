@@ -1,3 +1,4 @@
+import 'package:ailixir/core/entities/generation_files_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 
 class GenerationSummaryEntity {
@@ -21,6 +22,7 @@ class GenerationResultEntity {
   final String status;
   final GenerationSummaryEntity? summary;
   final List<LigandEntity> ligands;
+  final GenerationFilesEntity? files;
   final DateTime? createdAt;
 
   const GenerationResultEntity({
@@ -28,6 +30,7 @@ class GenerationResultEntity {
     required this.status,
     this.summary,
     required this.ligands,
+    this.files,
     this.createdAt,
   });
 }

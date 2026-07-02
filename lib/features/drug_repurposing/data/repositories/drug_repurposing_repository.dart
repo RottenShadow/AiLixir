@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/errors/failure.dart';
+import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/app_feature_flag.dart';
@@ -34,9 +35,11 @@ class DrugRepurposingRepository {
         endpoint: AppEndpoints.drugRepurposingTargets,
         data: {'disease_name': diseaseName, 'top_n': topN},
       );
-      return DrugRepurposingJobModel.fromJson(
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response as Map<String, dynamic>,
-      ).toEntity();
+        (d) => d as Map<String, dynamic>,
+      );
+      return DrugRepurposingJobModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -50,9 +53,11 @@ class DrugRepurposingRepository {
       final response = await dio.get(
         endpoint: AppEndpoints.drugRepurposingTargetsStatus(jobId),
       );
-      return DrugRepurposingTargetJobModel.fromJson(
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response as Map<String, dynamic>,
-      ).toEntity();
+        (d) => d as Map<String, dynamic>,
+      );
+      return DrugRepurposingTargetJobModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -68,9 +73,11 @@ class DrugRepurposingRepository {
         endpoint: AppEndpoints.drugRepurposingScreen,
         data: requestModel.toJson(),
       );
-      return DrugRepurposingJobModel.fromJson(
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response as Map<String, dynamic>,
-      ).toEntity();
+        (d) => d as Map<String, dynamic>,
+      );
+      return DrugRepurposingJobModel.fromJson(base.data!).toEntity();
     });
   }
 
@@ -84,9 +91,11 @@ class DrugRepurposingRepository {
       final response = await dio.get(
         endpoint: AppEndpoints.drugRepurposingScreenStatus(jobId),
       );
-      return DrugRepurposingScreenJobModel.fromJson(
+      final base = BaseResponseModel<Map<String, dynamic>>.fromJson(
         response as Map<String, dynamic>,
-      ).toEntity();
+        (d) => d as Map<String, dynamic>,
+      );
+      return DrugRepurposingScreenJobModel.fromJson(base.data!).toEntity();
     });
   }
 

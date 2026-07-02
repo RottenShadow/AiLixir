@@ -1,26 +1,22 @@
-import 'package:ailixir/core/model/base_response_model/base_response_model.dart';
 import 'package:ailixir/features/admet/data/models/admet_data_model.dart';
 import 'package:ailixir/features/admet/domain/entities/admet_predict_response_entity.dart';
 
 class AdmetPredictResponseModel {
-  final BaseResponseModel<AdmetDataModel> base;
+  final AdmetDataModel data;
 
-  const AdmetPredictResponseModel({required this.base});
+  const AdmetPredictResponseModel({required this.data});
 
   factory AdmetPredictResponseModel.fromJson(Map<String, dynamic> json) {
     return AdmetPredictResponseModel(
-      base: BaseResponseModel<AdmetDataModel>.fromJson(
-        json,
-        (data) => AdmetDataModel.fromJson(data as Map<String, dynamic>),
-      ),
+      data: AdmetDataModel.fromJson(json),
     );
   }
 
   AdmetPredictResponseEntity toEntity() {
     return AdmetPredictResponseEntity(
-      results: base.data?.results.map((e) => e.toEntity()).toList() ?? [],
-      totalProcessed: base.data?.totalProcessed ?? 0,
-      totalSmiles: base.data?.totalSmiles ?? 0,
+      results: data.results.map((e) => e.toEntity()).toList(),
+      totalProcessed: data.totalProcessed,
+      totalSmiles: data.totalSmiles,
     );
   }
 }

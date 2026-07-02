@@ -1,46 +1,38 @@
+import 'package:ailixir/core/entities/docking_score_entity.dart';
 import 'package:ailixir/features/docking/domain/entities/docking_job_entity.dart';
 
-class DockingJobInputsModel {
-  final String protein;
-  final String? ligand;
+class DockingScoreModel {
+  final double affinity;
+  final double inter;
+  final double intra;
+  final double torsions;
+  final double unbound;
 
-  const DockingJobInputsModel({required this.protein, this.ligand});
-
-  factory DockingJobInputsModel.fromJson(Map<String, dynamic> json) {
-    return DockingJobInputsModel(
-      protein: json['protein'] as String? ?? '',
-      ligand: json['ligand'] as String?,
-    );
-  }
-
-  DockingJobInputsEntity toEntity() {
-    return DockingJobInputsEntity(protein: protein, ligand: ligand);
-  }
-}
-
-class DockingJobResultsModel {
-  final List<double> vinaScores;
-  final String? downloadUrl;
-
-  const DockingJobResultsModel({
-    required this.vinaScores,
-    this.downloadUrl,
+  const DockingScoreModel({
+    required this.affinity,
+    required this.inter,
+    required this.intra,
+    required this.torsions,
+    required this.unbound,
   });
 
-  factory DockingJobResultsModel.fromJson(Map<String, dynamic> json) {
-    return DockingJobResultsModel(
-      vinaScores: (json['vina_scores'] as List<dynamic>?)
-              ?.map((e) => (e as num).toDouble())
-              .toList() ??
-          [],
-      downloadUrl: json['download_url'] as String?,
+  factory DockingScoreModel.fromJson(Map<String, dynamic> json) {
+    return DockingScoreModel(
+      affinity: (json['affinity'] as num?)?.toDouble() ?? 0.0,
+      inter: (json['inter'] as num?)?.toDouble() ?? 0.0,
+      intra: (json['intra'] as num?)?.toDouble() ?? 0.0,
+      torsions: (json['torsions'] as num?)?.toDouble() ?? 0.0,
+      unbound: (json['unbound'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
-  DockingJobResultsEntity toEntity() {
-    return DockingJobResultsEntity(
-      vinaScores: vinaScores,
-      downloadUrl: downloadUrl,
+  DockingScoreEntity toEntity() {
+    return DockingScoreEntity(
+      affinity: affinity,
+      inter: inter,
+      intra: intra,
+      torsions: torsions,
+      unbound: unbound,
     );
   }
 }
@@ -48,15 +40,19 @@ class DockingJobResultsModel {
 class DockingJobModel {
   final int jobId;
   final String status;
-  final DockingJobInputsModel? inputs;
-  final DockingJobResultsModel? results;
+  final String? protein;
+  final String? ligand;
+  final List<DockingScoreModel> scores;
+  final String? downloadUrl;
   final DateTime? createdAt;
 
   const DockingJobModel({
     required this.jobId,
     required this.status,
-    this.inputs,
-    this.results,
+    this.protein,
+    this.ligand,
+    this.scores = const [],
+    this.downloadUrl,
     this.createdAt,
   });
 
@@ -67,16 +63,18 @@ class DockingJobModel {
     }
 
     return DockingJobModel(
-      jobId: (json['job_id'] as num?)?.toInt() ?? 0,
+      jobId: json['job_id'] ?? json['id'] ?? 0,
       status: json['status'] as String? ?? 'unknown',
-      inputs: json['inputs'] != null
-          ? DockingJobInputsModel.fromJson(
-              json['inputs'] as Map<String, dynamic>)
-          : null,
-      results: json['results'] != null
-          ? DockingJobResultsModel.fromJson(
-              json['results'] as Map<String, dynamic>)
-          : null,
+      protein: json['protein'] as String?,
+      ligand: json['ligand'] as String?,
+      scores:
+          (json['scores'] as List<dynamic>?)
+              ?.map(
+                (e) => DockingScoreModel.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          [],
+      downloadUrl: json['download_url'] as String?,
       createdAt: parseDate(json['created_at'] as String?),
     );
   }
@@ -85,8 +83,10 @@ class DockingJobModel {
     return DockingJobEntity(
       jobId: jobId,
       status: status,
-      inputs: inputs?.toEntity(),
-      results: results?.toEntity(),
+      protein: protein,
+      ligand: ligand,
+      scores: scores.map((e) => e.toEntity()).toList(),
+      downloadUrl: downloadUrl,
       createdAt: createdAt,
     );
   }

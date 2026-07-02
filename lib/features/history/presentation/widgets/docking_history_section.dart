@@ -2,8 +2,8 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
-import 'package:ailixir/features/history/presentation/cubits/history_cubit/history_cubit.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/core/widgets/file_download_view.dart';
+import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
 import 'package:ailixir/features/history/presentation/views/docking_see_all_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +16,7 @@ class DockingHistorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: dockings.isEmpty ? MainAxisSize.max : MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -36,7 +37,7 @@ class DockingHistorySection extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (_) => BlocProvider(
-                      create: (_) => DockingSeeAllCubit()..loadFirstPage(),
+                      create: (_) => DockingHistoryCubit()..loadAll(),
                       child: const DockingSeeAllView(),
                     ),
                   ),
@@ -53,14 +54,13 @@ class DockingHistorySection extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         if (dockings.isEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 24, bottom: 24),
-            child: CustomEmptyBody(
-              icon: Icons.hub_outlined,
-              title: 'No Docking Results',
-              subTitle: 'Docking simulation results will appear here.',
-              actionLabel: 'Refresh',
-              onAction: () => context.read<HistoryCubit>().loadHistory(),
+          Expanded(
+            child: Center(
+              child: CustomEmptyBody(
+                icon: Icons.hub_outlined,
+                title: 'No Docking Results',
+                subTitle: 'Docking simulation results will appear here.',
+              ),
             ),
           )
         else
@@ -110,7 +110,6 @@ class _DockingCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Icon(Icons.history, color: AppColors.slate500, size: 16.sp),
             ],
           ),
           SizedBox(height: 4.h),
@@ -118,25 +117,44 @@ class _DockingCard extends StatelessWidget {
             'Job ID: ${docking.jobId}',
             style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
+          _StatItem(
+            label: 'Best Affinity',
+            value: '${docking.vinaScore.toStringAsFixed(3)} kcal/mol',
+          ),
+          SizedBox(height: 4.h),
           Row(
             children: [
-              _StatItem(
-                label: 'Vina Score',
-                value: docking.vinaScore.toString(),
+              Text(
+                '${docking.scores.length} poses',
+                style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
               ),
               const Spacer(),
-              Container(
-                width: 36.w,
-                height: 36.w,
-                decoration: BoxDecoration(
-                  color: AppColors.slate700,
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: Icon(
-                  Icons.download_outlined,
-                  color: AppColors.slate300,
-                  size: 16.sp,
+              GestureDetector(
+                onTap: docking.downloadUrl != null
+                    ? () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              FileDownloadView(url: docking.downloadUrl!),
+                        ),
+                      )
+                    : null,
+                child: Container(
+                  width: 30.w,
+                  height: 30.w,
+                  decoration: BoxDecoration(
+                    color: docking.downloadUrl != null
+                        ? AppColors.slate700
+                        : AppColors.slate800,
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                  child: Icon(
+                    Icons.download_outlined,
+                    color: docking.downloadUrl != null
+                        ? AppColors.slate300
+                        : AppColors.slate600,
+                    size: 14.sp,
+                  ),
                 ),
               ),
             ],
