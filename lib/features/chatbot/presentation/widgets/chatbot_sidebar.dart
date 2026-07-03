@@ -249,7 +249,7 @@ class _ExpandedSidebarState extends State<_ExpandedSidebar> {
           CustomTextField(
             onChanged: widget.cubit.onSearch,
             controller: widget.cubit.searchController,
-            hint: "Search Conversations",
+            hint: "Search Conversation",
             prefixIcon: Icon(Icons.search, size: 18, color: AppColors.slate400),
             borderRadius: 12.r,
           ),
