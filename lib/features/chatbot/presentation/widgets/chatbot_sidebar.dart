@@ -1,10 +1,12 @@
 import 'package:ailixir/core/constants/app_images.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/core/utils/toast/app_toast.dart';
 import 'package:ailixir/core/widgets/text_field/custom_text_field.dart';
 import 'package:ailixir/features/chatbot/presentation/cubits/chat_session_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChatbotSidebar extends StatelessWidget {
@@ -25,45 +27,54 @@ class ChatbotSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 240),
-      curve: Curves.easeOutCubic,
-      width: isExpanded ? 286.w : 64.w,
-      decoration: BoxDecoration(
-        color: AppColors.slate1100,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF071120),
-            const Color(0xFF081624),
-            const Color(0xFF071421),
-          ],
-          stops: const [0, 0.58, 1],
-        ),
-        border: Border(
-          right: BorderSide(color: AppColors.cyan400.withAlpha(14)),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.black.withAlpha(26),
-            blurRadius: 18,
-            offset: const Offset(4, 0),
+    return BlocBuilder<ChatSessionCubit, ChatSessionState>(
+      builder: (context, state) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutCubic,
+          width: isExpanded ? 286.w : 64.w,
+          decoration: BoxDecoration(
+            color: AppColors.slate1100,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                const Color(0xFF071120),
+                const Color(0xFF081624),
+                const Color(0xFF071421),
+              ],
+              stops: const [0, 0.58, 1],
+            ),
+            border: Border(
+              right: BorderSide(color: AppColors.cyan400.withAlpha(14)),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.black.withAlpha(26),
+                blurRadius: 18,
+                offset: const Offset(4, 0),
+              ),
+              BoxShadow(
+                color: AppColors.cyan400.withAlpha(10),
+                blurRadius: 22,
+                offset: const Offset(1, 0),
+              ),
+            ],
           ),
-          BoxShadow(
-            color: AppColors.cyan400.withAlpha(10),
-            blurRadius: 22,
-            offset: const Offset(1, 0),
+          child: SafeArea(
+            child: ClipRect(
+              child: isExpanded
+                  ? _ExpandedSidebar(
+                      onClose: onClose,
+                      onExit: onExit,
+                      cubit: cubit,
+                      state: state,
+                    )
+                  : _Rail(onOpen: onOpen, onExit: onExit),
+            ),
           ),
-        ],
-      ),
-      child: SafeArea(
-        child: ClipRect(
-          child: isExpanded
-              ? _ExpandedSidebar(onClose: onClose, onExit: onExit, cubit: cubit)
-              : _Rail(onOpen: onOpen, onExit: onExit),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -111,15 +122,30 @@ class _Rail extends StatelessWidget {
   }
 }
 
-class _ExpandedSidebar extends StatelessWidget {
+class _ExpandedSidebar extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onExit;
   final ChatSessionCubit cubit;
+  final ChatSessionState state;
   const _ExpandedSidebar({
     required this.onClose,
     required this.onExit,
     required this.cubit,
+    required this.state,
   });
+
+  @override
+  State<StatefulWidget> createState() {
+    return _ExpandedSidebarState();
+  }
+}
+
+class _ExpandedSidebarState extends State<_ExpandedSidebar> {
+  @override
+  void initState() {
+    super.initState();
+    widget.cubit.setSession(0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +158,7 @@ class _ExpandedSidebar extends StatelessWidget {
             children: [
               Expanded(
                 child: InkWell(
-                  onTap: onExit,
+                  onTap: widget.onExit,
                   borderRadius: BorderRadius.circular(12.r),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 5.h),
@@ -194,7 +220,18 @@ class _ExpandedSidebar extends StatelessWidget {
                 ],
               ),
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  bool success = await widget.cubit.newSession();
+                  if (!success) {
+                    if (context.mounted) {
+                      AppToast.showErrorToast(
+                        context: context,
+                        message: "Failed to create new conversation",
+                      );
+                    }
+                  }
+                  setState(() {});
+                },
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text("New chat"),
                 style: ElevatedButton.styleFrom(
@@ -210,13 +247,32 @@ class _ExpandedSidebar extends StatelessWidget {
           ),
           SizedBox(height: 25.h),
           CustomTextField(
-            onChanged: cubit.onSearch,
-            controller: cubit.searchController,
+            onChanged: widget.cubit.onSearch,
+            controller: widget.cubit.searchController,
             hint: "Search Conversations",
             prefixIcon: Icon(Icons.search, size: 18, color: AppColors.slate400),
             borderRadius: 12.r,
           ),
-          const Spacer(),
+          SizedBox(height: 25.h),
+          if (widget.state is ChatSessionSuccess)
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: List.generate(widget.cubit.sessions.length, (idx) {
+                    return _RecentChatRow(
+                      title: widget.cubit.sessions[idx].title,
+                      isActive: idx == widget.cubit.currentSession,
+                      onClick: () async {
+                        widget.cubit.setSession(idx);
+                        setState(() {});
+                      },
+                    );
+                  }),
+                ),
+              ),
+            ),
+          if ((widget.state is! ChatSessionSuccess)) Spacer(),
           _BottomSettings(),
         ],
       ),
@@ -227,8 +283,13 @@ class _ExpandedSidebar extends StatelessWidget {
 class _RecentChatRow extends StatelessWidget {
   final String title;
   final bool isActive;
+  final void Function() onClick;
 
-  const _RecentChatRow({required this.title, this.isActive = false});
+  const _RecentChatRow({
+    required this.title,
+    this.isActive = false,
+    required this.onClick,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -246,25 +307,29 @@ class _RecentChatRow extends StatelessWidget {
               : AppColors.cyan400.withAlpha(12),
         ),
       ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.chat_bubble_outline,
-            size: 16.sp,
-            color: isActive ? AppColors.cyan200 : AppColors.slate400,
-          ),
-          SizedBox(width: 10.w),
-          Expanded(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.bodysmall.copyWith(
-                color: isActive ? AppColors.slate50 : AppColors.slate300,
+      child: InkWell(
+        onTap: onClick,
+        splashColor: AppColors.brandBlue,
+        child: Row(
+          children: [
+            Icon(
+              Icons.chat_bubble_outline,
+              size: 16.sp,
+              color: isActive ? AppColors.cyan200 : AppColors.slate400,
+            ),
+            SizedBox(width: 10.w),
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTextStyles.bodysmall.copyWith(
+                  color: isActive ? AppColors.slate50 : AppColors.slate300,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 //import 'package:ailixir/features/auth/presentation/widgets/auth_shared/auth_gradient_scaffold.dart';
 import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
+import 'package:ailixir/features/chatbot/data/models/thread_message_model.dart';
 import 'package:ailixir/features/chatbot/presentation/cubits/chat_session_cubit.dart';
 import 'package:ailixir/features/chatbot/presentation/widgets/chatbot_textbox.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,6 @@ class ChatbotViewBody extends StatefulWidget {
 class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   late final TextEditingController _textcontroller;
   late final ScrollController _scrollController;
-  final List<ChatbotTextbox> _messages = [];
   bool _sendingEnabled = true;
   late double _textBoxHeight;
   late double _padding;
@@ -49,11 +49,15 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     }
   }
 
-  @override
-  void initState() {
+  void startLogoPosition() {
     _textBoxHeight = 0;
     _padding = 200;
     _opacity = 1;
+  }
+
+  @override
+  void initState() {
+    startLogoPosition();
     _scrollController = ScrollController();
     _textcontroller = TextEditingController();
     _focusNode = FocusNode(
@@ -81,7 +85,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     bool isErr = false,
     required void Function() onBufferFilled,
   }) {
-    _messages.add(
+    widget.cubit.messages.add(
       ChatbotTextbox(
         text: text,
         isError: isErr,
@@ -105,18 +109,18 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     if (_textcontroller.text == "") {
       return;
     }
-    if (_messages.isEmpty) {
+    if (widget.cubit.messages.isEmpty) {
       setWidgetPosition();
       await Future.delayed(Duration(milliseconds: _animationDuration + 50));
     }
     _addMessage(_textcontroller.text, isBot: false, onBufferFilled: () {});
     _sendingEnabled = false;
-    _messages.add(ChatbotTextbox.loading());
+    widget.cubit.messages.add(ChatbotTextbox.loading());
     setState(() {});
     String message = _textcontroller.text.toString();
     _textcontroller.text = "";
     ChatMessageModel responseMessage = await widget.cubit.sendMessage(message);
-    _messages.removeLast();
+    widget.cubit.messages.removeLast();
     setState(() {});
     await Future.delayed(Duration(milliseconds: 50));
     widget.cubit.loading = true;
@@ -135,7 +139,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
     return AnimatedContainer(
       key: _widgetKey,
       padding: EdgeInsetsGeometry.only(
-        top: _messages.isEmpty ? _textBoxHeight : 0,
+        top: widget.cubit.messages.isEmpty ? _textBoxHeight : 0,
         left: _padding,
         right: _padding,
       ),
@@ -341,6 +345,9 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
           );
         } else if (state is ChatSessionSuccess) {
           _sendingEnabled = true;
+          if (widget.cubit.messages.isEmpty) {
+            startLogoPosition();
+          }
           return Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
@@ -358,10 +365,10 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
               padding: EdgeInsetsGeometry.only(right: 0.02.sw),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: _messages.isNotEmpty
+                mainAxisAlignment: widget.cubit.messages.isNotEmpty
                     ? MainAxisAlignment.start
                     : MainAxisAlignment.center,
-                children: _messages.isNotEmpty
+                children: widget.cubit.messages.isNotEmpty
                     ? [
                         Expanded(
                           child: SingleChildScrollView(
@@ -371,7 +378,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
                                 padding: EdgeInsetsGeometry.symmetric(
                                   horizontal: 75,
                                 ),
-                                child: Column(children: _messages),
+                                child: Column(children: widget.cubit.messages),
                               ),
                             ),
                           ),
@@ -401,10 +408,10 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
               padding: EdgeInsetsGeometry.only(right: 0.02.sw),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: _messages.isNotEmpty
+                mainAxisAlignment: widget.cubit.messages.isNotEmpty
                     ? MainAxisAlignment.start
                     : MainAxisAlignment.center,
-                children: _messages.isNotEmpty
+                children: widget.cubit.messages.isNotEmpty
                     ? [
                         Expanded(
                           child: SingleChildScrollView(
@@ -415,7 +422,9 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
                                   horizontal: 200,
                                 ),
                                 child: Column(
-                                  children: _messages.map<Widget>((message) {
+                                  children: widget.cubit.messages.map<Widget>((
+                                    message,
+                                  ) {
                                     message.isNotSearched = false;
                                     bool visible =
                                         message.isBot &&
@@ -506,10 +515,10 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   //             padding: EdgeInsetsGeometry.only(right: 0.004.sw),
   //             child: Column(
   //               mainAxisSize: MainAxisSize.max,
-  //               mainAxisAlignment: _messages.isNotEmpty
+  //               mainAxisAlignment: widget.cubit.messages.isNotEmpty
   //                   ? MainAxisAlignment.start
   //                   : MainAxisAlignment.center,
-  //               children: _messages.isNotEmpty
+  //               children: widget.cubit.messages.isNotEmpty
   //                   ? [
   //                       Expanded(
   //                         child: SingleChildScrollView(
@@ -519,7 +528,7 @@ class _ChatbotViewBodyState extends State<ChatbotViewBody> {
   //                               padding: EdgeInsetsGeometry.symmetric(
   //                                 horizontal: 200,
   //                               ),
-  //                               child: Column(children: _messages),
+  //                               child: Column(children: widget.cubit.messages),
   //                             ),
   //                           ),
   //                         ),
