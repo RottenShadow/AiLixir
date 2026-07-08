@@ -66,7 +66,7 @@ class _ChemicalSearchTabsState extends State<_ChemicalSearchTabs> {
   Widget _buildHeader() {
     return Row(
       children: [
-        Icon(Icons.search, color: AppColors.brandBlue, size: 22.sp),
+        Icon(Icons.search, color: AppColors.cyan400, size: 22.sp),
         SizedBox(width: 10.w),
         Text(
           'Molecular Similarity Search',
@@ -76,14 +76,14 @@ class _ChemicalSearchTabsState extends State<_ChemicalSearchTabs> {
         Container(
           padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
           decoration: BoxDecoration(
-            color: AppColors.brandBlue.withOpacity(0.12),
+            color: AppColors.cyan400.withOpacity(0.12),
             borderRadius: BorderRadius.circular(6.r),
-            border: Border.all(color: AppColors.brandBlue.withOpacity(0.3)),
+            border: Border.all(color: AppColors.cyan400.withOpacity(0.3)),
           ),
           child: Text(
             'FAISS-IVF',
             style: AppTextStyles.labelsmall.copyWith(
-              color: AppColors.brandBlue,
+              color: AppColors.cyan400,
               fontWeight: FontWeight.w700,
               letterSpacing: 1,
             ),
@@ -144,7 +144,9 @@ class _TabOption extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.brandBlue.withOpacity(0.15) : Colors.transparent,
+          color: isSelected
+              ? AppColors.cyan400.withOpacity(0.15)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(6.r),
         ),
         child: Row(
@@ -153,13 +155,13 @@ class _TabOption extends StatelessWidget {
             Icon(
               icon,
               size: 14.sp,
-              color: isSelected ? AppColors.brandBlue : AppColors.slate500,
+              color: isSelected ? AppColors.cyan400 : AppColors.slate500,
             ),
             SizedBox(width: 6.w),
             Text(
               label,
               style: AppTextStyles.labelsmall.copyWith(
-                color: isSelected ? AppColors.brandBlue : AppColors.slate400,
+                color: isSelected ? AppColors.cyan400 : AppColors.slate400,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),

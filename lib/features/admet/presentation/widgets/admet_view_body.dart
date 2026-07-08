@@ -73,14 +73,14 @@ class _HeaderSection extends StatelessWidget {
           height: 48.w,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF00D9A3), Color(0xFF00FFC8)],
+              colors: [AppColors.cyan400, AppColors.cyan400],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(12.r),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF00FFC8).withOpacity(0.35),
+                color: AppColors.cyan400.withOpacity(0.35),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -94,7 +94,7 @@ class _HeaderSection extends StatelessWidget {
           children: [
             ShaderMask(
               shaderCallback: (bounds) => const LinearGradient(
-                colors: [Color(0xFF00FFC8), Color(0xFF00D9A3)],
+                colors: [AppColors.cyan400, AppColors.cyan400],
               ).createShader(bounds),
               child: Text(
                 'ADMET Prediction',

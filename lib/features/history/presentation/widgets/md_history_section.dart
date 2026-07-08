@@ -26,7 +26,7 @@ class MdHistorySection extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.blur_on, color: AppColors.purple400, size: 20.sp),
+                Icon(Icons.blur_on, color: AppColors.cyan400, size: 20.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Molecular Dynamics History',
@@ -222,7 +222,7 @@ class _MdRow extends StatelessWidget {
                   url: resultsUrl,
                   title: 'MD Results — ${md.simulationTask}',
                   enabled: hasResults,
-                  color: AppColors.violet400,
+                  color: AppColors.cyan400,
                 ),
                 SizedBox(width: 6.w),
                 _DownloadBtn(

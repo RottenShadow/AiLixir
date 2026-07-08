@@ -24,13 +24,13 @@ class MdSectionProduction extends StatelessWidget {
     return MdSectionCard(
       stepNumber: '5',
       title: 'MD Production Phase',
-      accentColor: AppColors.emerald500,
+      accentColor: AppColors.cyan400,
       trailing: GestureDetector(
         onTap: () => cubit.setProductionEnabled(!config.productionEnabled),
         child: MdBadge(
           text: config.productionEnabled ? 'ON / PRODUCTION' : 'OFF / PRODUCTION',
           color: config.productionEnabled
-              ? AppColors.emerald500
+              ? AppColors.cyan400
               : AppColors.slate500,
         ),
       ),
@@ -173,7 +173,7 @@ class _StrideDurationField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.emerald500),
+          borderSide: BorderSide(color: AppColors.cyan400),
         ),
       ),
     );
@@ -216,7 +216,7 @@ class _NumberOfStridesField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.emerald500),
+          borderSide: BorderSide(color: AppColors.cyan400),
         ),
       ),
     );

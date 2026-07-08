@@ -91,7 +91,7 @@ class DrugRepurposingHistorySection extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.biotech_outlined, color: AppColors.amber400, size: 20.sp),
+            Icon(Icons.biotech_outlined, color: AppColors.cyan400, size: 20.sp),
             SizedBox(width: 8.w),
             Text(
               'Drug Repurposing History',
@@ -157,7 +157,7 @@ class _RepurposingCard extends StatelessWidget {
             child: Icon(
               isTargets ? Icons.ads_click : Icons.screen_search_desktop_outlined,
               size: 18.sp,
-              color: AppColors.amber400,
+              color: AppColors.cyan400,
             ),
           ),
           SizedBox(width: 12.w),
@@ -191,7 +191,7 @@ class _RepurposingCard extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: AppColors.amber900.withOpacity(0.2),
+                color: AppColors.cyan400.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: Row(
@@ -200,11 +200,11 @@ class _RepurposingCard extends StatelessWidget {
                   Text(
                     'Details',
                     style: AppTextStyles.labelsmall.copyWith(
-                      color: AppColors.amber400,
+                      color: AppColors.cyan400,
                     ),
                   ),
                   SizedBox(width: 4.w),
-                  Icon(Icons.arrow_forward_ios, size: 10.sp, color: AppColors.amber400),
+                  Icon(Icons.arrow_forward_ios, size: 10.sp, color: AppColors.cyan400),
                 ],
               ),
             ),

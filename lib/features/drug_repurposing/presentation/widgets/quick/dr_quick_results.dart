@@ -78,7 +78,7 @@ class _TargetsList extends StatelessWidget {
           title: 'Protein Targets',
           subtitle:
               '${response.totalTargets} targets found for "${response.diseaseName}"',
-          accentColor: const Color(0xFF22D3EE),
+          accentColor: AppColors.cyan400,
           trailing: IconButton(
             onPressed: () => _copyToClipboard(context),
             icon: Icon(
@@ -170,16 +170,16 @@ class DrTargetCard extends StatelessWidget {
                         vertical: 3.h,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF8B5CF6).withOpacity(0.12),
+                        color: AppColors.cyan400.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(6.r),
                         border: Border.all(
-                          color: const Color(0xFF8B5CF6).withOpacity(0.4),
+                          color: AppColors.cyan400.withOpacity(0.4),
                         ),
                       ),
                       child: Text(
                         target.symbol,
                         style: AppTextStyles.caption.copyWith(
-                          color: const Color(0xFFA78BFA),
+                          color: AppColors.cyan400,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.5,
                         ),
@@ -208,7 +208,7 @@ class DrTargetCard extends StatelessWidget {
                       label: target.uniprotId.isEmpty
                           ? 'UniProt: N/A'
                           : 'UniProt: ${target.uniprotId}',
-                      color: const Color(0xFF22D3EE),
+                      color: AppColors.cyan400,
                     ),
                     if (target.pdbIds.isNotEmpty)
                       ...target.pdbIds
@@ -217,7 +217,7 @@ class DrTargetCard extends StatelessWidget {
                             (e) => _InfoChip(
                               icon: Icons.view_in_ar,
                               label: 'PDB: $e',
-                              color: const Color(0xFF10B981),
+                              color: AppColors.cyan400,
                             ),
                           ),
                   ],

@@ -48,16 +48,16 @@ class _SubTabChip extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
         decoration: BoxDecoration(
-          color: selected ? AppColors.amber900.withValues(alpha: 0.5) : AppColors.slate800,
+          color: selected ? AppColors.cyan900.withValues(alpha: 0.5) : AppColors.slate800,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: selected ? AppColors.amber500 : AppColors.slate700,
+            color: selected ? AppColors.cyan500 : AppColors.slate700,
           ),
         ),
         child: Text(
           label,
           style: AppTextStyles.labelsmall.copyWith(
-            color: selected ? AppColors.amber300 : AppColors.slate400,
+            color: selected ? AppColors.cyan300 : AppColors.slate400,
           ),
         ),
       ),

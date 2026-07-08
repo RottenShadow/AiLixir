@@ -17,7 +17,7 @@ class MdSectionIons extends StatelessWidget {
     return MdSectionCard(
       stepNumber: '3',
       title: 'Ions & Ionic Strength',
-      accentColor: AppColors.teal500,
+      accentColor: AppColors.cyan400,
       child: Row(
         children: [
           Expanded(
@@ -88,7 +88,7 @@ class _ConcentrationField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.teal500),
+          borderSide: BorderSide(color: AppColors.cyan400),
         ),
       ),
     );

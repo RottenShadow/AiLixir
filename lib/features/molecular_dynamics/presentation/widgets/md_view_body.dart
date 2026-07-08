@@ -49,10 +49,7 @@ class _FormColumn extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── Header ────────────────────────────────────────────────
-              Text(
-                'MD Lab',
-                style: AppTextStyles.h1.copyWith(fontSize: 28.sp),
-              ),
+              Text('MD Lab', style: AppTextStyles.h1.copyWith(fontSize: 28.sp)),
               SizedBox(height: 4.h),
               Text(
                 'Submit a molecular dynamics simulation of your protein-ligand complex.',
@@ -80,12 +77,7 @@ class _FormColumn extends StatelessWidget {
           ),
         ),
         // Sticky bottom submit bar
-        Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: _StickyBottomBar(),
-        ),
+        Positioned(bottom: 0, left: 0, right: 0, child: _StickyBottomBar()),
       ],
     );
   }
@@ -104,9 +96,7 @@ class _RequiredFilesNotice extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.amber400.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(8.r),
-        border: Border.all(
-          color: AppColors.amber400.withValues(alpha: 0.35),
-        ),
+        border: Border.all(color: AppColors.amber400.withValues(alpha: 0.35)),
       ),
       child: Row(
         children: [
@@ -132,7 +122,7 @@ class _StickyBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<MdCubit>().state;
-    final estimatedHours = state.config.estimatedHours;
+    final estimatedHours = state.config.estimatedHours * 100;
     final isSubmitting = state.submitStatus == MdSubmitStatus.submitting;
     final hasProtein = state.config.proteinPdbName.isNotEmpty;
     final hasLigand = state.config.ligandPdbName.isNotEmpty;
@@ -142,9 +132,7 @@ class _StickyBottomBar extends StatelessWidget {
       height: 72.h,
       decoration: BoxDecoration(
         color: AppColors.slate1000,
-        border: Border(
-          top: BorderSide(color: AppColors.brandBorder, width: 1),
-        ),
+        border: Border(top: BorderSide(color: AppColors.brandBorder, width: 1)),
       ),
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Row(
@@ -197,8 +185,8 @@ class _StickyBottomBar extends StatelessWidget {
                   !hasProtein && !hasLigand
                       ? 'Protein & ligand PDB required'
                       : !hasProtein
-                          ? 'Protein PDB required'
-                          : 'Ligand PDB required',
+                      ? 'Protein PDB required'
+                      : 'Ligand PDB required',
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.amber400,
                   ),
@@ -231,7 +219,7 @@ class _SubmitButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: canStart
               ? const LinearGradient(
-                  colors: [Color(0xFF6B3FE4), Color(0xFF8B5CF6)],
+                  colors: [AppColors.cyan400, AppColors.cyan400],
                 )
               : null,
           color: canStart ? null : AppColors.slate700,

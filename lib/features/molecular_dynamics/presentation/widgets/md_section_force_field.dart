@@ -16,7 +16,7 @@ class MdSectionForceField extends StatelessWidget {
     return MdSectionCard(
       stepNumber: '2',
       title: 'Force Field & Solvation',
-      accentColor: AppColors.cyan500,
+      accentColor: AppColors.cyan400,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

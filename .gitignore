@@ -49,3 +49,5 @@ app.*.map.json
 /assets/web/theme/
 lib/core/config/env/*.g.dart
 .opencode/
+opencode.json
+node_modules/
