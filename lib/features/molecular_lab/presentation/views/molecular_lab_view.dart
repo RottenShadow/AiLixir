@@ -275,7 +275,7 @@ class _EmptyState extends StatelessWidget {
               color: AppColors.brandBlue.withValues(alpha: 0.2),
             ),
             SizedBox(height: 24.h),
-            Text('Molecular Viewer', style: AppTextStyles.h2),
+            Text('Mol Lab', style: AppTextStyles.h2),
             SizedBox(height: 8.h),
             Text(
               'Enter a PDB ID in the toolbar or pick a sample structure below.',
