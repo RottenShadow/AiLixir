@@ -11,7 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ailixir/features/auth/presentation/cubits/user_auth_cubit/user_auth_cubit.dart';
 
 // Page index constants mirror main_view_body.dart
-// 0 News Feed | 1 Molecular Lab | 2 Generation | 3 Docking | 4 MD | 5 Drug Repurposing | 6 Chemical Search | 7 ADMET | 8 History
+// 0 News Feed | 1 Mol Lab | 2 Generation | 3 Docking | 4 MD | 5 Drug Repurposing | 6 Chemical Search | 7 ADMET | 8 History
 
 class MainTopBar extends StatelessWidget {
   final int selectedIndex;
@@ -63,7 +63,7 @@ class MainTopBar extends StatelessWidget {
           ),
           _NavItem(
             icon: Icons.science_outlined,
-            label: 'Molecular Lab',
+            label: 'Mol Lab',
             isActive: selectedIndex == 1,
             onTap: () => onNavTap(1),
           ),
