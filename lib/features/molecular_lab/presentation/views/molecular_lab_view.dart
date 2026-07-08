@@ -127,7 +127,7 @@ class _Toolbar extends StatelessWidget {
         children: [
           Icon(Icons.science_outlined, color: AppColors.brandBlue, size: 20.sp),
           SizedBox(width: 10.w),
-          Text('Molecular Lab', style: AppTextStyles.h4),
+          Text('Mol Lab', style: AppTextStyles.h4),
           SizedBox(width: 32.w),
 
           ...samples.map(
