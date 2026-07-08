@@ -24,13 +24,13 @@ class MdSectionProduction extends StatelessWidget {
     return MdSectionCard(
       stepNumber: '5',
       title: 'MD Production Phase',
-      accentColor: AppColors.emerald500,
+      accentColor: AppColors.cyan400,
       trailing: GestureDetector(
         onTap: () => cubit.setProductionEnabled(!config.productionEnabled),
         child: MdBadge(
           text: config.productionEnabled ? 'ON / PRODUCTION' : 'OFF / PRODUCTION',
           color: config.productionEnabled
-              ? AppColors.emerald500
+              ? AppColors.cyan400
               : AppColors.slate500,
         ),
       ),
@@ -59,7 +59,7 @@ class MdSectionProduction extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const MdFieldLabel('Number of Strides'),
+                    const MdFieldLabel('Number of Strides (max 10)'),
                     _NumberOfStridesField(
                       value: config.numberOfStrides,
                       onChanged: cubit.setNumberOfStrides,
@@ -173,7 +173,7 @@ class _StrideDurationField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.emerald500),
+          borderSide: BorderSide(color: AppColors.cyan400),
         ),
       ),
     );
@@ -194,9 +194,15 @@ class _NumberOfStridesField extends StatelessWidget {
       style: AppTextStyles.bodysmall.copyWith(color: AppColors.white),
       onChanged: (v) {
         final i = int.tryParse(v);
-        if (i != null) onChanged(i);
+        if (i != null) onChanged(i.clamp(1, 10));
       },
       decoration: InputDecoration(
+        hintText: '1–10',
+        hintStyle: AppTextStyles.bodysmall.copyWith(color: AppColors.slate500),
+        suffixText: '/ 10',
+        suffixStyle: AppTextStyles.caption.copyWith(
+          color: AppColors.authTextSecondary,
+        ),
         filled: true,
         fillColor: AppColors.slate800,
         contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
@@ -210,7 +216,7 @@ class _NumberOfStridesField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.emerald500),
+          borderSide: BorderSide(color: AppColors.cyan400),
         ),
       ),
     );

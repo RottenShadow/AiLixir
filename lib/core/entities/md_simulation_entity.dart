@@ -23,7 +23,8 @@ class MdSimulationEntity {
   // ── Section 4: MD Equilibration Phase ───────────────────────────────────
   final bool equilibrationEnabled;
   final String equilJobName;
-  final String minimizationSteps; // 1000 | 5000 | 10000 | 20000 | 50000 | 100000
+  final String
+  minimizationSteps; // 1000 | 5000 | 10000 | 20000 | 50000 | 100000
   final double equilTimestep; // fs  0.5 | 1 | 2 | 3 | 4
   final double equilTemperature; // K
   final double equilPressure; // bar
@@ -62,8 +63,8 @@ class MdSimulationEntity {
     this.equilWriteTraj = 10,
     this.equilWriteLog = 1,
     this.productionEnabled = true,
-    this.strideDuration = 100,
-    this.numberOfStrides = 50,
+    this.strideDuration = 10,
+    this.numberOfStrides = 1,
     this.compressTrajectory = true,
     this.calculateRmsdOnTheFly = false,
   });
@@ -71,8 +72,8 @@ class MdSimulationEntity {
   /// Total production simulation time in ns
   double get totalSimTime => strideDuration * numberOfStrides / 1000;
 
-  /// Estimated wall-clock hours (very rough: ~1 ns/hr on GPU)
-  double get estimatedHours => totalSimTime * 1.0;
+  /// Estimated wall-clock hours (very rough: ~10 ns per 6 hr on GPU)
+  double get estimatedHours => totalSimTime * 6;
 
   MdSimulationEntity copyWith({
     String? proteinPdbPath,

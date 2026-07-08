@@ -1,28 +1,31 @@
 part of 'md_cubit.dart';
 
-enum MdStatus { idle, running, completed, failure }
+enum MdSubmitStatus { idle, submitting, submitted, failure }
 
-@immutable
 class MdState {
-  final MdStatus status;
+  final MdSubmitStatus submitStatus;
   final MdSimulationEntity config;
-  final List<String> logs;
+  final String? submittedJobId;
+  final String? errorMessage;
 
   const MdState({
-    this.status = MdStatus.idle,
+    this.submitStatus = MdSubmitStatus.idle,
     required this.config,
-    this.logs = const [],
+    this.submittedJobId,
+    this.errorMessage,
   });
 
   MdState copyWith({
-    MdStatus? status,
+    MdSubmitStatus? submitStatus,
     MdSimulationEntity? config,
-    List<String>? logs,
+    String? submittedJobId,
+    String? errorMessage,
   }) {
     return MdState(
-      status: status ?? this.status,
+      submitStatus: submitStatus ?? this.submitStatus,
       config: config ?? this.config,
-      logs: logs ?? this.logs,
+      submittedJobId: submittedJobId ?? this.submittedJobId,
+      errorMessage: errorMessage ?? this.errorMessage,
     );
   }
 }

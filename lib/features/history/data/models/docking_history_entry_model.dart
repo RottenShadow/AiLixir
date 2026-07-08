@@ -1,52 +1,22 @@
-import 'dart:math';
 import 'package:ailixir/core/entities/docking_entity.dart';
-
-class DockingHistoryInputsModel {
-  final String protein;
-  final String? ligand;
-
-  const DockingHistoryInputsModel({required this.protein, this.ligand});
-
-  factory DockingHistoryInputsModel.fromJson(Map<String, dynamic> json) {
-    return DockingHistoryInputsModel(
-      protein: json['protein'] as String? ?? 'Unknown',
-      ligand: json['ligand'] as String?,
-    );
-  }
-}
-
-class DockingHistoryResultsModel {
-  final List<double> vinaScores;
-  final String? downloadUrl;
-
-  const DockingHistoryResultsModel({
-    required this.vinaScores,
-    this.downloadUrl,
-  });
-
-  factory DockingHistoryResultsModel.fromJson(Map<String, dynamic> json) {
-    return DockingHistoryResultsModel(
-      vinaScores: (json['vina_scores'] as List<dynamic>?)
-              ?.map((e) => (e as num).toDouble())
-              .toList() ??
-          [],
-      downloadUrl: json['download_url'] as String?,
-    );
-  }
-}
+import 'package:ailixir/core/entities/docking_score_entity.dart';
 
 class DockingHistoryEntryModel {
   final int jobId;
   final String status;
-  final DockingHistoryInputsModel inputs;
-  final DockingHistoryResultsModel? results;
+  final String protein;
+  final String? ligand;
+  final List<DockingScoreEntity> scores;
+  final String? downloadUrl;
   final DateTime createdAt;
 
   const DockingHistoryEntryModel({
     required this.jobId,
     required this.status,
-    required this.inputs,
-    this.results,
+    required this.protein,
+    this.ligand,
+    this.scores = const [],
+    this.downloadUrl,
     required this.createdAt,
   });
 
@@ -57,31 +27,41 @@ class DockingHistoryEntryModel {
     }
 
     return DockingHistoryEntryModel(
-      jobId: (json['job_id'] as num?)?.toInt() ?? 0,
+      jobId: (json['id'] as num?)?.toInt() ?? 0,
       status: json['status'] as String? ?? 'unknown',
-      inputs: DockingHistoryInputsModel.fromJson(
-        (json['inputs'] as Map<String, dynamic>?) ?? {},
-      ),
-      results: json['results'] != null
-          ? DockingHistoryResultsModel.fromJson(
-              json['results'] as Map<String, dynamic>)
-          : null,
+      protein: json['protein'] as String? ?? 'Unknown',
+      ligand: json['ligand'] as String?,
+      scores: (json['scores'] as List<dynamic>?)
+              ?.map((e) => DockingScoreEntity(
+                    affinity: (e['affinity'] as num?)?.toDouble() ?? 0.0,
+                    inter: (e['inter'] as num?)?.toDouble() ?? 0.0,
+                    intra: (e['intra'] as num?)?.toDouble() ?? 0.0,
+                    torsions: (e['torsions'] as num?)?.toDouble() ?? 0.0,
+                    unbound: (e['unbound'] as num?)?.toDouble() ?? 0.0,
+                  ))
+              .toList() ??
+          [],
+      downloadUrl: json['download_url'] as String?,
       createdAt: parseDate(json['created_at'] as String?) ?? DateTime.now(),
     );
   }
 
   DockingEntity toEntity() {
-    final vinaScore = results?.vinaScores.isNotEmpty == true
-        ? results!.vinaScores.reduce(max)
+    final bestScore = scores.isNotEmpty
+        ? scores.map((s) => s.affinity).reduce(
+              (a, b) => a < b ? a : b,
+            )
         : 0.0;
 
     return DockingEntity(
       id: jobId.toString(),
-      targetId: inputs.protein,
-      targetName: inputs.protein,
+      targetId: protein,
+      targetName: protein,
       jobId: 'JOB-$jobId',
       createdAt: createdAt,
-      vinaScore: vinaScore,
+      vinaScore: bestScore,
+      scores: scores,
+      downloadUrl: downloadUrl,
     );
   }
 }

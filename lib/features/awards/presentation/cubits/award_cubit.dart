@@ -1,3 +1,4 @@
+import 'package:ailixir/core/utils/app_feature_flag.dart';
 import 'package:ailixir/features/awards/data/models/award_model.dart';
 import 'package:ailixir/features/awards/data/repos/award_repo.dart';
 import 'package:ailixir/features/awards/presentation/factories/award_factory.dart';
@@ -13,11 +14,15 @@ part 'award_state.dart';
 
 class AwardsCubit extends Cubit<AwardState> {
   final _repo = GetIt.I.get<AwardRepo>();
+  bool isErr = false;
   late final int maxPage;
   int currentPage = 1;
   AwardsCubit() : super(AwardInitial());
 
   Future<void> getAwards(int page) async {
+    if (AppFeatureFlag.useFakeAwards) {
+      return getTestAwards();
+    }
     emit(AwardLoading());
     var res = await _repo.getAwards(page: page);
     res.fold(
@@ -32,9 +37,13 @@ class AwardsCubit extends Cubit<AwardState> {
   }
 
   Future<List<ScientistModel>> getScientists(int awardId) async {
+    if (AppFeatureFlag.useFakeScientists) {
+      return getTestScientists(awardId);
+    }
     var res = await _repo.getScientists(awardId);
     return res.fold(
       (_) {
+        isErr = true;
         return [];
       },
       (jsonData) {
@@ -59,6 +68,9 @@ class AwardsCubit extends Cubit<AwardState> {
   }
 
   Future<List<AwardModel>> getPageAwards() async {
+    if (AppFeatureFlag.useFakeAwards) {
+      return getPageTestAwards();
+    }
     if (currentPage == maxPage) {
       return [];
     }
@@ -89,6 +101,7 @@ class AwardsCubit extends Cubit<AwardState> {
     var res = await _repo.getTestScientists(awardId);
     return res.fold(
       (_) {
+        isErr = true;
         return [];
       },
       (jsonData) {

@@ -36,8 +36,10 @@ class AwardRepo {
             "id": -1,
             "name": "DEFAULT_SCIENTIST",
             "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "images": [
+              "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            ],
+            "nationality": "Japanese",
             "year_won": "2026",
             "contribution": "DEFAULT_CONTRIBUTION",
           },
@@ -45,8 +47,10 @@ class AwardRepo {
             "id": -1,
             "name": "DEFAULT_SCIENTIST",
             "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "images": [
+              "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            ],
+            "nationality": "Japanese",
             "year_won": "2026",
             "contribution": "DEFAULT_CONTRIBUTION",
           },
@@ -54,8 +58,10 @@ class AwardRepo {
             "id": -1,
             "name": "DEFAULT_SCIENTIST",
             "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "images": [
+              "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            ],
+            "nationality": "Japanese",
             "year_won": "2026",
             "contribution": "DEFAULT_CONTRIBUTION",
           },
@@ -63,8 +69,10 @@ class AwardRepo {
             "id": -1,
             "name": "DEFAULT_SCIENTIST",
             "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "images": [
+              "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            ],
+            "nationality": "Japanese",
             "year_won": "2026",
             "contribution": "DEFAULT_CONTRIBUTION",
           },
@@ -72,8 +80,10 @@ class AwardRepo {
             "id": -1,
             "name": "DEFAULT_SCIENTIST",
             "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "images": [
+              "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            ],
+            "nationality": "Japanese",
             "year_won": "2026",
             "contribution": "DEFAULT_CONTRIBUTION",
           },
@@ -81,35 +91,10 @@ class AwardRepo {
             "id": -1,
             "name": "DEFAULT_SCIENTIST",
             "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
-            "year_won": "2026",
-            "contribution": "DEFAULT_CONTRIBUTION",
-          },
-          {
-            "id": -1,
-            "name": "DEFAULT_SCIENTIST",
-            "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
-            "year_won": "2026",
-            "contribution": "DEFAULT_CONTRIBUTION",
-          },
-          {
-            "id": -1,
-            "name": "DEFAULT_SCIENTIST",
-            "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
-            "year_won": "2026",
-            "contribution": "DEFAULT_CONTRIBUTION",
-          },
-          {
-            "id": -1,
-            "name": "DEFAULT_SCIENTIST",
-            "field": "DEFAULT_FIELD",
-            "image":
-                "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            "images": [
+              "https://www.allalliedhealthschools.com/wp-content/uploads/2021/02/hero-how-to-become-a-pharmacist-290x253-1.jpg",
+            ],
+            "nationality": "Japanese",
             "year_won": "2026",
             "contribution": "DEFAULT_CONTRIBUTION",
           },

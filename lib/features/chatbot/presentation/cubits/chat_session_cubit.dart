@@ -1,5 +1,12 @@
+import 'package:ailixir/core/errors/failure.dart';
+import 'package:ailixir/core/utils/app_feature_flag.dart';
 import 'package:ailixir/features/chatbot/data/models/chat_message_model.dart';
+import 'package:ailixir/features/chatbot/data/models/thread_message_model.dart';
+import 'package:ailixir/features/chatbot/data/models/thread_model.dart';
 import 'package:ailixir/features/chatbot/data/repos/chat_repo.dart';
+import 'package:ailixir/features/chatbot/presentation/widgets/chatbot_textbox.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:bloc/bloc.dart';
@@ -12,24 +19,90 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
 
   final ChatRepo _repo = ChatRepo();
   late final int maxPage;
-  String? sessionId;
+  final TextEditingController searchController = TextEditingController();
+  bool loading = false;
+  List<ThreadModel> sessions = [];
+  List<ChatbotTextbox> messages = [];
+  int currentSession = 0;
   int currentPage = 1;
-  Future<void> getSessionThread() async {
+  void onSearch(String txt) {
+    if (txt.isNotEmpty) {
+      emit(ChatSessionSearch());
+    } else {
+      emit(ChatSessionSuccess());
+    }
+  }
+
+  Future<bool> newSession() async {
+    if (AppFeatureFlag.useFakeChatbot) {
+      await Future.delayed(Duration(milliseconds: 22));
+      emit(ChatSessionSuccess());
+      return true;
+    }
+    bool status = false;
+    var res = await _repo.newThread();
+    res.fold((_) {}, (s) async {
+      currentSession = sessions.length;
+      sessions.add(s);
+      getThreadHistory();
+      status = true;
+    });
+    return status;
+  }
+
+  void setSession(int sessionIdx) {
+    currentSession = sessionIdx;
+    getThreadHistory();
+  }
+
+  Future<void> getThreadHistory() async {
     emit(ChatSessionLoading());
-    var res = await _repo.getUserThread();
+    if (AppFeatureFlag.useFakeChatbot) {
+      await Future.delayed(Duration(milliseconds: 22));
+      emit(ChatSessionSuccess());
+      return;
+    }
+    var res = await _repo.getThreadHistory(sessions[currentSession].id);
     res.fold(
       (_) {
-        emit(ChatSessionSuccess());
+        emit(ChatSessionError());
       },
-      (s) {
-        sessionId = s;
+      (s) async {
+        messages = s.toMessages();
         emit(ChatSessionSuccess());
       },
     );
   }
 
+  Future<void> getSessionThread() async {
+    emit(ChatSessionLoading());
+    if (AppFeatureFlag.useFakeChatbot) {
+      await Future.delayed(Duration(milliseconds: 22));
+      emit(ChatSessionSuccess());
+      return;
+    }
+    var res = await _repo.getUserThreads();
+    res.fold(
+      (_) {
+        emit(ChatSessionError());
+      },
+      (s) async {
+        sessions = s;
+        getThreadHistory();
+      },
+    );
+  }
+
   Future<ChatMessageModel> sendMessage(String message) async {
-    var res = await _repo.sendMessage(message);
+    if (AppFeatureFlag.useFakeChatbot) {
+      await Future.delayed(Duration(milliseconds: 22));
+      return ChatMessageModel(
+        message: "Hello, how may I help you today?",
+        isErr: false,
+      );
+    }
+
+    var res = await _repo.sendMessage(message, sessions[currentSession].id);
     late ChatMessageModel response;
     res.fold(
       (e) {
@@ -40,19 +113,5 @@ class ChatSessionCubit extends Cubit<ChatSessionState> {
       },
     );
     return response;
-  }
-
-  Future<void> getTestScientists() async {
-    emit(ChatSessionLoading());
-    var res = await _repo.getTestThreads("");
-    res.fold(
-      (_) {
-        emit(ChatSessionError());
-      },
-      (jsonData) {
-        sessionId = jsonData.thread_id;
-        emit(ChatSessionSuccess());
-      },
-    );
   }
 }

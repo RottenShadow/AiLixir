@@ -48,3 +48,6 @@ app.*.map.json
 .env
 /assets/web/theme/
 lib/core/config/env/*.g.dart
+.opencode/
+opencode.json
+node_modules/

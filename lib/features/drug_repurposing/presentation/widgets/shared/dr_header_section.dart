@@ -16,7 +16,7 @@ class DrHeaderSection extends StatelessWidget {
           height: 48.w,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF1E69FF), Color(0xFF8B5CF6)],
+              colors: [Color(0xFF1E69FF), AppColors.cyan400],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -41,7 +41,7 @@ class DrHeaderSection extends StatelessWidget {
                 fontSize: 22.sp,
                 foreground: Paint()
                   ..shader = const LinearGradient(
-                    colors: [Color(0xFF60A5FA), Color(0xFFA78BFA)],
+                    colors: [Color(0xFF60A5FA), AppColors.cyan400],
                   ).createShader(const Rect.fromLTWH(0, 0, 400, 40)),
               ),
             ),

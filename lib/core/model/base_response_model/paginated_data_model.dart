@@ -15,10 +15,11 @@ class PaginatedDataWithExtra<T, E> {
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) fromJsonT, {
     E Function(Map<String, dynamic>)? fromJsonExtra,
+    String resultsKey = 'results',
   }) {
     return PaginatedDataWithExtra<T, E>(
       results:
-          (json['results'] as List<dynamic>?)
+          (json[resultsKey] as List<dynamic>?)
               ?.map((e) => fromJsonT(e as Map<String, dynamic>))
               .toList() ??
           [],

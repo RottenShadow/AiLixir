@@ -17,37 +17,28 @@ class MdViewBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<MdCubit, MdState>(
-      listenWhen: (prev, next) => prev.status != next.status,
+      listenWhen: (prev, next) => prev.submitStatus != next.submitStatus,
       listener: (context, state) {
-        if (state.status == MdStatus.completed) {
+        if (state.submitStatus == MdSubmitStatus.submitted) {
           AppToast.showSuccessToast(
             context: context,
-            message: 'Simulation completed successfully!',
+            message: 'MD job submitted. Check progress in history.',
           );
-        } else if (state.status == MdStatus.failure) {
+        } else if (state.submitStatus == MdSubmitStatus.failure) {
           AppToast.showErrorToast(
             context: context,
-            message: 'Simulation failed.',
+            message: state.errorMessage ?? 'Failed to submit MD simulation.',
           );
         }
       },
-      child: Column(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(child: _FormColumn()),
-                _BottomBar(),
-              ],
-            ),
-          ),
-        ],
-      ),
+      child: const _FormColumn(),
     );
   }
 }
 
 class _FormColumn extends StatelessWidget {
+  const _FormColumn();
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -57,18 +48,22 @@ class _FormColumn extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
+              // ── Header ────────────────────────────────────────────────
               Text('MD Lab', style: AppTextStyles.h1.copyWith(fontSize: 28.sp)),
               SizedBox(height: 4.h),
               Text(
-                'Set up high-performance molecular dynamics runs with AI-optimized force fields.',
+                'Submit a molecular dynamics simulation of your protein-ligand complex.',
                 style: AppTextStyles.bodysmall.copyWith(
                   color: AppColors.authTextSecondary,
                 ),
               ),
               SizedBox(height: 24.h),
 
-              // Sections
+              // ── Required badge ────────────────────────────────────────
+              _RequiredFilesNotice(),
+              SizedBox(height: 20.h),
+
+              // ── Sections ──────────────────────────────────────────────
               const MdSectionSystemSetup(),
               SizedBox(height: 24.h),
               const MdSectionForceField(),
@@ -81,9 +76,44 @@ class _FormColumn extends StatelessWidget {
             ],
           ),
         ),
-        // Sticky bottom bar
+        // Sticky bottom submit bar
         Positioned(bottom: 0, left: 0, right: 0, child: _StickyBottomBar()),
       ],
+    );
+  }
+}
+
+class _RequiredFilesNotice extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final config = context.watch<MdCubit>().state.config;
+    final hasProtein = config.proteinPdbName.isNotEmpty;
+    final hasLigand = config.ligandPdbName.isNotEmpty;
+    if (hasProtein && hasLigand) return const SizedBox.shrink();
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+      decoration: BoxDecoration(
+        color: AppColors.amber400.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: AppColors.amber400.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            color: AppColors.amber400,
+            size: 16.sp,
+          ),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Text(
+              'Protein and Ligand PDB files are required to start a simulation. Upload them in Section 1.',
+              style: AppTextStyles.caption.copyWith(color: AppColors.amber400),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -92,11 +122,11 @@ class _StickyBottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<MdCubit>().state;
-    final estimatedHours = state.config.estimatedHours;
-    final isRunning = state.status == MdStatus.running;
+    final estimatedHours = state.config.estimatedHours * 100;
+    final isSubmitting = state.submitStatus == MdSubmitStatus.submitting;
     final hasProtein = state.config.proteinPdbName.isNotEmpty;
     final hasLigand = state.config.ligandPdbName.isNotEmpty;
-    final canStart = hasProtein && hasLigand && !isRunning;
+    final canStart = hasProtein && hasLigand && !isSubmitting;
 
     return Container(
       height: 72.h,
@@ -107,6 +137,7 @@ class _StickyBottomBar extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Row(
         children: [
+          // Estimated GPU hours
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,22 +171,22 @@ class _StickyBottomBar extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          // Missing-file hint
+          // Missing-file inline hint
           if (!hasProtein || !hasLigand) ...[
             Row(
               children: [
                 Icon(
-                  Icons.info_outline,
+                  Icons.warning_amber_rounded,
                   color: AppColors.amber400,
                   size: 14.sp,
                 ),
                 SizedBox(width: 6.w),
                 Text(
                   !hasProtein && !hasLigand
-                      ? 'Protein & ligand files required'
+                      ? 'Protein & ligand PDB required'
                       : !hasProtein
-                      ? 'Protein file required'
-                      : 'Ligand file required',
+                      ? 'Protein PDB required'
+                      : 'Ligand PDB required',
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.amber400,
                   ),
@@ -164,17 +195,18 @@ class _StickyBottomBar extends StatelessWidget {
             ),
             SizedBox(width: 16.w),
           ],
-          _StartButton(canStart: canStart, isRunning: isRunning),
+          _SubmitButton(canStart: canStart, isSubmitting: isSubmitting),
         ],
       ),
     );
   }
 }
 
-class _StartButton extends StatelessWidget {
+class _SubmitButton extends StatelessWidget {
   final bool canStart;
-  final bool isRunning;
-  const _StartButton({required this.canStart, required this.isRunning});
+  final bool isSubmitting;
+
+  const _SubmitButton({required this.canStart, required this.isSubmitting});
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +219,7 @@ class _StartButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: canStart
               ? const LinearGradient(
-                  colors: [Color(0xFF6B3FE4), Color(0xFF8B5CF6)],
+                  colors: [AppColors.cyan400, AppColors.cyan400],
                 )
               : null,
           color: canStart ? null : AppColors.slate700,
@@ -196,7 +228,7 @@ class _StartButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (isRunning)
+            if (isSubmitting)
               SizedBox(
                 width: 14.w,
                 height: 14.h,
@@ -207,13 +239,13 @@ class _StartButton extends StatelessWidget {
               )
             else
               Icon(
-                Icons.play_arrow,
+                Icons.play_arrow_rounded,
                 color: canStart ? AppColors.white : AppColors.slate500,
                 size: 18.sp,
               ),
             SizedBox(width: 8.w),
             Text(
-              isRunning ? 'Running...' : 'Start MD Simulation',
+              isSubmitting ? 'Submitting...' : 'Start MD Simulation',
               style: AppTextStyles.labelmedium.copyWith(
                 color: canStart ? AppColors.white : AppColors.slate500,
               ),
@@ -222,13 +254,5 @@ class _StartButton extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-// Right panel placeholder (logs / results)
-class _BottomBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.shrink();
   }
 }

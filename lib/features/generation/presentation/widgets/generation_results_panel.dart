@@ -1,6 +1,9 @@
+import 'package:ailixir/core/entities/generation_files_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
+import 'package:ailixir/features/generation/presentation/widgets/bulk_export_dialog.dart';
+import 'package:ailixir/features/generation/presentation/widgets/ligand_export_dialog.dart';
 import 'package:ailixir/features/history/presentation/views/ligand_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,7 +11,9 @@ import 'package:go_router/go_router.dart';
 
 class GenerationResultsPanel extends StatelessWidget {
   final List<LigandEntity> ligands;
-  const GenerationResultsPanel({super.key, required this.ligands});
+  final GenerationFilesEntity? files;
+
+  const GenerationResultsPanel({super.key, required this.ligands, this.files});
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +26,7 @@ class GenerationResultsPanel extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.science_outlined,
-                  color: AppColors.cyan400,
-                  size: 20.sp,
-                ),
+                Icon(Icons.auto_awesome, color: AppColors.cyan400, size: 20.sp),
                 SizedBox(width: 8.w),
                 Text(
                   'Generated SMILES',
@@ -61,6 +62,34 @@ class GenerationResultsPanel extends StatelessWidget {
                 ),
               ],
             ),
+            if (files != null)
+              OutlinedButton.icon(
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (_) => BulkExportDialog(files: files!),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: AppColors.emerald600),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                icon: Icon(
+                  Icons.download_outlined,
+                  color: AppColors.emerald400,
+                  size: 14.sp,
+                ),
+                label: Text(
+                  'Download All',
+                  style: AppTextStyles.labelsmall.copyWith(
+                    color: AppColors.emerald400,
+                  ),
+                ),
+              ),
           ],
         ),
         SizedBox(height: 16.h),
@@ -160,9 +189,12 @@ class _GeneratedLigandCard extends StatelessWidget {
 
           // Download
           OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () => showDialog(
+              context: context,
+              builder: (_) => LigandExportDialog(smiles: ligand.smiles),
+            ),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.slate600),
+              side: BorderSide(color: AppColors.cyan600),
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.r),
@@ -170,13 +202,13 @@ class _GeneratedLigandCard extends StatelessWidget {
             ),
             icon: Icon(
               Icons.download_outlined,
-              color: AppColors.slate300,
+              color: AppColors.cyan400,
               size: 14.sp,
             ),
             label: Text(
-              'Download .mol',
+              'Download',
               style: AppTextStyles.labelsmall.copyWith(
-                color: AppColors.slate300,
+                color: AppColors.cyan400,
               ),
             ),
           ),

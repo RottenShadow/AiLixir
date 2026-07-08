@@ -17,7 +17,7 @@ class MdSectionSystemSetup extends StatelessWidget {
     return MdSectionCard(
       stepNumber: '1',
       title: 'System Setup',
-      accentColor: AppColors.violet500,
+      accentColor: AppColors.cyan400,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -30,7 +30,7 @@ class MdSectionSystemSetup extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const MdFieldLabel('Protein PDB File'),
+                    const MdFieldLabel('Protein PDB File', required: true),
                     _PdbFilePicker(
                       hint: 'Select protein.pdb file...',
                       fileName: config.proteinPdbName,
@@ -38,7 +38,7 @@ class MdSectionSystemSetup extends StatelessWidget {
                       onClear: cubit.clearProteinFile,
                     ),
                     SizedBox(height: 12.h),
-                    const MdFieldLabel('Ligand PDB File'),
+                    const MdFieldLabel('Ligand PDB File', required: true),
                     _PdbFilePicker(
                       hint: 'Select ligand.pdb file...',
                       fileName: config.ligandPdbName,
@@ -106,16 +106,16 @@ class MdSectionSystemSetup extends StatelessWidget {
                         vertical: 3.h,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.violet500.withValues(alpha: 0.15),
+                        color: AppColors.cyan400.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4.r),
                         border: Border.all(
-                          color: AppColors.violet500.withValues(alpha: 0.4),
+                          color: AppColors.cyan400.withValues(alpha: 0.4),
                         ),
                       ),
                       child: Text(
                         config.systemTotalCharge.toString(),
                         style: AppTextStyles.labelsmall.copyWith(
-                          color: AppColors.violet400,
+                          color: AppColors.cyan400,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -124,10 +124,10 @@ class MdSectionSystemSetup extends StatelessWidget {
                 ),
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: AppColors.violet500,
+                    activeTrackColor: AppColors.cyan400,
                     inactiveTrackColor: AppColors.slate700,
-                    thumbColor: AppColors.violet400,
-                    overlayColor: AppColors.violet500.withValues(alpha: 0.15),
+                    thumbColor: AppColors.cyan400,
+                    overlayColor: AppColors.cyan400.withValues(alpha: 0.15),
                     trackHeight: 3,
                     thumbShape: const RoundSliderThumbShape(
                       enabledThumbRadius: 6,
@@ -199,12 +199,12 @@ class _PdbFilePicker extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12.w),
         decoration: BoxDecoration(
           color: _hasFile
-              ? AppColors.violet500.withValues(alpha: 0.08)
+              ? AppColors.cyan400.withValues(alpha: 0.08)
               : AppColors.slate800,
           borderRadius: BorderRadius.circular(8.r),
           border: Border.all(
             color: _hasFile
-                ? AppColors.violet500.withValues(alpha: 0.5)
+                ? AppColors.cyan400.withValues(alpha: 0.5)
                 : AppColors.brandBorder,
           ),
         ),
@@ -215,7 +215,7 @@ class _PdbFilePicker extends StatelessWidget {
                   ? Icons.insert_drive_file_outlined
                   : Icons.upload_file_outlined,
               color: _hasFile
-                  ? AppColors.violet400
+                  ? AppColors.cyan400
                   : AppColors.authTextSecondary,
               size: 16.sp,
             ),
@@ -235,13 +235,13 @@ class _PdbFilePicker extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: AppColors.violet500.withValues(alpha: 0.15),
+                  color: AppColors.cyan400.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4.r),
                 ),
                 child: Text(
                   '.pdb',
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.violet400,
+                    color: AppColors.cyan400,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

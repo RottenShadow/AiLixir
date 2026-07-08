@@ -2,7 +2,8 @@ import 'package:ailixir/core/entities/docking_entity.dart';
 import 'package:ailixir/core/themes/app_colors.dart';
 import 'package:ailixir/core/themes/app_text_styles.dart';
 import 'package:ailixir/core/widgets/custom_empty_body.dart';
-import 'package:ailixir/features/history/presentation/cubits/see_all_cubit/see_all_cubit.dart';
+import 'package:ailixir/core/widgets/file_download_view.dart';
+import 'package:ailixir/features/history/presentation/cubits/docking_history_cubit/docking_history_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,7 +29,7 @@ class _DockingSeeAllViewState extends State<DockingSeeAllView> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      context.read<DockingSeeAllCubit>().loadNextPage();
+      context.read<DockingHistoryCubit>().loadMore();
     }
   }
 
@@ -61,9 +62,11 @@ class _DockingSeeAllViewState extends State<DockingSeeAllView> {
           ],
         ),
       ),
-      body: BlocBuilder<DockingSeeAllCubit, SeeAllState<DockingEntity>>(
+      body: BlocBuilder<DockingHistoryCubit, DockingHistoryState>(
         builder: (context, state) {
-          if (state.status == SeeAllStatus.loading) {
+          final cubit = context.read<DockingHistoryCubit>();
+
+          if (state is DockingHistoryLoading) {
             return Skeletonizer(
               enabled: true,
               child: _DockingList(
@@ -75,23 +78,44 @@ class _DockingSeeAllViewState extends State<DockingSeeAllView> {
             );
           }
 
-          if (state.items.isEmpty) {
-            return Center(
-              child: CustomEmptyBody(
-                icon: Icons.hub_outlined,
-                title: 'No Docking Results',
-                subTitle: 'No docking simulations yet.\nSubmit a docking job to see results here.',
-                actionLabel: 'Refresh',
-                onAction: () => context.read<DockingSeeAllCubit>().loadFirstPage(),
+          if (state is DockingHistoryError) {
+            return SizedBox.expand(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.error_outline,
+                  title: 'Error',
+                  subTitle: state.message,
+                  actionLabel: 'Retry',
+                  onAction: () => cubit.loadAll(),
+                ),
+              ),
+            );
+          }
+
+          final items = state is DockingHistoryLoaded
+              ? state.dockings
+              : (state as DockingHistoryLoadingMore).dockings;
+
+          if (items.isEmpty) {
+            return SizedBox.expand(
+              child: Center(
+                child: CustomEmptyBody(
+                  icon: Icons.hub_outlined,
+                  title: 'No Docking Results',
+                  subTitle:
+                      'No docking simulations yet.\nSubmit a docking job to see results here.',
+                  actionLabel: 'Refresh',
+                  onAction: () => cubit.loadAll(),
+                ),
               ),
             );
           }
 
           return _DockingList(
-            items: state.items,
+            items: items,
             scrollController: _scrollController,
-            isLoadingMore: state.status == SeeAllStatus.loadingMore,
-            hasMore: state.hasMore,
+            isLoadingMore: state is DockingHistoryLoadingMore,
+            hasMore: cubit.hasMore,
           );
         },
       ),
@@ -208,46 +232,50 @@ class _DockingRow extends StatelessWidget {
               ],
             ),
           ),
-          // Vina Score
-          _ScoreChip(label: 'Vina', value: docking.vinaScore.toString()),
+          // Score
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${docking.vinaScore.toStringAsFixed(3)} kcal/mol',
+                style: AppTextStyles.h5.copyWith(color: AppColors.cyan400),
+              ),
+              Text(
+                '${docking.scores.length} poses',
+                style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate500),
+              ),
+            ],
+          ),
           SizedBox(width: 12.w),
-          // Download
-          Container(
-            width: 34.w,
-            height: 34.w,
-            decoration: BoxDecoration(
-              color: AppColors.slate700,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Icon(
-              Icons.download_outlined,
-              color: AppColors.slate300,
-              size: 16.sp,
+          GestureDetector(
+            onTap: docking.downloadUrl != null
+                ? () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          FileDownloadView(url: docking.downloadUrl!),
+                    ),
+                  )
+                : null,
+            child: Container(
+              width: 34.w,
+              height: 34.w,
+              decoration: BoxDecoration(
+                color: docking.downloadUrl != null
+                    ? AppColors.slate700
+                    : AppColors.slate800,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Icon(
+                Icons.download_outlined,
+                color: docking.downloadUrl != null
+                    ? AppColors.slate300
+                    : AppColors.slate600,
+                size: 16.sp,
+              ),
             ),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _ScoreChip extends StatelessWidget {
-  final String label;
-  final String value;
-  const _ScoreChip({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          label,
-          style: AppTextStyles.bodyxs.copyWith(color: AppColors.slate400),
-        ),
-        SizedBox(height: 2.h),
-        Text(value, style: AppTextStyles.h5.copyWith(color: AppColors.cyan400)),
-      ],
     );
   }
 }

@@ -9,8 +9,8 @@ final class DrFullIdle extends DrFullState {
   const DrFullIdle({super.logs});
 }
 
-final class DrFullLoading extends DrFullState {
-  const DrFullLoading({super.logs});
+final class DrFullPolling extends DrFullState {
+  const DrFullPolling({super.logs});
 }
 
 final class DrFullSuccess extends DrFullState {

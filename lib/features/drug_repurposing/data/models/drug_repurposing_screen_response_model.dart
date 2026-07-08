@@ -22,16 +22,18 @@ class DrugRepurposingScreenResponseModel extends DrugRepurposingBaseModel {
   factory DrugRepurposingScreenResponseModel.fromJson(Map<String, dynamic> json) {
     final String diseaseName = (json['disease_name'] ?? json['disease'] ?? '') as String;
 
+    final topResults = (json['top_candidates'] as List?)?.map((e) {
+      final Map<String, dynamic> map = Map<String, dynamic>.from(e as Map);
+      map['disease_name'] = diseaseName;
+      return DrugRepurposingTopCandidateModel.fromJson(map);
+    }).toList() ?? const [];
+
     return DrugRepurposingScreenResponseModel(
       diseaseName: diseaseName,
       totalTargetsFound: (json['total_targets_found'] as num?)?.toInt() ?? 0,
       totalDrugsScreened: (json['total_drugs_screened'] as num?)?.toInt() ?? 0,
       totalPairsEvaluated: (json['total_pairs_evaluated'] as num?)?.toInt() ?? 0,
-      topCandidates: (json['top_candidates'] as List?)?.map((e) {
-        final Map<String, dynamic> map = Map<String, dynamic>.from(e as Map);
-        map['disease_name'] = diseaseName;
-        return DrugRepurposingTopCandidateModel.fromJson(map);
-      }).toList() ?? const [],
+      topCandidates: topResults,
       warnings: (json['warnings'] as List?)?.map((e) => e as String).toList() ?? const [],
     );
   }

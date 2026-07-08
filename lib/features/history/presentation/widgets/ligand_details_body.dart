@@ -184,7 +184,7 @@ class _CompoundIdentityCard extends StatelessWidget {
     final displaySmiles = ligand.canonicalSmiles ?? details.smiles;
     return _SectionCard(
       title: '1. Compound Identity',
-      icon: Icons.science_outlined,
+      icon: Icons.auto_awesome,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

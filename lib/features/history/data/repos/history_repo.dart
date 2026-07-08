@@ -1,5 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:ailixir/core/entities/docking_entity.dart';
+import 'package:ailixir/core/entities/docking_score_entity.dart';
+import 'package:ailixir/core/entities/generation_job_history_entity.dart';
 import 'package:ailixir/core/entities/ligand_entity.dart';
 import 'package:ailixir/core/entities/ligand_details_entity.dart';
 import 'package:ailixir/core/entities/md_entity.dart';
@@ -10,8 +12,12 @@ import 'package:ailixir/core/services/api/app_endpoints.dart';
 import 'package:ailixir/core/services/api/dio_service.dart';
 import 'package:ailixir/core/utils/app_feature_flag.dart';
 import 'package:ailixir/core/utils/helper_functions/safe_api_call.dart';
+import 'package:ailixir/core/entities/drug_repurposing_entity.dart';
 import 'package:ailixir/features/history/data/models/generation_history_entry_model.dart';
 import 'package:ailixir/features/history/data/models/docking_history_entry_model.dart';
+import 'package:ailixir/features/history/data/models/md_history_entry_model.dart';
+import 'package:ailixir/features/history/data/models/drug_repurposing_targets_entry_model.dart';
+import 'package:ailixir/features/history/data/models/drug_repurposing_screen_entry_model.dart';
 
 class HistoryRepo {
   final DioService dioService;
@@ -49,13 +55,19 @@ class HistoryRepo {
 
   static final _fakeDockingPool = List.generate(40, (i) {
     final t = _fakeDockingTargets[i % _fakeDockingTargets.length];
+    final baseScore = t.$3 - (i % 3) * 0.3;
     return DockingEntity(
       id: '${i + 1}',
       targetId: t.$1,
       targetName: t.$2,
       jobId: 'JOB-${1000 + i}-${44000 + i * 7}',
       createdAt: DateTime.now().subtract(Duration(days: i + 1)),
-      vinaScore: t.$3 - (i % 3) * 0.3,
+      vinaScore: baseScore,
+      scores: [
+        DockingScoreEntity(affinity: baseScore, inter: -8.8, intra: -0.35, torsions: 1.50, unbound: -0.35),
+        DockingScoreEntity(affinity: baseScore + 0.6, inter: -8.7, intra: -0.26, torsions: 1.45, unbound: -0.35),
+        DockingScoreEntity(affinity: baseScore + 1.2, inter: -7.9, intra: -0.61, torsions: 1.39, unbound: -0.35),
+      ],
     );
   });
 
@@ -80,7 +92,7 @@ class HistoryRepo {
     );
   });
 
-  Future<Either<Failure, PaginatedData<LigandEntity>>> getGenerationHistory({
+  Future<Either<Failure, PaginatedData<GenerationJobHistoryEntity>>> getGenerationHistory({
     int page = 1,
     int perPage = 20,
   }) async {
@@ -89,37 +101,33 @@ class HistoryRepo {
     }
     return safeApiCall(() async {
       final response = await dioService.get(
-        endpoint: AppEndpoints.aiJobHistory,
-        queryParameters: {
-          'page': page,
-          'per_page': perPage,
-        },
+        endpoint: AppEndpoints.aiGenerationHistory,
+        queryParameters: {'page': page, 'per_page': perPage},
       );
 
-      final json = response as Map<String, dynamic>;
-      final dataList = (json['data'] as List<dynamic>?)
-              ?.map((e) => GenerationHistoryEntryModel.fromJson(
-                    e as Map<String, dynamic>,
-                  ).toEntity())
+      final base = BaseResponseModel.fromJson(
+        response as Map<String, dynamic>,
+        (data) => data,
+      );
+
+      final innerData = base.data as Map<String, dynamic>;
+      final jobs =
+          (innerData['results'] as List<dynamic>?)
+              ?.map(
+                (e) => GenerationHistoryEntryModel.fromJson(
+                  e as Map<String, dynamic>,
+                ),
+              )
               .toList() ??
           [];
 
-      final meta = json['meta'] as Map<String, dynamic>? ?? {};
-      final rawPagination =
-          meta['pagination'] as Map<String, dynamic>? ?? {};
+      final dataList = jobs.map((job) => job.toEntity()).toList();
 
-      final currentPage = rawPagination['current_page'] as num? ?? 1;
-      final lastPage = rawPagination['last_page'] as num? ?? 1;
-      final total = rawPagination['total'] as num? ?? 0;
-      final pagination = PaginationModel(
-        currentPage: currentPage.toInt(),
-        totalPages: lastPage.toInt(),
-        totalResults: total.toInt(),
-        hasNextPage: currentPage.toInt() < lastPage.toInt(),
-        hasPrevPage: currentPage.toInt() > 1,
+      final pagination = PaginationModel.fromJson(
+        innerData['pagination'] ?? {},
       );
 
-      return PaginatedDataWithExtra<LigandEntity, dynamic>(
+      return PaginatedDataWithExtra<GenerationJobHistoryEntity, dynamic>(
         results: dataList,
         pagination: pagination,
       );
@@ -136,10 +144,7 @@ class HistoryRepo {
     return safeApiCall(() async {
       final response = await dioService.get(
         endpoint: AppEndpoints.dockingHistory,
-        queryParameters: {
-          'page': page,
-          'per_page': perPage,
-        },
+        queryParameters: {'page': page, 'per_page': perPage},
       );
 
       final base = BaseResponseModel.fromJson(
@@ -147,34 +152,9 @@ class HistoryRepo {
         (data) => data,
       );
 
-      final innerData = base.data as Map<String, dynamic>;
-
-      final items = (innerData['data'] as List<dynamic>?)
-              ?.map((e) => DockingHistoryEntryModel.fromJson(
-                    e as Map<String, dynamic>,
-                  ).toEntity())
-              .toList() ??
-          [];
-
-      final rawPagination =
-          innerData['pagination'] as Map<String, dynamic>? ?? {};
-
-      final currentPage = rawPagination['current_page'] as num? ?? 1;
-      final lastPage = rawPagination['last_page'] as num? ?? 1;
-      final total = rawPagination['total'] as num? ?? 0;
-      final hasMore = rawPagination['has_more'] as bool? ?? false;
-
-      final pagination = PaginationModel(
-        currentPage: currentPage.toInt(),
-        totalPages: lastPage.toInt(),
-        totalResults: total.toInt(),
-        hasNextPage: hasMore,
-        hasPrevPage: currentPage.toInt() > 1,
-      );
-
-      return PaginatedDataWithExtra<DockingEntity, dynamic>(
-        results: items,
-        pagination: pagination,
+      return PaginatedDataWithExtra<DockingEntity, dynamic>.fromJson(
+        base.data as Map<String, dynamic>,
+        (e) => DockingHistoryEntryModel.fromJson(e).toEntity(),
       );
     });
   }
@@ -199,35 +179,150 @@ class HistoryRepo {
     if (AppFeatureFlag.useFakeHistory) {
       return _fakeMdHistory(page, perPage);
     }
-    return Right(
-      PaginatedDataWithExtra<MdEntity, dynamic>(
-        results: [],
-        pagination: PaginationModel(
-          currentPage: 1,
-          totalPages: 1,
-          totalResults: 0,
-          hasNextPage: false,
-          hasPrevPage: false,
-        ),
-      ),
-    );
+    return safeApiCall(() async {
+      final response = await dioService.get(
+        endpoint: AppEndpoints.mdSimulationHistory,
+        queryParameters: {'page': page, 'per_page': perPage},
+      );
+
+      final base = BaseResponseModel.fromJson(
+        response as Map<String, dynamic>,
+        (data) => data,
+      );
+
+      return PaginatedDataWithExtra<MdEntity, dynamic>.fromJson(
+        base.data as Map<String, dynamic>,
+        (e) => MdHistoryEntryModel.fromJson(e).toEntity(),
+        resultsKey: 'results',
+      );
+    });
   }
 
-  Future<Either<Failure, PaginatedData<LigandEntity>>> _fakeGenerationHistory(
+  Future<Either<Failure, PaginatedData<DrugRepurposingEntity>>>
+  getDrugRepurposingTargetsHistory({int page = 1, int perPage = 15}) async {
+    if (AppFeatureFlag.useFakeHistory) {
+      return _fakeDrugRepurposingHistory(
+        page,
+        perPage,
+        DrugRepurposingType.targets,
+      );
+    }
+    return safeApiCall(() async {
+      final response = await dioService.get(
+        endpoint: AppEndpoints.drugRepurposingTargetsHistory,
+        queryParameters: {'page': page, 'per_page': perPage},
+      );
+
+      final base = BaseResponseModel.fromJson(
+        response as Map<String, dynamic>,
+        (data) => data,
+      );
+
+      return PaginatedDataWithExtra<DrugRepurposingEntity, dynamic>.fromJson(
+        base.data as Map<String, dynamic>,
+        (e) => DrugRepurposingTargetsEntryModel.fromJson(e).toEntity(),
+        resultsKey: 'data',
+      );
+    });
+  }
+
+  Future<Either<Failure, PaginatedData<DrugRepurposingEntity>>>
+  getDrugRepurposingScreenHistory({int page = 1, int perPage = 15}) async {
+    if (AppFeatureFlag.useFakeHistory) {
+      return _fakeDrugRepurposingHistory(
+        page,
+        perPage,
+        DrugRepurposingType.screen,
+      );
+    }
+    return safeApiCall(() async {
+      final response = await dioService.get(
+        endpoint: AppEndpoints.drugRepurposingScreenHistory,
+        queryParameters: {'page': page, 'per_page': perPage},
+      );
+
+      final base = BaseResponseModel.fromJson(
+        response as Map<String, dynamic>,
+        (data) => data,
+      );
+
+      return PaginatedDataWithExtra<DrugRepurposingEntity, dynamic>.fromJson(
+        base.data as Map<String, dynamic>,
+        (e) => DrugRepurposingScreenEntryModel.fromJson(e).toEntity(),
+        resultsKey: 'data',
+      );
+    });
+  }
+
+  static final List<GenerationJobHistoryEntity> _fakeJobPool = () {
+    final now = DateTime.now();
+    return [
+      // Running job
+      GenerationJobHistoryEntity(
+        id: '1',
+        jobId: 'gen_20260627_193816_c496f7',
+        status: 'running',
+        preset: 'egfr_generator',
+        numMolecules: 100,
+        returnTopK: 10,
+        dockingMode: 'top_k',
+        dockTopK: 10,
+        stage: 'sampling',
+        createdAt: now.subtract(const Duration(minutes: 5)),
+        updatedAt: now.subtract(const Duration(minutes: 5)),
+      ),
+      // Failed job
+      GenerationJobHistoryEntity(
+        id: '2',
+        jobId: 'gen_20260627_183000_a123b4',
+        status: 'failed',
+        preset: 'drd2_generator',
+        numMolecules: 50,
+        returnTopK: 5,
+        dockingMode: 'off',
+        dockTopK: 0,
+        summary: 'Generation failed: sampling error at step 42',
+        createdAt: now.subtract(const Duration(hours: 2)),
+        updatedAt: now.subtract(const Duration(hours: 1, minutes: 50)),
+      ),
+      // Completed jobs with ligands
+      ...List.generate(10, (i) {
+        final ligands = _fakeLigandPool
+            .skip((i * 5) % _fakeLigandPool.length)
+            .take(5)
+            .toList();
+        return GenerationJobHistoryEntity(
+          id: '${i + 3}',
+          jobId: 'gen_2026062${7 - i}_120000_abc$i',
+          status: 'completed',
+          preset: ['egfr_generator', 'drd2_generator', 'jak2_generator'][i % 3],
+          numMolecules: 100,
+          returnTopK: 10,
+          dockingMode: i % 2 == 0 ? 'top_k' : 'off',
+          dockTopK: i % 2 == 0 ? 10 : 0,
+          createdAt: now.subtract(Duration(days: i + 1)),
+          updatedAt: now.subtract(Duration(days: i + 1)),
+          ligands: ligands,
+        );
+      }),
+    ];
+  }();
+
+  Future<Either<Failure, PaginatedData<GenerationJobHistoryEntity>>> _fakeGenerationHistory(
     int page,
     int perPage,
   ) async {
     await Future.delayed(const Duration(milliseconds: 800));
     final start = (page - 1) * perPage;
-    final items = _fakeLigandPool.skip(start).take(perPage).toList();
-    final totalPages = (_fakeLigandPool.length / perPage).ceil();
+    final items = _fakeJobPool.skip(start).take(perPage).toList();
+    final totalPages = (_fakeJobPool.length / perPage).ceil();
     return Right(
-      PaginatedDataWithExtra<LigandEntity, dynamic>(
+      PaginatedDataWithExtra<GenerationJobHistoryEntity, dynamic>(
         results: items,
         pagination: PaginationModel(
           currentPage: page,
           totalPages: totalPages,
-          totalResults: _fakeLigandPool.length,
+          totalResults: _fakeJobPool.length,
           hasNextPage: page < totalPages,
           hasPrevPage: page > 1,
         ),
@@ -272,6 +367,49 @@ class HistoryRepo {
           currentPage: page,
           totalPages: totalPages,
           totalResults: _fakeMdPool.length,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        ),
+      ),
+    );
+  }
+
+  static final _fakeDrugRepurposingPool = List.generate(
+    20,
+    (i) => DrugRepurposingEntity(
+      id: '${i + 1}',
+      type: i.isEven ? DrugRepurposingType.targets : DrugRepurposingType.screen,
+      diseaseName: [
+        'Type 2 Diabetes',
+        'Alzheimer Disease',
+        'Breast Cancer',
+        'Parkinson Disease',
+        'Rheumatoid Arthritis',
+      ][i % 5],
+      status: i % 5 == 0 ? 'failed' : 'completed',
+      createdAt: DateTime.now().subtract(Duration(days: i + 1)),
+      resultCount: (i + 1) * 10,
+    ),
+  );
+
+  Future<Either<Failure, PaginatedData<DrugRepurposingEntity>>>
+  _fakeDrugRepurposingHistory(
+    int page,
+    int perPage,
+    DrugRepurposingType type,
+  ) async {
+    await Future.delayed(const Duration(milliseconds: 800));
+    final pool = _fakeDrugRepurposingPool.where((e) => e.type == type).toList();
+    final start = (page - 1) * perPage;
+    final items = pool.skip(start).take(perPage).toList();
+    final totalPages = (pool.length / perPage).ceil();
+    return Right(
+      PaginatedDataWithExtra<DrugRepurposingEntity, dynamic>(
+        results: items,
+        pagination: PaginationModel(
+          currentPage: page,
+          totalPages: totalPages,
+          totalResults: pool.length,
           hasNextPage: page < totalPages,
           hasPrevPage: page > 1,
         ),
