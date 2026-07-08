@@ -27,7 +27,7 @@ class DrModeToggle extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           _ModeButton(
-            label: 'Quick Mode',
+            label: 'Quick Mode (Targets)',
             icon: Icons.flash_on_rounded,
             isSelected: selectedMode == DrugRepurposingMode.quick,
             accentColor: AppColors.cyan400,
@@ -35,7 +35,7 @@ class DrModeToggle extends StatelessWidget {
           ),
           SizedBox(width: 4.w),
           _ModeButton(
-            label: 'Full Screening',
+            label: 'Full Screening (Drugs)',
             icon: Icons.science_rounded,
             isSelected: selectedMode == DrugRepurposingMode.full,
             accentColor: AppColors.cyan400,
