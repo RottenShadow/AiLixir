@@ -211,7 +211,7 @@ class _MdTable extends StatelessWidget {
                         height: 20.w,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.purple400,
+                          color: AppColors.cyan400,
                         ),
                       ),
                     ),
@@ -328,7 +328,7 @@ class _MdRow extends StatelessWidget {
                   url: resultsUrl,
                   title: 'MD Results — ${md.simulationTask}',
                   enabled: hasResults,
-                  color: AppColors.violet400,
+                  color: AppColors.cyan400,
                 ),
                 SizedBox(width: 8.w),
                 _DownloadBtn(

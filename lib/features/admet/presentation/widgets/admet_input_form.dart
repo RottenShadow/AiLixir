@@ -242,7 +242,7 @@ class _ManualInput extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
-              borderSide: BorderSide(color: const Color(0xFF00FFC8).withOpacity(0.5)),
+              borderSide: BorderSide(color: AppColors.cyan400.withOpacity(0.5)),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12.r),
@@ -280,21 +280,21 @@ class _FileUpload extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: 40.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF00FFC8).withOpacity(0.05),
+              color: AppColors.cyan400.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: const Color(0xFF00FFC8).withOpacity(0.3),
+                color: AppColors.cyan400.withOpacity(0.3),
                 width: 2,
               ),
             ),
             child: Column(
               children: [
-                Icon(Icons.upload_file, size: 32.sp, color: const Color(0xFF00FFC8)),
+                Icon(Icons.upload_file, size: 32.sp, color: AppColors.cyan400),
                 SizedBox(height: 12.h),
                 Text(
                   'Click to upload CSV or TXT file',
                   style: AppTextStyles.labelsmall.copyWith(
-                    color: const Color(0xFF00FFC8),
+                    color: AppColors.cyan400,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -314,12 +314,12 @@ class _FileUpload extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(12.r),
             decoration: BoxDecoration(
-              color: const Color(0xFF00FFC8).withOpacity(0.08),
+              color: AppColors.cyan400.withOpacity(0.08),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
               children: [
-                Icon(Icons.check_circle, size: 16.sp, color: const Color(0xFF00FFC8)),
+                Icon(Icons.check_circle, size: 16.sp, color: AppColors.cyan400),
                 SizedBox(width: 8.w),
                 Expanded(
                   child: Text(
@@ -359,7 +359,7 @@ class _PredictButton extends StatelessWidget {
           gradient: isLoading
               ? null
               : const LinearGradient(
-                  colors: [Color(0xFF00FFC8), Color(0xFF00D9A3)],
+                  colors: [AppColors.cyan400, AppColors.cyan400],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -369,7 +369,7 @@ class _PredictButton extends StatelessWidget {
               ? null
               : [
                   BoxShadow(
-                    color: const Color(0xFF00FFC8).withOpacity(0.3),
+                    color: AppColors.cyan400.withOpacity(0.3),
                     blurRadius: 14,
                     offset: const Offset(0, 4),
                   ),

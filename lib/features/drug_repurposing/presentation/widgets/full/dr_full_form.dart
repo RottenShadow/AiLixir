@@ -72,7 +72,7 @@ class _DrFullFormState extends State<DrFullForm> {
                       label: 'Known Drugs',
                       hint: 'e.g. Metformin, Insulin...',
                       tags: _knownDrugs,
-                      accentColor: const Color(0xFF8B5CF6),
+                      accentColor: AppColors.cyan400,
                       onTagsChanged: (tags) =>
                           setState(() => _knownDrugs = tags),
                     ),
@@ -172,7 +172,7 @@ class _DiseaseInput extends StatelessWidget {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.r),
               borderSide: const BorderSide(
-                color: Color(0xFF8B5CF6),
+                color: AppColors.cyan400,
                 width: 1.5,
               ),
             ),
@@ -221,10 +221,10 @@ class _MinScoreInput extends StatelessWidget {
         Expanded(
           child: SliderTheme(
             data: SliderThemeData(
-              activeTrackColor: const Color(0xFF22D3EE),
+              activeTrackColor: AppColors.cyan400,
               inactiveTrackColor: AppColors.slate700,
-              thumbColor: const Color(0xFF22D3EE),
-              overlayColor: const Color(0xFF22D3EE).withOpacity(0.15),
+              thumbColor: AppColors.cyan400,
+              overlayColor: AppColors.cyan400.withOpacity(0.15),
               trackHeight: 4,
               thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7.r),
             ),
@@ -242,15 +242,15 @@ class _MinScoreInput extends StatelessWidget {
           width: 48.w,
           padding: EdgeInsets.symmetric(vertical: 4.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF22D3EE).withOpacity(0.12),
+            color: AppColors.cyan400.withOpacity(0.12),
             borderRadius: BorderRadius.circular(8.r),
-            border: Border.all(color: const Color(0xFF22D3EE).withOpacity(0.4)),
+            border: Border.all(color: AppColors.cyan400.withOpacity(0.4)),
           ),
           child: Center(
             child: Text(
               value.toStringAsFixed(1),
               style: AppTextStyles.labelmedium.copyWith(
-                color: const Color(0xFF22D3EE),
+                color: AppColors.cyan400,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -289,10 +289,10 @@ class _TopNTargetsInput extends StatelessWidget {
         Expanded(
           child: SliderTheme(
             data: SliderThemeData(
-              activeTrackColor: const Color(0xFF10B981),
+              activeTrackColor: AppColors.cyan400,
               inactiveTrackColor: AppColors.slate700,
-              thumbColor: const Color(0xFF10B981),
-              overlayColor: const Color(0xFF10B981).withOpacity(0.15),
+              thumbColor: AppColors.cyan400,
+              overlayColor: AppColors.cyan400.withOpacity(0.15),
               trackHeight: 4,
               thumbShape: RoundSliderThumbShape(enabledThumbRadius: 7.r),
             ),
@@ -310,15 +310,15 @@ class _TopNTargetsInput extends StatelessWidget {
           width: 48.w,
           padding: EdgeInsets.symmetric(vertical: 4.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF10B981).withOpacity(0.12),
+            color: AppColors.cyan400.withOpacity(0.12),
             borderRadius: BorderRadius.circular(8.r),
-            border: Border.all(color: const Color(0xFF10B981).withOpacity(0.4)),
+            border: Border.all(color: AppColors.cyan400.withOpacity(0.4)),
           ),
           child: Center(
             child: Text(
               '$value',
               style: AppTextStyles.labelmedium.copyWith(
-                color: const Color(0xFF10B981),
+                color: AppColors.cyan400,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -349,7 +349,7 @@ class _RunScreeningButton extends StatelessWidget {
           gradient: isLoading
               ? null
               : const LinearGradient(
-                  colors: [Color(0xFF6B3FE4), Color(0xFF8B5CF6)],
+                  colors: [AppColors.cyan400, AppColors.cyan400],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -359,7 +359,7 @@ class _RunScreeningButton extends StatelessWidget {
               ? null
               : [
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.3),
+                    color: AppColors.cyan400.withOpacity(0.3),
                     blurRadius: 14,
                     offset: const Offset(0, 4),
                   ),

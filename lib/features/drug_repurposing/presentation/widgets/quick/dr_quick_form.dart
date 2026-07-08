@@ -118,7 +118,7 @@ class _DiseaseInput extends StatelessWidget {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10.r),
               borderSide: const BorderSide(
-                color: Color(0xFF22D3EE),
+                color: AppColors.cyan400,
                 width: 1.5,
               ),
             ),
@@ -159,7 +159,7 @@ class _GetTargetsButton extends StatelessWidget {
           gradient: isLoading
               ? null
               : const LinearGradient(
-                  colors: [Color(0xFF0891B2), Color(0xFF22D3EE)],
+                  colors: [Color(0xFF0891B2), AppColors.cyan400],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                 ),
@@ -169,7 +169,7 @@ class _GetTargetsButton extends StatelessWidget {
               ? null
               : [
                   BoxShadow(
-                    color: const Color(0xFF22D3EE).withOpacity(0.25),
+                    color: AppColors.cyan400.withOpacity(0.25),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),

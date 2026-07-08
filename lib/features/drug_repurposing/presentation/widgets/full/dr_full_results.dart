@@ -82,7 +82,7 @@ class _CandidatesList extends StatelessWidget {
           title: 'Top Candidates',
           subtitle:
               '${response.topCandidates.length} drug-target pairs ranked by binding score',
-          accentColor: const Color(0xFF8B5CF6),
+          accentColor: AppColors.cyan400,
           trailing: IconButton(
             onPressed: () => _copyToClipboard(context),
             icon: Icon(
@@ -121,7 +121,7 @@ class _StatsRow extends StatelessWidget {
             label: 'Targets Found',
             value: '${response.totalTargetsFound}',
             icon: Icons.radar,
-            color: const Color(0xFF22D3EE),
+            color: AppColors.cyan400,
           ),
         ),
         SizedBox(width: 10.w),
@@ -130,7 +130,7 @@ class _StatsRow extends StatelessWidget {
             label: 'Drugs Screened',
             value: '${response.totalDrugsScreened}',
             icon: Icons.medication,
-            color: const Color(0xFF8B5CF6),
+            color: AppColors.cyan400,
           ),
         ),
         SizedBox(width: 10.w),
@@ -139,7 +139,7 @@ class _StatsRow extends StatelessWidget {
             label: 'Pairs Evaluated',
             value: '${response.totalPairsEvaluated}',
             icon: Icons.compare_arrows,
-            color: const Color(0xFF10B981),
+            color: AppColors.cyan400,
           ),
         ),
       ],
@@ -452,13 +452,13 @@ class _CardBody extends StatelessWidget {
             _DetailChip(
               icon: Icons.link,
               label: 'UniProt: ${candidate.uniprotId}',
-              color: const Color(0xFF22D3EE),
+            color: AppColors.cyan400,
             ),
           if (candidate.smiles.isNotEmpty)
             _DetailChip(
               icon: Icons.science,
               label: 'SMILES: ${candidate.smiles}',
-              color: const Color(0xFF8B5CF6),
+              color: AppColors.cyan400,
             ),
         ],
       ),
