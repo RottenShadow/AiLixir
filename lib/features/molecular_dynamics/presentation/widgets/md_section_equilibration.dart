@@ -17,11 +17,11 @@ class MdSectionEquilibration extends StatelessWidget {
     return MdSectionCard(
       stepNumber: '4',
       title: 'MD Equilibration Phase',
-      accentColor: AppColors.violet500,
+      accentColor: AppColors.cyan400,
       trailing: MdBadge(
         text: config.equilibrationEnabled ? 'SET ENABLED' : 'DISABLED',
         color: config.equilibrationEnabled
-            ? AppColors.violet500
+            ? AppColors.cyan400
             : AppColors.slate500,
       ),
       child: Column(
@@ -86,7 +86,7 @@ class MdSectionEquilibration extends StatelessWidget {
                         final d = double.tryParse(v);
                         if (d != null) cubit.setEquilTemperature(d);
                       },
-                      accentColor: AppColors.violet500,
+                      accentColor: AppColors.cyan400,
                     ),
                   ],
                 ),
@@ -103,7 +103,7 @@ class MdSectionEquilibration extends StatelessWidget {
                         final d = double.tryParse(v);
                         if (d != null) cubit.setEquilPressure(d);
                       },
-                      accentColor: AppColors.violet500,
+                      accentColor: AppColors.cyan400,
                     ),
                   ],
                 ),
@@ -144,7 +144,7 @@ class MdSectionEquilibration extends StatelessWidget {
                         final d = double.tryParse(v);
                         if (d != null) cubit.setEquilWriteTraj(d);
                       },
-                      accentColor: AppColors.violet500,
+                      accentColor: AppColors.cyan400,
                     ),
                   ],
                 ),
@@ -161,7 +161,7 @@ class MdSectionEquilibration extends StatelessWidget {
                         final d = double.tryParse(v);
                         if (d != null) cubit.setEquilWriteLog(d);
                       },
-                      accentColor: AppColors.violet500,
+                      accentColor: AppColors.cyan400,
                     ),
                   ],
                 ),

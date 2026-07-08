@@ -22,7 +22,7 @@ class MdSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = accentColor ?? AppColors.violet500;
+    final accent = accentColor ?? AppColors.cyan400;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.slate900,
@@ -134,7 +134,7 @@ class MdTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
-          borderSide: BorderSide(color: AppColors.violet500),
+          borderSide: BorderSide(color: AppColors.cyan400),
         ),
       ),
     );
@@ -240,8 +240,8 @@ class MdToggleRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.violet500,
-            activeTrackColor: AppColors.violet500.withOpacity(0.3),
+            activeColor: AppColors.cyan400,
+            activeTrackColor: AppColors.cyan400.withOpacity(0.3),
             inactiveThumbColor: AppColors.slate500,
             inactiveTrackColor: AppColors.slate700,
           ),
@@ -289,16 +289,16 @@ class MdSliderRow extends StatelessWidget {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
               decoration: BoxDecoration(
-                color: AppColors.violet500.withOpacity(0.15),
+                color: AppColors.cyan400.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(4.r),
                 border: Border.all(
-                  color: AppColors.violet500.withOpacity(0.4),
+                  color: AppColors.cyan400.withOpacity(0.4),
                 ),
               ),
               child: Text(
                 '${value % 1 == 0 ? value.toInt() : value.toStringAsFixed(1)} $unit',
                 style: AppTextStyles.caption.copyWith(
-                  color: AppColors.violet400,
+                  color: AppColors.cyan400,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -307,10 +307,10 @@ class MdSliderRow extends StatelessWidget {
         ),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: AppColors.violet500,
+            activeTrackColor: AppColors.cyan400,
             inactiveTrackColor: AppColors.slate700,
-            thumbColor: AppColors.violet400,
-            overlayColor: AppColors.violet500.withOpacity(0.15),
+            thumbColor: AppColors.cyan400,
+            overlayColor: AppColors.cyan400.withOpacity(0.15),
             trackHeight: 3,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
           ),
@@ -368,7 +368,7 @@ class MdCheckRow extends StatelessWidget {
           child: Checkbox(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.violet500,
+            activeColor: AppColors.cyan400,
             checkColor: AppColors.white,
             side: BorderSide(color: AppColors.slate500),
             shape: RoundedRectangleBorder(

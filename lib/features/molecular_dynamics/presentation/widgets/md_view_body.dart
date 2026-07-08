@@ -219,7 +219,7 @@ class _SubmitButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: canStart
               ? const LinearGradient(
-                  colors: [Color(0xFF6B3FE4), Color(0xFF8B5CF6)],
+                  colors: [AppColors.cyan400, AppColors.cyan400],
                 )
               : null,
           color: canStart ? null : AppColors.slate700,
