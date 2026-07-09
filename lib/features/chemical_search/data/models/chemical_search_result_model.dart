@@ -37,6 +37,7 @@ class ChemicalSearchResultModel {
       similarityScore: similarity,
       rank: rank,
       explanation: explanation,
+      imageUrl: imageUrl,
     );
   }
 }

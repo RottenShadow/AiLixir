@@ -157,9 +157,7 @@ class AuthRepoImpl {
     return const Right("Login successful");
   }
 
-  Future<Either<Failure, String>> _fakeRegister({
-    required String email,
-  }) async {
+  Future<Either<Failure, String>> _fakeRegister({required String email}) async {
     await Future.delayed(const Duration(milliseconds: 33));
     return Right(email);
   }
@@ -198,7 +196,7 @@ class AuthRepoImpl {
 
   AuthTokenUserResponse _fakeSession({required String email}) {
     return AuthTokenUserResponse(
-      token: 'fake-jwt-token',
+      token: 'test-jwt-token',
       user: UserModel(
         id: 1,
         name: 'Test User',

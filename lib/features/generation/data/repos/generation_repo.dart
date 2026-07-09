@@ -130,7 +130,7 @@ class GenerationRepo {
     await Future.delayed(const Duration(milliseconds: 500));
     return Right(
       GenerationJobEntity(
-        jobId: 'fake-job-${DateTime.now().millisecondsSinceEpoch}',
+        jobId: 'job-${DateTime.now().millisecondsSinceEpoch}',
         status: 'submitted',
         numMolecules: 10,
         createdAt: DateTime.now(),
