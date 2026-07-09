@@ -42,7 +42,7 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
   }
 
   void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate() || _selectedProtein == null) return;
     final request = GenerationRequestEntity(
       targetProtein: _selectedProtein!,
       numMolecules: int.parse(_numMoleculesCtrl.text.trim()),
@@ -73,7 +73,9 @@ class _GenerationViewBodyState extends State<GenerationViewBody> {
             onPressed: () => Navigator.of(ctx).pop(false),
             child: Text(
               'No',
-              style: AppTextStyles.labelsmall.copyWith(color: AppColors.slate400),
+              style: AppTextStyles.labelsmall.copyWith(
+                color: AppColors.slate400,
+              ),
             ),
           ),
           TextButton(
