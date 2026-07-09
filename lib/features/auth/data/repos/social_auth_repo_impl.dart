@@ -81,25 +81,22 @@ class SocialAuthRepoImpl {
 
   Future<Either<Failure, String>> _fakeSignInWithGoogle() async {
     await Future.delayed(const Duration(milliseconds: 33));
-    final res = BaseResponseModel.fromJson(
-      {
-        'success': true,
-        'message': 'Login successful',
-        'data': {
-          'token': 'fake-jwt-token',
-          'user': {
-            'id': 1,
-            'name': 'Test User',
-            'email': 'test@example.com',
-            'role': 'normal',
-            'avatar': '',
-            'updated_at': '',
-            'is_verified': true,
-          },
+    final res = BaseResponseModel.fromJson({
+      'success': true,
+      'message': 'Login successful',
+      'data': {
+        'token': 'fake-token',
+        'user': {
+          'id': 1,
+          'name': 'Ailixir User',
+          'email': 'test@example.com',
+          'role': 'normal',
+          'avatar': '',
+          'updated_at': '',
+          'is_verified': true,
         },
       },
-      (req) => AuthTokenUserResponse.fromJson(req),
-    );
+    }, (req) => AuthTokenUserResponse.fromJson(req));
     await localAuthDataSource.saveAllUserData(authTokenUserResponse: res.data!);
     return Right(res.message);
   }
