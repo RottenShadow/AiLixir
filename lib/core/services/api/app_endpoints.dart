@@ -1,7 +1,7 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      'https://rottenshadow-ailixir-api.hf.space/api/';
+      'https://ailixir-ai-team-ailixir-api.hf.space/api/';
 
   // ── Auth Endpoints ──────────────────────────────────────
   static const String userAuthBaseUrl = 'user';

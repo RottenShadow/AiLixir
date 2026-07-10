@@ -2,17 +2,17 @@ abstract class AppFeatureFlag {
   // if true, use fake data instead of API.
   // if false, use API.
 
-  static const bool useFakeAuth = true;
-  static const bool useFakeProfile = true;
-  static const bool useFakeNews = true;
-  static const bool useFakeGeneration = true;
-  static const bool useFakeDocking = true;
-  static const bool useFakeMdSimulation = true;
-  static const bool useFakeHistory = true;
-  static const bool useFakeAdmet = true;
-  static const bool useFakeChemicalSearch = true;
-  static const bool useFakeDrugRepurposing = true;
-  static const bool useFakeChatbot = true;
-  static const bool useFakeAwards = true;
-  static const bool useFakeScientists = true;
+  static const bool useFakeAuth = false;
+  static const bool useFakeProfile = false;
+  static const bool useFakeNews = false;
+  static const bool useFakeGeneration = false;
+  static const bool useFakeDocking = false;
+  static const bool useFakeMdSimulation = false;
+  static const bool useFakeHistory = false;
+  static const bool useFakeAdmet = false;
+  static const bool useFakeChemicalSearch = false;
+  static const bool useFakeDrugRepurposing = false;
+  static const bool useFakeChatbot = false;
+  static const bool useFakeAwards = false;
+  static const bool useFakeScientists = false;
 }
