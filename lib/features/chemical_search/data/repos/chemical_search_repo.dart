@@ -47,21 +47,22 @@ class ChemicalSearchRepo {
   ) async {
     await Future.delayed(const Duration(milliseconds: 900));
     final results = <ChemicalSearchResultEntity>[
+      // ChemicalSearchResultEntity(
+      //   smiles: querySmiles,
+      //   similarityScore: 1.0,
+      //   rank: 1,
+      //   explanation: fullRag
+      //       ? 'Query and Match: Identical compound.\n'
+      //             'Similarity Score: 1.000\n\n'
+      //             'Explanation: The structure is an exact match.'
+      //       : null,
+      //   imageUrl:
+      //       'https://rottenshadow-ailixir-chemical-rag.hf.space/static/images/3194272462107947604.png',
+      // ),
       ChemicalSearchResultEntity(
-        smiles: querySmiles,
-        similarityScore: 1.0,
-        rank: 1,
-        explanation: fullRag
-            ? 'Query and Match: Identical compound.\n'
-                  'Similarity Score: 1.000\n\n'
-                  'Explanation: The structure is an exact match.'
-            : null,
-      ),
-      ChemicalSearchResultEntity(
-        smiles:
-            'C1=CC(=CC=C1C(CC(C(F)(F)F)(C(F)(F)F)O)O)C(CC(C(F)(F)F)(C(F)(F)F)O)O',
+        smiles: 'C1=CC=CC=C1',
         similarityScore: 0.9951,
-        rank: 2,
+        rank: 1,
         explanation: fullRag
             ? 'Query: Contains C=O ketone group | Match: C-OH alcohol group\n'
                   'Similarity Score: 0.995\n\n'
@@ -69,12 +70,15 @@ class ChemicalSearchRepo {
                   'group (C=O) in the query to a secondary alcohol group (C-OH). '
                   'The rest of the molecular framework remains identical.'
             : null,
+        imageUrl:
+            'http://rottenshadow-ailixir-chemical-rag.hf.space/static/images/3194272462107947604.png',
       ),
       ChemicalSearchResultEntity(
-        smiles:
-            'C1=CC(=CC=C1C(CC(C(F)(F)F)(C(F)(F)F)O)O)C(=O)CC(C(F)(F)F)(C(F)(F)F)O',
+        smiles: 'C1=CC(=CC=C1Cl)Cl',
         similarityScore: 0.9823,
-        rank: 3,
+        rank: 2,
+        imageUrl:
+            'http://rottenshadow-ailixir-chemical-rag.hf.space/static/images/730985987817279194.png',
         explanation: fullRag
             ? 'Query: C1=CC...C(=O)... | Match: C1=CC...C(=O)...\n'
                   'Similarity Score: 0.982\n\n'
@@ -84,26 +88,17 @@ class ChemicalSearchRepo {
             : null,
       ),
       ChemicalSearchResultEntity(
-        smiles: 'C1=CC(=CC=C1C(CC(C(F)(F)F)(C(F)(F)F)O)O)C(=O)CC(C(F)(F)F)O',
+        smiles: 'C1=CN=CC=N1',
         similarityScore: 0.8947,
-        rank: 4,
+        rank: 3,
+        imageUrl:
+            'https://rottenshadow-ailixir-chemical-rag.hf.space/static/images/666667328157542416.png',
         explanation: fullRag
             ? 'Query: Two HFIP groups | Match: One HFIP group\n'
                   'Similarity Score: 0.895\n\n'
                   'Explanation: This compound retains the core aromatic structure '
                   'and one hexafluoroisopropanol (HFIP) group but is missing the '
                   'second HFIP group, resulting in moderate similarity.'
-            : null,
-      ),
-      ChemicalSearchResultEntity(
-        smiles: 'c1ccccc1',
-        similarityScore: 0.3210,
-        rank: 5,
-        explanation: fullRag
-            ? 'Query: Complex fluorinated compound | Match: Benzene\n'
-                  'Similarity Score: 0.321\n\n'
-                  'Explanation: Only the aromatic core is shared. All functional '
-                  'group extensions are absent in the match.'
             : null,
       ),
     ];

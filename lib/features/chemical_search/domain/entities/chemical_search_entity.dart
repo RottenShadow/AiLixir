@@ -3,11 +3,13 @@ class ChemicalSearchResultEntity {
   final double similarityScore;
   final int rank;
   final String? explanation;
+  final String imageUrl;
 
   const ChemicalSearchResultEntity({
     required this.smiles,
     required this.similarityScore,
     required this.rank,
+    this.imageUrl = '',
     this.explanation,
   });
 
@@ -23,9 +25,9 @@ class ChemicalSearchResultEntity {
     );
   }
 
-  String get imageUrl =>
-      'https://cactus.nci.nih.gov/chemical/structure/'
-      '${Uri.encodeComponent(smiles)}/image';
+  // String get imageUrl =>
+  //     'https://cactus.nci.nih.gov/chemical/structure/'
+  //     '${Uri.encodeComponent(smiles)}/image';
 
   String get displayName => 'Compound_${smiles.hashCode.abs()}';
 

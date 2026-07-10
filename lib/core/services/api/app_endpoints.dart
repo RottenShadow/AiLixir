@@ -1,7 +1,7 @@
 abstract class AppEndpoints {
   // Base URLs
   static const String baseUrl =
-      'https://rottenshadow-ailixir-api.hf.space/api/';
+      'https://ailixir-ai-team-ailixir-api.hf.space/api/';
 
   // ── Auth Endpoints ──────────────────────────────────────
   static const String userAuthBaseUrl = 'user';
@@ -41,8 +41,6 @@ abstract class AppEndpoints {
   static String generationCancel(String jobId) =>
       'ai/generation/jobs/$jobId/cancel';
   static const String ligandsExport = 'ai/ligands/export';
-  static String aiFiles(String jobId, String filename) =>
-      'ai/files/$jobId/$filename';
 
   // ── Docking Endpoints ─────────────────────────────────
   static const String dockingSubmit = 'docking/submit';
