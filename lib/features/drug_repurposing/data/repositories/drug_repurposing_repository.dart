@@ -68,7 +68,9 @@ class DrugRepurposingRepository {
       return _fakeSubmitScreenJob(request);
     }
     return safeApiCall(() async {
-      final requestModel = DrugRepurposingScreenRequestModel.fromEntity(request);
+      final requestModel = DrugRepurposingScreenRequestModel.fromEntity(
+        request,
+      );
       final response = await dio.post(
         endpoint: AppEndpoints.drugRepurposingScreen,
         data: requestModel.toJson(),
@@ -111,9 +113,8 @@ class DrugRepurposingRepository {
     );
   }
 
-  Future<Either<Failure, DrugRepurposingTargetJobEntity>> _fakeGetTargetsJobStatus(
-    int jobId,
-  ) async {
+  Future<Either<Failure, DrugRepurposingTargetJobEntity>>
+  _fakeGetTargetsJobStatus(int jobId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return Right(
       DrugRepurposingTargetJobEntity(
@@ -167,9 +168,8 @@ class DrugRepurposingRepository {
     );
   }
 
-  Future<Either<Failure, DrugRepurposingScreenJobEntity>> _fakeGetScreenJobStatus(
-    int jobId,
-  ) async {
+  Future<Either<Failure, DrugRepurposingScreenJobEntity>>
+  _fakeGetScreenJobStatus(int jobId) async {
     await Future.delayed(const Duration(milliseconds: 300));
     return Right(
       DrugRepurposingScreenJobEntity(
@@ -195,9 +195,9 @@ class DrugRepurposingRepository {
               smiles: 'COc1cc2c(cc1OC)C(=O)C3=C(C2=O)C4=C(C=C(C=C4)F)CC3',
               targetSymbol: 'APP',
               uniprotId: 'P05067',
-              bindingScore: -9.8,
+              bindingScore: 9.8,
               rank: 1,
-              status: 'approved',
+              status: 'Approved',
             ),
             DrugRepurposingTopCandidateEntity(
               diseaseName: 'Alzheimer',
@@ -205,9 +205,9 @@ class DrugRepurposingRepository {
               smiles: 'CC1(C)CC2CC1C(C)(C)C2N',
               targetSymbol: 'PSEN1',
               uniprotId: 'P49768',
-              bindingScore: -8.5,
+              bindingScore: 8.5,
               rank: 2,
-              status: 'approved',
+              status: 'Approved',
             ),
             DrugRepurposingTopCandidateEntity(
               diseaseName: 'Alzheimer',
@@ -215,9 +215,9 @@ class DrugRepurposingRepository {
               smiles: 'CCN(C)C(=O)OC1=C(C)C=CC=C1C',
               targetSymbol: 'BACE1',
               uniprotId: 'P56817',
-              bindingScore: -7.9,
+              bindingScore: 7.9,
               rank: 3,
-              status: 'approved',
+              status: 'Approved',
             ),
           ],
         ),

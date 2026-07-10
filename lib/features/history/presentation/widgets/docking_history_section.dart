@@ -13,6 +13,29 @@ class DockingHistorySection extends StatelessWidget {
   final List<DockingEntity> dockings;
   const DockingHistorySection({super.key, required this.dockings});
 
+  List<Widget> _buildDockingGrid() {
+    final count = dockings.length > 9 ? 9 : dockings.length;
+    final rows = (count + 2) ~/ 3;
+    return List.generate(rows, (row) {
+      final start = row * 3;
+      return Padding(
+        padding: EdgeInsets.only(top: row > 0 ? 10.h : 0),
+        child: Row(
+          children: List.generate(3, (col) {
+            final index = start + col;
+            if (index >= count) return Expanded(child: SizedBox.shrink());
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: col > 0 ? 10.w : 0),
+                child: _DockingCard(docking: dockings[index]),
+              ),
+            );
+          }),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -64,20 +87,7 @@ class DockingHistorySection extends StatelessWidget {
             ),
           )
         else
-          Row(
-            children: dockings
-                .map(
-                  (d) => Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        right: d == dockings.last ? 0 : 10.w,
-                      ),
-                      child: _DockingCard(docking: d),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
+          ..._buildDockingGrid(),
       ],
     );
   }
