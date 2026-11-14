@@ -1,6 +1,15 @@
 # AILIXIR
 
-AI-powered drug discovery platform built with Flutter — molecular docking, generation, ADMET prediction, chemical similarity search, drug repurposing, and MD simulation setup, all in one desktop application.
+
+AILIXIR is an AI-assisted drug discovery platform built with Flutter, integrating molecular generation, reinforcement learning, molecular docking, DeepPurpose, ADMET prediction, chemical similarity search, molecular dynamics workflows, and a tool-enabled Chemistry AI Agent.
+
+The application connects to a Laravel backend and specialized Python AI microservices.
+
+
+**Backend & AI Services:** [AILIXIR Backend](https://github.com/Yasmeen-code/AILIXIR_BackEnd)
+
+**Download Application:** [AILIXIR Releases](https://github.com/RottenShadow/AiLixir/releases)
+
 
 ## Features
 
@@ -17,6 +26,7 @@ AI-powered drug discovery platform built with Flutter — molecular docking, gen
 | Feature | Description |
 |---|---|
 | **AI Molecule Generation** | Generate novel drug-like molecules with configurable parameters. View molecular properties (MW, LogP, TPSA, HBD, HBA, QED, SA Score, predicted pAff). Export ligands as PDBQT/SDF/PDB. Download results as CSV/JSON. |
+| **Chemistry AI Agent** | Tool-enabled chemistry assistant for SMILES analysis, molecular property calculations, drug-likeness evaluation, compound comparison, docking-result interpretation, and independent AutoDock Vina docking functionality. |
 | **Molecular Docking** | Submit docking jobs (AutoDock Vina style) with protein + ligand (SMILES or file), configure binding site, exhaustiveness, and number of poses. View results with Vina scores and visualize docked poses in MolStar. |
 | **ADMET Prediction** | Predict Absorption, Distribution, Metabolism, Excretion, and Toxicity for compounds. Input SMILES strings or upload CSV/TXT files. View results in sortable tables with individual metric cards. |
 | **Chemical Similarity Search** | Tanimoto similarity search against a database of 1M+ compounds. Two modes: Retrieval-Only (fast) and Full RAG (with LLM-generated explanations using Llama-3.1-8B). Search by SMILES with configurable top-K results. |
@@ -27,7 +37,7 @@ AI-powered drug discovery platform built with Flutter — molecular docking, gen
 
 | Feature | Description |
 |---|---|
-| **Chatbot** | AI-powered chemistry assistant with thread-based conversation. Analyze SMILES, compare molecules, answer chemistry questions. |
+
 | **History** | View past operations: generation jobs, docking results, MD simulations, and ligand details with properties and scores. |
 | **Awards** | Browse scientific awards (Nobel Prize, Lasker Award, etc.) and their recipients. |
 | **Scientists** | Browse famous scientists, their biographies, awards, field, and nationality. |
@@ -57,8 +67,8 @@ AI-powered drug discovery platform built with Flutter — molecular docking, gen
 ### 1. Clone the Repository
 
 ```bash
-git clone <repo-url>
-cd ailixir
+git clone https://github.com/RottenShadow/AiLixir.git
+cd AiLixir
 ```
 
 ### 2. Configure Environment Variables
@@ -115,9 +125,12 @@ The app is designed for **Windows** first. Support for other platforms (macOS, L
 flutter build windows        # Windows
 ```
 
+
 ## Feature Flags
 
-All features currently use mock/fake data. To connect to the real backend, set the corresponding flag to `false` in `lib/core/utils/app_feature_flag.dart`:
+AILIXIR is configured to use the real backend APIs by default.
+
+Mock data modes are retained for development and testing. All fake-data feature flags are currently disabled (`false`) in `lib/core/utils/app_feature_flag.dart`.
 
 - `useFakeGeneration`, `useFakeDocking`, `useFakeHistory`, `useFakeAdmet`, `useFakeChemicalSearch`, `useFakeDrugRepurposing`, `useFakeChatbot`, `useFakeAwards`, `useFakeScientists`, `useFakeNews`, `useFakeProfile`
 
