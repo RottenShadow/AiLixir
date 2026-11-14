@@ -37,7 +37,6 @@ The application connects to a Laravel backend and specialized Python AI microser
 
 | Feature | Description |
 |---|---|
-
 | **History** | View past operations: generation jobs, docking results, MD simulations, and ligand details with properties and scores. |
 | **Awards** | Browse scientific awards (Nobel Prize, Lasker Award, etc.) and their recipients. |
 | **Scientists** | Browse famous scientists, their biographies, awards, field, and nationality. |
